@@ -1,5 +1,11 @@
-# storyblok-cli
-A simple CLI for scaffolding Storyblok projects and fieldtypes.
+<p align="center">
+  <h1 align="center">storyblok-cli</h1>
+  <p align="center">A simple CLI for scaffolding <a href="https://storyblok.com" target="_blank">Storyblok</a> projects and fieldtypes.</p>
+</p>
+
+<a href="https://badge.fury.io/js/storyblok-cli">
+  <img src="https://badge.fury.io/js/storyblok-cli.svg" alt="npm version" height="20">
+</a>
 
 ## Installation
 ```
@@ -33,6 +39,8 @@ This allows developers to directly get started with a new projects by simple ans
 ## Fieldtypes Development Environment
 - Fieldtype [https://github.com/storyblok/storyblok-fieldtype.git]
 
+<br>
+<br>
 <p align="center">
 <img src="https://a.storyblok.com/f/39898/1c9c224705/storyblok_black.svg" alt="Storyblok Logo">
 </p>
