@@ -45,7 +45,7 @@ var questions = [
     name: 'theme',
     message: 'We got some Themes prepared for you:',
     choices: [
-      'Creater Theme (Blueprint) [https://github.com/storyblok/creator-theme]',
+      'Creator Theme (Blueprint) [https://github.com/storyblok/creator-theme]',
       'City Theme [https://github.com/storyblok/city-theme]',
       'Nexo Theme [https://github.com/storyblok/nexo-theme]'
     ],
@@ -97,7 +97,7 @@ inquirer.prompt(questions).then(function (answers) {
     })
     .on('end', function () {
       console.log()
-      console.log(chalk.cyan('  Your storyblok project is now ready for you:'))
+      console.log(chalk.cyan('  Your storyblok project is ready for you:'))
       console.log()
       console.log(chalk.green('  ' + process.cwd() + '/' + answers.name))
       console.log()
