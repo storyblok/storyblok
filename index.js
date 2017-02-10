@@ -19,12 +19,12 @@ var questions = [
   {
     type: 'input',
     name: 'name',
-    message: 'How should we call your new project?',
+    message: 'How should your Project be named?',
     validate: function (value) {
       if (value.length > 0) {
         return true
       }
-      return 'Please enter a valid folder name for your project'
+      return 'Please enter a valid name for your project:'
     },
     filter: function (val) {
       return val.replace(/\s+/g, '-').toLowerCase()
@@ -33,7 +33,7 @@ var questions = [
   {
     type: 'list',
     name: 'type',
-    message: 'What do you wish to start with?',
+    message: 'Select the type of your project:',
     choices: [
       'Theme (Storyrenderer/Hosted)',
       'Boilerplate (Selfhosted)',
@@ -83,13 +83,14 @@ inquirer.prompt(questions).then(function (answers) {
     .on('error', function (err) {
       if (err.code == 'ENOTEMPTY') {
         console.log()
-        console.log(chalk.red('  Oh Snap! Seems that you already have a project with the name: ' + answers.name))
+        console.log(chalk.red('  Oh Snap! It seems that you already have a project with the name: ' + answers.name))
         console.log()
       } else {
         console.log()
         console.log(chalk.red('  We never had this kind of issue - Sorry for that!'))
-        console.log(chalk.red('  Could you send us the error below on stackoverflow question'))
-        console.log(chalk.red('  with the storyblok tag? - would be great! :)'))
+        console.log(chalk.red('  Could you send us the error below as a stackoverflow question?'))
+        console.log(chalk.red('  That would be great! :)'))
+        console.log(chalk.red('  Don\'t forget to mark it with the tag `storyblok` so will can find it.'))
         console.log()
         console.error(err)
         exit(0);
