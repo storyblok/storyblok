@@ -1,12 +1,5 @@
-<p align="center">
-<img src="https://a.storyblok.com/f/39898/1c9c224705/storyblok_black.svg" alt="Storyblok Logo">
-</p>
-
-<p align="center">
-  <h1 align="center">storyblok-cli</h1>
-  <p align="center">A simple CLI for scaffolding <a href="https://www.storyblok.com" target="_blank">Storyblok</a> projects and fieldtypes.</p>
-</p>
-<br>
+# storyblok-cli
+A simple CLI for scaffolding Storyblok projects and fieldtypes.
 
 ## Installation
 ```
@@ -19,10 +12,14 @@ $ storyblok
 ```
 <sub>No - really - it's that easy.</sub>
 
-## How will it look like
-<p align="center">
+## What it does
+This allows developers to directly get started with a new projects by simple answering 3 questions:
+1. How should we call your new project?
+2. Type Selection (Theme/Boilerplate/Fieldtype)
+3. Theme/Boilerplate Selection (skipped for Fieldtypes)
+
+## How will it looks like
 <img src="https://a.storyblok.com/f/39898/d26d369183/storyblok-cli.gif" alt="How to use the storyblok cli">
-</p>
 
 ## Themes
 - Creater Theme (Blueprint) [https://github.com/storyblok/creator-theme]
@@ -36,3 +33,6 @@ $ storyblok
 ## Fieldtypes Development Environment
 - Fieldtype [https://github.com/storyblok/storyblok-fieldtype.git]
 
+<p align="center">
+<img src="https://a.storyblok.com/f/39898/1c9c224705/storyblok_black.svg" alt="Storyblok Logo">
+</p>
