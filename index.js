@@ -99,7 +99,7 @@ inquirer.prompt(questions).then(function (answers) {
       console.log()
       console.log(chalk.cyan('  Your storyblok project is now ready for you:'))
       console.log()
-      console.log(chalk.green('  ' + path.dirname(process.mainModule.filename) + '/' + answers.name))
+      console.log(chalk.green('  ' + process.cwd() + '/' + answers.name))
       console.log()
       console.log(chalk.cyan('  Now it\'s your turn. Have a look at the README.md and enjoy!'))
       console.log()
