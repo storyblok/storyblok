@@ -6,7 +6,7 @@
 
 ## Installation
 ```
-$ npm i storyblok -g
+$ npm i storyblok-cli -g
 ```
 
 ## Usage
