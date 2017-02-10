@@ -1,4 +1,8 @@
 <p align="center">
+<img src="https://a.storyblok.com/f/39898/1c9c224705/storyblok_black.svg" alt="Storyblok Logo">
+</p>
+
+<p align="center">
   <h1 align="center">storyblok-cli</h1>
   <p align="center">A simple CLI for scaffolding <a href="https://www.storyblok.com" target="_blank">Storyblok</a> projects and fieldtypes.</p>
 </p>
@@ -17,7 +21,7 @@ $ storyblok
 
 ## How will it look like
 <p align="center">
-<img src="https://a.storyblok.com/f/39898/0db290765a/storyblok-cli.gif" alt="How to use the storyblok cli">
+<img src="https://a.storyblok.com/f/39898/d26d369183/storyblok-cli.gif" alt="How to use the storyblok cli">
 </p>
 
 ## Themes
