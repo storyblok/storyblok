@@ -18,7 +18,7 @@ This allows developers to directly get started with a new projects by simple ans
 2. Type Selection (Theme/Boilerplate/Fieldtype)
 3. Theme/Boilerplate Selection (skipped for Fieldtypes)
 
-## How will it looks like
+## How will it look like
 <img src="https://a.storyblok.com/f/39898/d26d369183/storyblok-cli.gif" alt="How to use the storyblok cli">
 
 ## Themes
