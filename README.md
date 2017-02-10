@@ -19,16 +19,16 @@ $ storyblok
 <sub>No - really - it's that easy.</sub>
 
 ## What it does
-The CLI allows developers to directly get started with a new storyblok project by simple answering 3 questions:    
-1. How should your Project be named?    
-2. Select the type of your project (Theme/Boilerplate/Fieldtype)    
-3. Select your Theme/Boilerplate (skipped for Fieldtypes)    
+The CLI allows developers to directly get started with a new storyblok project by simple answering 3 questions:
+1. How should your Project be named?
+2. Select the type of your project (Theme/Boilerplate/Fieldtype)
+3. Select your Theme/Boilerplate (skipped for Fieldtypes)
 
 ## How will it look like
 <img src="https://a.storyblok.com/f/39898/d26d369183/storyblok-cli.gif" alt="How to use the storyblok cli">
 
 ## Themes
-- Creater Theme (Blueprint) [https://github.com/storyblok/creator-theme]
+- Creator Theme (Blueprint) [https://github.com/storyblok/creator-theme]
 - City Theme [https://github.com/storyblok/city-theme]
 - Nexo Theme [https://github.com/storyblok/nexo-theme]
 
