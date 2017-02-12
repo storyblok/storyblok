@@ -1,12 +1,12 @@
 {
   "name": "storyblok-cli",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A simple CLI for scaffolding storyblok projects and fieldtypes",
   "main": "index.js",
   "bin": {
     "storyblok": "./index.js"
   },
-  "author": "Dominik Angerer <dominikangerer1@gmail.com>",
+  "author": "Dominik Angerer <dominikangerer1@gmail.com>, Alexander Feiglstorfer",
   "license": "MIT",
   "dependencies": {
     "chalk": "^1.1.3",
