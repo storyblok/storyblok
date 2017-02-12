@@ -7,6 +7,7 @@ var fs = require('fs')
 var path = require('path')
 var inquirer = require('inquirer')
 var ghdownload = require('github-download')
+var replace = require('./replace')
 
 clear()
 console.log(chalk.cyan(figlet.textSync('Storyblok')))
@@ -64,6 +65,33 @@ var questions = [
     when: function (answers) {
       return answers.type == 'Boilerplate (Selfhosted)'
     }
+  },
+  {
+    type: 'input',
+    name: 'spaceId',
+    message: 'What is your space ID? Tip: You can find the space ID in the dashboard on https://app.storyblok.com:',
+    when: function (answers) {
+      return answers.type == 'Theme (Storyrenderer/Hosted)'
+    }
+  },
+  {
+    type: 'input',
+    name: 'spaceDomain',
+    message: 'What is your domain? Example: city.me.storyblok.com:',
+    when: function (answers) {
+      return answers.type == 'Theme (Storyrenderer/Hosted)'
+    },
+    filter: function (val) {
+      return val.replace(/https:/g, '').replace(/\//g, '')
+    }
+  },
+  {
+    type: 'input',
+    name: 'themeToken',
+    message: 'What is your theme token?',
+    when: function (answers) {
+      return answers.type == 'Theme (Storyrenderer/Hosted)'
+    }
   }
 ]
 
@@ -107,5 +135,25 @@ inquirer.prompt(questions).then(function (answers) {
       console.log(chalk.white('  If you need more help, just try asking a question on stackoverflow'))
       console.log(chalk.white('  with the [storyblok] tag - we will be there ;)'))
       console.log()
+
+      if (answers.type == 'Theme (Storyrenderer/Hosted)') {
+        fs.renameSync(outputDir + '/_token.js', outputDir + '/token.js')
+
+        if (answers.themeToken) {
+          replace(outputDir + '/token.js', {'INSERT_TOKEN': answers.themeToken})
+        }
+
+        var spaceConfig = {}
+
+        if (answers.spaceId) {
+          spaceConfig['INSERT_SPACE_ID'] = answers.spaceId
+        }
+
+        if (answers.spaceDomain) {
+          spaceConfig['INSERT_YOUR_DOMAIN'] = answers.spaceDomain
+        }
+
+        replace(outputDir + '/config.js', spaceConfig)
+      }
     })
 })
