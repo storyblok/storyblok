@@ -2,6 +2,11 @@
   "name": "storyblok-cli",
   "version": "1.0.8",
   "description": "A simple CLI for scaffolding storyblok projects and fieldtypes",
+  "keywords": [
+    "storyblok",
+    "cli",
+    "node"
+  ],
   "main": "index.js",
   "bin": {
     "storyblok": "./index.js"
