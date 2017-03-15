@@ -48,10 +48,19 @@ var questions = [
     choices: [
       'Creator Theme (Blueprint) [https://github.com/storyblok/creator-theme]',
       'City Theme [https://github.com/storyblok/city-theme]',
-      'Nexo Theme [https://github.com/storyblok/nexo-theme]'
+      'Nexo Theme [https://github.com/storyblok/nexo-theme]',
+      'Custom Theme [We will ask you about your Github URL]'
     ],
     when: function (answers) {
       return answers.type == 'Theme (Storyrenderer/Hosted)'
+    }
+  },
+  {
+    type: 'input',
+    name: 'custom_theme_url',
+    message: 'What is your github theme URL? Tip: should look like: "https://github.com/storyblok/city-theme"',
+    when: function (answers) {
+      return answers.theme == 'Custom Theme [We will ask you about your Github URL]'
     }
   },
   {
@@ -60,10 +69,19 @@ var questions = [
     message: 'We got some Boilerplates prepared for you:',
     choices: [
       'Silex Boilerplate [https://github.com/storyblok/silex-boilerplate]',
-      'NodeJs Boilerplate [https://github.com/storyblok/nodejs-boilerplate]'
+      'NodeJs Boilerplate [https://github.com/storyblok/nodejs-boilerplate]',
+      'Custom Boilerplate [We will ask you about your Github URL]'
     ],
     when: function (answers) {
       return answers.type == 'Boilerplate (Selfhosted)'
+    }
+  },
+  {
+    type: 'input',
+    name: 'custom_theme_url',
+    message: 'What is your github boilerplate URL? Tip: should look like: "https://github.com/storyblok/silex-boilerplate"',
+    when: function (answers) {
+      return answers.theme == 'Custom Boilerplate [We will ask you about your Github URL]'
     }
   },
   {
@@ -99,7 +117,11 @@ inquirer.prompt(questions).then(function (answers) {
   var regex = /\[(.*?)\]/;
   var gitRepo = '';
   if (answers.type == 'Theme (Storyrenderer/Hosted)' || answers.type == 'Boilerplate (Selfhosted)') {
-    gitRepo = regex.exec(answers.theme)[1] + '.git'
+    if (answers.custom_theme_url) { 
+      gitRepo = answers.custom_theme_url + '.git'
+    } else {
+      gitRepo = regex.exec(answers.theme)[1] + '.git'
+    }
   }
   if (answers.type == 'Fieldtype') {
     gitRepo = 'https://github.com/storyblok/storyblok-fieldtype.git'
