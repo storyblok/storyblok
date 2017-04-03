@@ -3,9 +3,8 @@
   <p align="center">A simple CLI for scaffolding <a href="https://storyblok.com" target="_blank">Storyblok</a> projects and fieldtypes.</p>
 </p>
 
-<a href="https://badge.fury.io/js/storyblok-cli">
-  <img src="https://badge.fury.io/js/storyblok-cli.svg" alt="npm version" height="20">
-</a>
+[![npm](https://img.shields.io/npm/v/storyblok-cli.svg)](https://www.npmjs.com/package/storyblok-cli)
+[![npm](https://img.shields.io/npm/dt/storyblok-cli.svg)](ttps://img.shields.io/npm/dt/storyblok-cli.svg)
 
 ## Installation
 ```
