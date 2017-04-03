@@ -68,8 +68,10 @@ var questions = [
     name: 'theme',
     message: 'We got some Boilerplates prepared for you:',
     choices: [
-      'Silex Boilerplate [https://github.com/storyblok/silex-boilerplate]',
-      'NodeJs Boilerplate [https://github.com/storyblok/nodejs-boilerplate]',
+      'PHP - Silex Boilerplate [https://github.com/storyblok/silex-boilerplate]',
+      'JavaScript - NodeJs Boilerplate [https://github.com/storyblok/nodejs-boilerplate]',
+      'Ruby - Sinatra Boilerplate [https://github.com/storyblok/sinatra-boilerplate]',
+      'Python - Django Boilerplate [https://github.com/storyblok/django-boilerplate]',
       'Custom Boilerplate [We will ask you about your Github URL]'
     ],
     when: function (answers) {

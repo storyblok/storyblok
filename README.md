@@ -33,8 +33,10 @@ The CLI allows developers to directly get started with a new storyblok project b
 - Nexo Theme [https://github.com/storyblok/nexo-theme]
 
 ## Boilerplates
-- Silex Boilerplate [https://github.com/storyblok/silex-boilerplate]
-- NodeJs Boilerplate [https://github.com/storyblok/nodejs-boilerplate]
+- PHP - Silex Boilerplate [https://github.com/storyblok/silex-boilerplate]
+- JavaScript - NodeJs Boilerplate [https://github.com/storyblok/nodejs-boilerplate]
+- Ruby - Sinatra Boilerplate [https://github.com/storyblok/sinatra-boilerplate]
+- Python - Django Boilerplate [https://github.com/storyblok/django-boilerplate]
 
 ## Fieldtypes Development Environment
 - Fieldtype [https://github.com/storyblok/storyblok-fieldtype.git]
