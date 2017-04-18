@@ -32,7 +32,7 @@ A space is a content repository. Think of it as a place to keep all the content 
 A folder is a collection of stories. You can create a simple structure for your content using the folders. Best examples are multilanguage/multicountry or news...<br><br>
 - **[What is a Story?](https://www.storyblok.com/docs/terminology/story)**   
 A story is a collection of instances of components filled with information by the content creator. You will be able to fetch a story directly by its slug...<br><br>
-- **[What is a Component?](https://www.storyblok.com/docs/terminology/component) **   
+- **[What is a Component?](https://www.storyblok.com/docs/terminology/component)**    
 A component is a standalone entity that is meaningful on its own. While components/bloks can be nested in each other, semantically they remain...<br><br>
 - **[What is a Field Type?](https://www.storyblok.com/docs/terminology/field-type)**   
 One field type is the smallest part in the storyblok terminology...<br><br>
