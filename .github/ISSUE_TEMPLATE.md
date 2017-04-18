@@ -1,11 +1,11 @@
-**The issue occurres while working with: ** (check one with "x")   
-[ ] *app.storyblok.com*   
-[ ] *api.storyblok.com*   
-[ ] *Other* <!-- => If you've got an issue with on of our boilerplates or themes - please create an issue in the specific repo -->
+**The issue occurs while working with:** (check one with "x")   
+- [ ] *app.storyblok.com*   
+- [ ] *api.storyblok.com*   
+- [ ] *Other* <!-- => If you've got an issue with on of our boilerplates or themes - please create an issue in the specific repo -->
 
 **I'm submitting a ...**  (check one with "x")  
-[ ] bug report  
-[ ] feature request  
+- [ ] bug report  
+- [ ] feature request  
 
 **Current behavior:**
 <!-- Describe how the bug manifests. -->
