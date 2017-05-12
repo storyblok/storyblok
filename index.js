@@ -19,12 +19,8 @@ console.log()
 
 var subcommand = 'default'
 
-if (typeof process.argv[1] != 'undefined') {
-  if (process.argv[1].indexOf('/index.js') > -1 && typeof process.argv[2] != 'undefined') {
-    subcommand = process.argv[2]
-  } else {
-    subcommand = process.argv[1]
-  }
+if (typeof process.argv[1] != 'undefined' && typeof process.argv[2] != 'undefined') {
+  subcommand = process.argv[2]
 }
 
 var questions = []
