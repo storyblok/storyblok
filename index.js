@@ -275,7 +275,8 @@ inquirer.prompt(questions).then(function (answers) {
         api.get('api_keys', (keys_res) => {
           if (keys_res.status == 200) {
             answers.spaceId = space_res.body.space.id
-            answers.spaceDomain = space_res.body.space.domain
+            answers.spaceDomain = space_res.body.space.domain.replace('https://', '')
+                                                             .replace('/', '')
 
             let tokens = keys_res.body.api_keys.filter((token) => {
               return token.access == 'theme'

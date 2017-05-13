@@ -1,6 +1,6 @@
 {
   "name": "storyblok-cli",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "A simple CLI for scaffolding storyblok projects and fieldtypes",
   "keywords": [
     "storyblok",
