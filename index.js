@@ -275,13 +275,13 @@ inquirer.prompt(questions).then(function (answers) {
         api.get('api_keys', (keys_res) => {
           if (keys_res.status == 200) {
             answers.spaceId = space_res.body.space.id
-            answers.spaceDomain = space_res.body.space.id
+            answers.spaceDomain = space_res.body.space.domain
 
             let tokens = keys_res.body.api_keys.filter((token) => {
               return token.access == 'theme'
             })
 
-            answers.themeToken = tokens[0]
+            answers.themeToken = tokens[0].token
             lastStep()
           } else {
             console.log(keys_res.body)
