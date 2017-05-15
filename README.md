@@ -11,6 +11,13 @@
 
 <br>
 
+
+## Check out our CLI
+
+```
+npm i storyblok-cli -g
+```
+
 ## Frequently asked questions
 - **[What is Storyblok?](https://www.storyblok.com/)**        
 Storyblok is a headless cms - we removed the front-end component (the head) and, what remains is our [content delivery RESTful API](https://www.storyblok.com/docs/Delivery-Api/introduction). - Most of the Content Management Systems force you into a specific way on how to develop a website. With Storyblok you can just plug in the service to your template. There is no need to take care of CMS installation or database setup.<br><br>
