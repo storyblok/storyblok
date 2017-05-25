@@ -1,26 +1,59 @@
 <p align="center">
-<img src="https://a.storyblok.com/f/39898/1c9c224705/storyblok_black.svg" alt="Storyblok">
+  <h1 align="center">Storyblok CLI</h1>
+  <p align="center">A simple CLI for scaffolding <a href="https://storyblok.com" target="_blank">Storyblok</a> projects and fieldtypes.</p>
 </p>
 
-<p align="center">
-  <p align="center">You found an issue with one of our products?<br>Tell us about it - <a href="https://github.com/storyblok/storyblok/issues/new">open an issue</a> or look if it was <a href="https://github.com/storyblok/storyblok/issues/">already reported</a>.</p>
-</p>
+You found an issue?<br>Tell us about it - <a href="https://github.com/storyblok/storyblok/issues/new">open an issue</a> or look if it was <a href="https://github.com/storyblok/storyblok/issues/">already reported</a>.
 
+[![npm](https://img.shields.io/npm/v/storyblok-cli.svg)](https://www.npmjs.com/package/storyblok-cli)
+[![npm](https://img.shields.io/npm/dt/storyblok-cli.svg)](ttps://img.shields.io/npm/dt/storyblok-cli.svg)
 [![GitHub issues](https://img.shields.io/github/issues/storyblok/storyblok.svg?style=flat-square&v=1)](https://github.com/storyblok/storyblok/issues?q=is%3Aopen+is%3Aissue)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/storyblok/storyblok.svg?style=flat-square&v=1)](https://github.com/storyblok/storyblok/issues?q=is%3Aissue+is%3Aclosed)
 
-<br>
-
-
-## Check out our CLI
-
+## Installation
 ```
-npm i storyblok-cli -g
+$ npm i storyblok -g
 ```
+
+## Usage for the quickstart
+```
+$ storyblok quickstart
+```
+
+## Usage for fieldtypes and other boilerplates
+```
+$ storyblok
+```
+
+## What it does
+We recommend to execute the quickstart command first to learn how easy it is to use Storyblok.
+
+The CLI allows developers to get started with a new Storyblok project by answering 3 questions:
+1. How should your Project be named?
+2. Select the type of your project (Theme/Boilerplate/Fieldtype)
+3. Select your Theme/Boilerplate (skipped for Fieldtypes)
+
+## How will it look like
+<img src="https://a.storyblok.com/f/39898/d26d369183/storyblok-cli.gif" alt="How to use the Storyblok cli">
+
+## Themes
+- Creator Theme (Blueprint) [https://github.com/storyblok/creator-theme]
+- City Theme [https://github.com/storyblok/city-theme]
+- Nexo Theme [https://github.com/storyblok/nexo-theme]
+
+## Boilerplates
+- PHP - Silex Boilerplate [https://github.com/storyblok/silex-boilerplate]
+- JavaScript - NodeJs Boilerplate [https://github.com/storyblok/nodejs-boilerplate]
+- Ruby - Sinatra Boilerplate [https://github.com/storyblok/sinatra-boilerplate]
+- Python - Django Boilerplate [https://github.com/storyblok/django-boilerplate]
+- JavaScript - VueJs Boilerplate [https://github.com/storyblok/vuejs-boilerplate]
+
+## Fieldtypes Development Environment
+- Fieldtype [https://github.com/storyblok/storyblok-fieldtype.git]
 
 ## Frequently asked questions
 - **[What is Storyblok?](https://www.storyblok.com/)**        
-Storyblok is a headless cms - we removed the front-end component (the head) and, what remains is our [content delivery RESTful API](https://www.storyblok.com/docs/Delivery-Api/introduction). - Most of the Content Management Systems force you into a specific way on how to develop a website. With Storyblok you can just plug in the service to your template. There is no need to take care of CMS installation or database setup.<br><br>
+A component composer - Storyblok augments your web framework or the technology you already use with powerful editing capabilities to bring your static websites to life. We fill the gap between a visual composer and a content collection backend system.<br><br>
 - **[How can I access the Storyblok Content Delivery API?](https://www.storyblok.com/docs/Delivery-Api/introduction)**       
 You can directly access the API using simple HTTP GET Requests. We've done some examples for you already in our [Delivery APi Introduction](https://www.storyblok.com/docs/Delivery-Api/introduction). <br>You can of course use one of the SDK's available for storyblok:
    - PHP SDK: https://github.com/storyblok/php-client
