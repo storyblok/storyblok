@@ -9,6 +9,8 @@ var inquirer = require('inquirer')
 var ghdownload = require('github-download')
 var replace = require('./replace')
 var api = require('./api')
+var pushComponents = require('./tasks/push-components.js')
+var pullComponents = require('./tasks/pull-components.js')
 
 clear()
 console.log(chalk.cyan(figlet.textSync('Storyblok')))
@@ -18,9 +20,14 @@ console.log('Hi, welcome to the Storyblok CLI')
 console.log()
 
 var subcommand = 'default'
+var cliAttribute = ''
 
 if (typeof process.argv[1] != 'undefined' && typeof process.argv[2] != 'undefined') {
   subcommand = process.argv[2]
+
+  if (typeof process.argv[3] != 'undefined') {
+    cliAttribute = process.argv[3]
+  }
 }
 
 var questions = []
@@ -105,6 +112,51 @@ if (subcommand == 'quickstart') {
       }
     }
   ]
+
+} else if (subcommand == 'pull-components' || subcommand == 'push-components') {
+
+  questions = [
+    {
+      type: 'input',
+      name: 'email',
+      message: 'Enter your email address:',
+      validate: function (value) {
+        email = value    
+        if (value.length > 0) {
+          return true
+        }
+        return 'Please enter a valid email:'
+      }
+    },
+    {
+      type: 'password',
+      name: 'password',
+      message: 'Enter your password:',
+      validate: function (value) {
+        var done = this.async();
+      
+        api.login(email, value, (data) => {
+          if (data.status == 200) {
+            done(null, true)
+          } else {
+            done('Password seams to be wrong. Please try again:')
+          }
+        })
+      }
+    },
+    {
+      type: 'input',
+      name: 'spaceId',
+      message: 'Insert the space ID where you want to execute this command:',
+      validate: function (value) {
+        if (value.length > 0) {
+          return true
+        }
+        return 'Please enter a valid id:'
+      }
+    }
+  ]
+
 } else {
   questions = [
     {
@@ -296,48 +348,61 @@ inquirer.prompt(questions).then(function (answers) {
       })
   }
 
-  if (subcommand == 'quickstart') {
-    console.log('  Your project will be created now...')
+  switch(subcommand) {
+    case 'quickstart':
+      console.log('  Your project will be created now...')
 
-    api.post('spaces', {
-      create_demo: false,
-      dup_id: 40288,
-      space: {
-        name: answers.name,
-        environments: [{name: 'Dev', location: 'http://localhost:4440/'}]
-      }
-    }, (space_res) => {
-      if (space_res.status == 200) {
-        console.log(chalk.green('  ' + answers.name + ' has been created in Storyblok!'))
+      api.post('spaces', {
+        create_demo: false,
+        dup_id: 40288,
+        space: {
+          name: answers.name,
+          environments: [{name: 'Dev', location: 'http://localhost:4440/'}]
+        }
+      }, (space_res) => {
+        if (space_res.status == 200) {
+          console.log(chalk.green('  ' + answers.name + ' has been created in Storyblok!'))
 
-        api.post('tokens', {}, (tokens_res) => {
-          answers.loginToken = tokens_res.body.key
+          api.post('tokens', {}, (tokens_res) => {
+            answers.loginToken = tokens_res.body.key
 
-          api.setSpaceId(space_res.body.space.id)
-          api.get('api_keys', (keys_res) => {
-            if (keys_res.status == 200) {
-              answers.spaceId = space_res.body.space.id
-              answers.spaceDomain = space_res.body.space.domain.replace('https://', '')
-                                                               .replace('/', '')
+            api.setSpaceId(space_res.body.space.id)
+            api.get('api_keys', (keys_res) => {
+              if (keys_res.status == 200) {
+                answers.spaceId = space_res.body.space.id
+                answers.spaceDomain = space_res.body.space.domain.replace('https://', '')
+                                                                 .replace('/', '')
 
-              var tokens = keys_res.body.api_keys.filter((token) => {
-                return token.access == 'theme'
-              })
+                var tokens = keys_res.body.api_keys.filter((token) => {
+                  return token.access == 'theme'
+                })
 
-              answers.themeToken = tokens[0].token
+                answers.themeToken = tokens[0].token
 
-              lastStep()
-            } else {
-              console.log(keys_res.body)
-            }
+                lastStep()
+              } else {
+                console.log(keys_res.body)
+              }
+            })
           })
-        })
-      } else {
-        console.log(space_res.body)
-      }
-    })
-  } else {
-    lastStep()
+        } else {
+          console.log(space_res.body)
+        }
+      })
+
+    break;
+    case 'push-components':
+      api.setSpaceId(answers.spaceId)
+      pushComponents(api, cliAttribute)
+
+    break;
+    case 'pull-components':
+      api.setSpaceId(answers.spaceId)
+      pullComponents(api, cliAttribute)
+
+    break;
+    default:
+      lastStep()
   }
 
 })
