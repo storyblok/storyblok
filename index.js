@@ -167,7 +167,7 @@ if (subcommand == 'quickstart') {
   console.log()
   console.log('No direct input command available - starting with default questions: ')
   console.log()
-  
+
   questions = [
     {
       type: 'input',
@@ -360,7 +360,7 @@ inquirer.prompt(questions).then(function (answers) {
     case 'quickstart':
       var space_id = ''  
       var parameter = cliAttribute.split('=')
-      if (parameter.length > 1 && parameter[0] == 'space') {
+      if (parameter.length > 1 && parameter[0] == '--space') {
         try {
           space_id = parseInt(parameter[1])
         } catch (e) {
@@ -373,7 +373,7 @@ inquirer.prompt(questions).then(function (answers) {
         exit(402)
       }
       switch (parameter[0]) {
-        case 'space':
+        case '--space':
           console.log('  Your project will be initialized now...')
 
           api.put('spaces/' + space_id + '/', {
