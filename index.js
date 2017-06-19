@@ -11,6 +11,7 @@ var replace = require('./replace')
 var api = require('./api')
 var pushComponents = require('./tasks/push-components.js')
 var pullComponents = require('./tasks/pull-components.js')
+var opn = require('opn');
 
 clear()
 console.log(chalk.cyan(figlet.textSync('Storyblok')))
@@ -312,7 +313,7 @@ inquirer.prompt(questions).then(function (answers) {
           console.log(chalk.red('  Don\'t forget to mark it with the tag `storyblok` so will can find it.'))
           console.log()
           console.error(err)
-          exit(0);
+          process.exit(0)
         }
       })
       .on('end', function () {
@@ -364,13 +365,10 @@ inquirer.prompt(questions).then(function (answers) {
         try {
           space_id = parseInt(parameter[1])
         } catch (e) {
-          console.log(chalk.red('Your space id should be a number - maybe check your input again'))
-          exit(401)
+          console.log(chalk.red('It seems as we don\'t know your parameter "' + cliAttribute + '" - you may want to try this: '))
+          console.log(chalk.white('storyblok quickstart space=YOUR_SPACE_ID'))
+          process.exit(0)
         } 
-      } else {
-        console.log(chalk.red('It seems as we don\'t know your parameter "' + cliAttribute + '" - you may want to try this: '))
-        console.log(chalk.white('storyblok quickstart space=YOUR_SPACE_ID'))
-        exit(402)
       }
       switch (parameter[0]) {
         case '--space':
@@ -424,8 +422,7 @@ inquirer.prompt(questions).then(function (answers) {
             create_demo: false,
             dup_id: 40288,
             space: {
-              name: answers.name,
-              environments: [{ name: 'Dev', location: 'http://localhost:4440/' }]
+              name: answers.name
             }
           }, (space_res) => {
             if (space_res.status == 200) {
@@ -447,11 +444,15 @@ inquirer.prompt(questions).then(function (answers) {
                       return token.access == 'theme'
                     })
 
-                    answers.themeToken = tokens[0].token
 
-                    console.log(chalk.green('✓') + ' - Development Environment configured (./' + answers.name + '/config.js' + ')')
+                    console.log(chalk.green('✓') + ' - Starting Storyblok in your browser')
                     
-                    lastStep()
+                    setTimeout(() => {
+                      opn('http://' + answers.spaceDomain + '/_quickstart?quickstart=' + answers.loginToken)
+                      process.exit(0)
+                    }, 2000)
+                                        
+                    
                   } else {
                     console.log(keys_res.body)
                   }
