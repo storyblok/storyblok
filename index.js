@@ -296,6 +296,10 @@ inquirer.prompt(questions).then(function (answers) {
       gitRepo = 'https://github.com/storyblok/quickstart.git'
     }
 
+    if (answers.type == 'quickstart' && cliAttribute != '') {
+      gitRepo = 'https://github.com/storyblok/quickstart-instructions.git'
+    }
+
     var outputDir = './' + answers.name
 
     console.log(chalk.green('✓') + ' - The github repository ' + gitRepo + ' will be cloned now...')
