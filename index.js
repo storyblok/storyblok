@@ -318,7 +318,8 @@ inquirer.prompt(questions).then(function (answers) {
       })
       .on('end', function () {
         var finalStep = 'gulp'
-        if (answers.type == 'Fieldtype') {
+        
+        if (answers.type == 'Fieldtype' || answers.type == 'quickstart') {
           finalStep = 'npm run dev'
         }
 
