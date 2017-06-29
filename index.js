@@ -9,9 +9,11 @@ var inquirer = require('inquirer')
 var ghdownload = require('github-download')
 var replace = require('./replace')
 var api = require('./api')
-var pushComponents = require('./tasks/push-components.js')
-var pullComponents = require('./tasks/pull-components.js')
-var opn = require('opn');
+var pushComponents = require('./tasks/push-components')
+var pullComponents = require('./tasks/pull-components')
+var scaffold = require('./tasks/scaffold')
+var opn = require('opn')
+var parseArgs = require('minimist')
 
 clear()
 console.log(chalk.cyan(figlet.textSync('Storyblok')))
@@ -22,12 +24,13 @@ console.log()
 
 var subcommand = 'default'
 var cliAttribute = ''
+var argv = parseArgs(process.argv.slice(2))
 
-if (typeof process.argv[1] != 'undefined' && typeof process.argv[2] != 'undefined') {
-  subcommand = process.argv[2]
+if (typeof argv._[0] != 'undefined') {
+  subcommand = argv._[0]
 
-  if (typeof process.argv[3] != 'undefined') {
-    cliAttribute = process.argv[3]
+  if (typeof argv._[1] != 'undefined') {
+    cliAttribute = argv._[1]
   }
 }
 
@@ -48,7 +51,7 @@ if (subcommand == 'quickstart') {
         'Yes'
       ],
       when: function (answers) {
-        return cliAttribute == ''
+        return !api.isAuthorized() && !argv.space
       }
     },
     {
@@ -61,6 +64,9 @@ if (subcommand == 'quickstart') {
           return true
         }
         return 'Please enter a valid email:'
+      },
+      when: function (answers) {
+        return !api.isAuthorized()
       }
     },
     {
@@ -98,7 +104,7 @@ if (subcommand == 'quickstart') {
         })
       },
       when: function (answers) {
-        return answers.has_account == 'Yes' || cliAttribute != ''
+        return answers.has_account == 'Yes' || (!api.isAuthorized() && !answers.has_account)
       }
     },
     {
@@ -115,14 +121,14 @@ if (subcommand == 'quickstart') {
         return val.replace(/\s+/g, '-').toLowerCase()
       },
       when: function (answers) {
-        return cliAttribute == ''
+        return !argv.space
       }
     }
   ]
 
-} else if (subcommand == 'pull-components' || subcommand == 'push-components') {
-  
-  questions = [
+} else if (['pull-components', 'push-components', 'scaffold', 'logout'].indexOf(subcommand) > -1) {
+
+  var loginQuestions = [
     {
       type: 'input',
       name: 'email',
@@ -150,19 +156,14 @@ if (subcommand == 'quickstart') {
           }
         })
       }
-    },
-    {
-      type: 'input',
-      name: 'spaceId',
-      message: 'Insert the space ID where you want to execute this command:',
-      validate: function (value) {
-        if (value.length > 0) {
-          return true
-        }
-        return 'Please enter a valid id:'
-      }
     }
   ]
+  
+  questions = []
+
+  if (!api.isAuthorized()) {
+    questions = loginQuestions
+  }
 
 } else {
   console.log()
@@ -360,121 +361,135 @@ inquirer.prompt(questions).then(function (answers) {
 
   switch (subcommand) {
     case 'quickstart':
-      var space_id = ''  
-      var parameter = cliAttribute.split('=')
-      if (parameter.length > 1 && parameter[0] == '--space') {
-        try {
-          space_id = parseInt(parameter[1])
-        } catch (e) {
-          console.log(chalk.red('It seems as we don\'t know your parameter "' + cliAttribute + '" - you may want to try this: '))
-          console.log(chalk.white('storyblok quickstart space=YOUR_SPACE_ID'))
-          process.exit(0)
-        } 
-      }
-      switch (parameter[0]) {
-        case '--space':
-          console.log('  Your project will be initialized now...')
+      var spaceId = argv.space
 
-          api.put('spaces/' + space_id + '/', {
-            space: {
-              environments: [{ name: 'Dev', location: 'http://localhost:4440/' }]
-            }
-          }, (space_res) => {
+      if (typeof spaceId !== 'undefined') {
+
+        console.log('  Your project will be initialized now...')
+
+        api.put('spaces/' + spaceId + '/', {
+          space: {
+            environments: [{ name: 'Dev', location: 'http://localhost:4440/' }]
+          }
+        }, (space_res) => {
+          if (space_res.status == 200) {
             answers.name = space_res.body.space.name.replace(/\s+/g, '-').toLowerCase()
-            if (space_res.status == 200) {
-              console.log(chalk.green('✓') + ' - Space ' + answers.name + ' updated with dev environment in Storyblok')
+            console.log(chalk.green('✓') + ' - Space ' + answers.name + ' updated with dev environment in Storyblok')
 
-              api.post('tokens', {}, (tokens_res) => {
-                console.log(chalk.green('✓') + ' - Configuration for your Space was loaded')
-                answers.loginToken = tokens_res.body.key
+            api.post('tokens', {}, (tokens_res) => {
+              console.log(chalk.green('✓') + ' - Configuration for your Space was loaded')
+              answers.loginToken = tokens_res.body.key
 
-                api.setSpaceId(space_res.body.space.id)
-                api.get('api_keys', (keys_res) => {
-                  if (keys_res.status == 200) {
-                    answers.spaceId = space_res.body.space.id
-                    answers.spaceDomain = space_res.body.space.domain.replace('https://', '')
-                      .replace('/', '')
+              api.setSpaceId(space_res.body.space.id)
+              api.get('api_keys', (keys_res) => {
+                if (keys_res.status == 200) {
+                  answers.spaceId = space_res.body.space.id
+                  answers.spaceDomain = space_res.body.space.domain.replace('https://', '')
+                    .replace('/', '')
 
-                    var tokens = keys_res.body.api_keys.filter((token) => {
-                      return token.access == 'theme'
-                    })
+                  var tokens = keys_res.body.api_keys.filter((token) => {
+                    return token.access == 'theme'
+                  })
 
-                    answers.themeToken = tokens[0].token
+                  answers.themeToken = tokens[0].token
 
-                    console.log(chalk.green('✓') + ' - Development Environment configured (./' + answers.name + '/config.js' + ')')
-                    
-                    lastStep()
-                  } else {
-                    console.log(keys_res.body)
-                  }
-                })
+                  console.log(chalk.green('✓') + ' - Development Environment configured (./' + answers.name + '/config.js' + ')')
+                  
+                  lastStep()
+                } else {
+                  console.log(keys_res.body)
+                }
               })
-            } else {
-              console.log(space_res.body)
-            }
-          })
+            })
+          } else {
+            console.log('  Something went wrong, be sure that you inserted the right space id.')
+            console.log(space_res.body)
+          }
+        })
 
-          break;
-        default:
+      } else {
 
-          console.log('  Your project will be created now...')
+        console.log('  Your project will be created now...')
 
-          api.post('spaces', {
-            create_demo: false,
-            dup_id: 40288,
-            space: {
-              name: answers.name
-            }
-          }, (space_res) => {
-            if (space_res.status == 200) {
-              console.log(chalk.green('✓') + ' - Space ' + answers.name + ' has been created in Storyblok')
-              console.log(chalk.green('✓') + ' - Story "home" has been created in your Space')
+        api.post('spaces', {
+          create_demo: false,
+          dup_id: 40288,
+          space: {
+            name: answers.name
+          }
+        }, (space_res) => {
+          if (space_res.status == 200) {
+            console.log(chalk.green('✓') + ' - Space ' + answers.name + ' has been created in Storyblok')
+            console.log(chalk.green('✓') + ' - Story "home" has been created in your Space')
 
-              api.post('tokens', {}, (tokens_res) => {
-                console.log(chalk.green('✓') + ' - Configuration for your Space was loaded')
-                answers.loginToken = tokens_res.body.key
+            api.post('tokens', {}, (tokens_res) => {
+              console.log(chalk.green('✓') + ' - Configuration for your Space was loaded')
+              answers.loginToken = tokens_res.body.key
 
-                api.setSpaceId(space_res.body.space.id)
-                api.get('api_keys', (keys_res) => {
-                  if (keys_res.status == 200) {
-                    answers.spaceId = space_res.body.space.id
-                    answers.spaceDomain = space_res.body.space.domain.replace('https://', '')
-                      .replace('/', '')
+              api.setSpaceId(space_res.body.space.id)
+              api.get('api_keys', (keys_res) => {
+                if (keys_res.status == 200) {
+                  answers.spaceId = space_res.body.space.id
+                  answers.spaceDomain = space_res.body.space.domain.replace('https://', '')
+                    .replace('/', '')
 
-                    var tokens = keys_res.body.api_keys.filter((token) => {
-                      return token.access == 'theme'
-                    })
+                  var tokens = keys_res.body.api_keys.filter((token) => {
+                    return token.access == 'theme'
+                  })
 
-
-                    console.log(chalk.green('✓') + ' - Starting Storyblok in your browser')
-                    
-                    setTimeout(() => {
-                      opn('http://' + answers.spaceDomain + '/_quickstart?quickstart=' + answers.loginToken)
-                      process.exit(0)
-                    }, 2000)
-                                        
-                    
-                  } else {
-                    console.log(keys_res.body)
-                  }
-                })
+                  console.log(chalk.green('✓') + ' - Starting Storyblok in your browser')
+                  
+                  setTimeout(() => {
+                    opn('http://' + answers.spaceDomain + '/_quickstart?quickstart=' + answers.loginToken)
+                    process.exit(0)
+                  }, 2000)
+                                      
+                  
+                } else {
+                  console.log(keys_res.body)
+                }
               })
-            } else {
-              console.log(space_res.body)
-            }
-          })
-          break;
+            })
+          } else {
+            console.log(space_res.body)
+          }
+        })
       }
 
       break;
     case 'push-components':
-      api.setSpaceId(answers.spaceId)
+      if (!argv.space) {
+        console.log('Please provide the space id as argument --space=YOUR_SPACE_ID.')
+        process.exit(0)
+      }
+
+      api.setSpaceId(argv.space)
       pushComponents(api, cliAttribute)
 
       break;
     case 'pull-components':
-      api.setSpaceId(answers.spaceId)
+      if (!argv.space) {
+        console.log('Please provide the space id as argument --space=YOUR_SPACE_ID.')
+        process.exit(0)
+      }
+
+      api.setSpaceId(argv.space)
       pullComponents(api, cliAttribute)
+
+      break;
+    case 'scaffold':
+      if (!cliAttribute.length) {
+        console.log('Second cli argument is missing.')
+        process.exit(0)
+      }
+
+      scaffold(api, argv)
+
+      break;
+    case 'logout':
+      api.logout()
+      console.log('Logged out successfully! Token has been removed from .netrc file.')
+      console.log()
 
       break;
     default:

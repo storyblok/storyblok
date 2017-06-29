@@ -1,4 +1,5 @@
 var unirest = require('unirest')
+var creds = require('./lib/creds')
 
 module.exports = {
   accessToken: '',
@@ -11,9 +12,14 @@ module.exports = {
     login.end((res) => {
       if (res.status == 200) {
         this.accessToken = res.body.access_token
+        creds.set(email, res.body.access_token)
       }
       callback(res)
     })
+  },
+
+  logout: function() {
+    creds.set(null)
   },
 
   signup: function(email, password, callback) {
@@ -23,9 +29,21 @@ module.exports = {
     login.end((res) => {
       if (res.status == 200) {
         this.accessToken = res.body.access_token
+        creds.set(email, res.body.access_token)
       }
       callback(res)
     })
+  },
+
+  isAuthorized: function() {
+    var loginCreds = creds.get()
+
+    if (loginCreds !== null) {
+      this.accessToken = loginCreds.token
+      return true
+    }
+
+    return false
   },
 
   setSpaceId: function(spaceId) {
