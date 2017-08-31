@@ -126,7 +126,13 @@ if (subcommand == 'quickstart') {
     }
   ]
 
-} else if (['pull-components', 'push-components', 'scaffold', 'logout'].indexOf(subcommand) > -1) {
+} else if (['logout'].indexOf(subcommand) > -1) {
+  api.logout();
+  console.log('Logged out successfully! Token has been removed from .netrc file.');
+  console.log();
+  process.exit(0);
+
+} else if (['pull-components', 'push-components', 'scaffold', 'login'].indexOf(subcommand) > -1) {
 
   var loginQuestions = [
     {
@@ -486,9 +492,8 @@ inquirer.prompt(questions).then(function (answers) {
       scaffold(api, argv)
 
       break;
-    case 'logout':
-      api.logout()
-      console.log('Logged out successfully! Token has been removed from .netrc file.')
+    case 'login':
+      console.log('Logged in successfully! Token has been added to .netrc file.')
       console.log()
 
       break;
