@@ -22,7 +22,7 @@ console.log()
 console.log('Hi, welcome to the Storyblok CLI')
 console.log()
 
-var subcommand = 'default'
+var subcommand = 'quickstart'
 var cliAttribute = ''
 var argv = parseArgs(process.argv.slice(2))
 
@@ -37,9 +37,11 @@ if (typeof argv._[0] != 'undefined') {
 var questions = []
 var email = ''
 
-if (subcommand == 'create') {
+if (['select'].indexOf(subcommand) > -1) {
   console.log()
   console.log()
+
+  subcommand = 'select';
 
   questions = [
     {
