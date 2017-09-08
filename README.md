@@ -22,7 +22,7 @@ $ storyblok quickstart
 
 ## Usage for fieldtypes and other boilerplates
 ```
-$ storyblok
+$ storyblok select
 ```
 
 ## What it does
