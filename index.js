@@ -37,143 +37,8 @@ if (typeof argv._[0] != 'undefined') {
 var questions = []
 var email = ''
 
-if (subcommand == 'quickstart') {
+if (subcommand == 'create') {
   console.log()
-  console.log()
-
-  questions = [
-    {
-      type: 'list',
-      name: 'has_account',
-      message: 'Do you have already a Storyblok account?',
-      choices: [
-        'No',
-        'Yes'
-      ],
-      when: function (answers) {
-        return !api.isAuthorized() && !argv.space
-      }
-    },
-    {
-      type: 'input',
-      name: 'email',
-      message: 'Enter your email address:',
-      validate: function (value) {
-        email = value
-        if (value.length > 0) {
-          return true
-        }
-        return 'Please enter a valid email:'
-      },
-      when: function (answers) {
-        return !api.isAuthorized()
-      }
-    },
-    {
-      type: 'password',
-      name: 'password',
-      message: 'Define your password:',
-      validate: function (value) {
-        var done = this.async();
-
-        api.signup(email, value, (data) => {
-          if (data.status == 200) {
-            done(null, true)
-          } else {
-            done('Failed: ' + JSON.stringify(data.body) + '. Please try again:')
-          }
-        })
-      },
-      when: function (answers) {
-        return answers.has_account == 'No'
-      }
-    },
-    {
-      type: 'password',
-      name: 'password',
-      message: 'Enter your password:',
-      validate: function (value) {
-        var done = this.async();
-
-        api.login(email, value, (data) => {
-          if (data.status == 200) {
-            done(null, true)
-          } else {
-            done('Password seams to be wrong. Please try again:')
-          }
-        })
-      },
-      when: function (answers) {
-        return answers.has_account == 'Yes' || (!api.isAuthorized() && !answers.has_account)
-      }
-    },
-    {
-      type: 'input',
-      name: 'name',
-      message: 'How should your Project be named?',
-      validate: function (value) {
-        if (value.length > 0) {
-          return true
-        }
-        return 'Please enter a valid name for your project:'
-      },
-      filter: function (val) {
-        return val.replace(/\s+/g, '-').toLowerCase()
-      },
-      when: function (answers) {
-        return !argv.space
-      }
-    }
-  ]
-
-} else if (['logout'].indexOf(subcommand) > -1) {
-  api.logout();
-  console.log('Logged out successfully! Token has been removed from .netrc file.');
-  console.log();
-  process.exit(0);
-
-} else if (['pull-components', 'push-components', 'scaffold', 'login'].indexOf(subcommand) > -1) {
-
-  var loginQuestions = [
-    {
-      type: 'input',
-      name: 'email',
-      message: 'Enter your email address:',
-      validate: function (value) {
-        email = value
-        if (value.length > 0) {
-          return true
-        }
-        return 'Please enter a valid email:'
-      }
-    },
-    {
-      type: 'password',
-      name: 'password',
-      message: 'Enter your password:',
-      validate: function (value) {
-        var done = this.async();
-
-        api.login(email, value, (data) => {
-          if (data.status == 200) {
-            done(null, true)
-          } else {
-            done('Password seams to be wrong. Please try again:')
-          }
-        })
-      }
-    }
-  ]
-  
-  questions = []
-
-  if (!api.isAuthorized()) {
-    questions = loginQuestions
-  }
-
-} else {
-  console.log()
-  console.log('No direct input command available - starting with default questions: ')
   console.log()
 
   questions = [
@@ -272,6 +137,141 @@ if (subcommand == 'quickstart') {
       message: 'What is your theme token?',
       when: function (answers) {
         return answers.type == 'Theme (Storyrenderer/Hosted)'
+      }
+    }
+  ]
+
+} else if (['logout'].indexOf(subcommand) > -1) {
+  api.logout();
+  console.log('Logged out successfully! Token has been removed from .netrc file.');
+  console.log();
+  process.exit(0);
+
+} else if (['pull-components', 'push-components', 'scaffold', 'login'].indexOf(subcommand) > -1) {
+
+  var loginQuestions = [
+    {
+      type: 'input',
+      name: 'email',
+      message: 'Enter your email address:',
+      validate: function (value) {
+        email = value
+        if (value.length > 0) {
+          return true
+        }
+        return 'Please enter a valid email:'
+      }
+    },
+    {
+      type: 'password',
+      name: 'password',
+      message: 'Enter your password:',
+      validate: function (value) {
+        var done = this.async();
+
+        api.login(email, value, (data) => {
+          if (data.status == 200) {
+            done(null, true)
+          } else {
+            done('Password seams to be wrong. Please try again:')
+          }
+        })
+      }
+    }
+  ]
+  
+  questions = []
+
+  if (!api.isAuthorized()) {
+    questions = loginQuestions
+  }
+
+} else {
+  console.log()
+  console.log()
+
+  subcommand = 'quickstart'
+  questions = [
+    {
+      type: 'list',
+      name: 'has_account',
+      message: 'Do you have already a Storyblok account?',
+      choices: [
+        'No',
+        'Yes'
+      ],
+      when: function (answers) {
+        return !api.isAuthorized() && !argv.space
+      }
+    },
+    {
+      type: 'input',
+      name: 'email',
+      message: 'Enter your email address:',
+      validate: function (value) {
+        email = value
+        if (value.length > 0) {
+          return true
+        }
+        return 'Please enter a valid email:'
+      },
+      when: function (answers) {
+        return !api.isAuthorized()
+      }
+    },
+    {
+      type: 'password',
+      name: 'password',
+      message: 'Define your password:',
+      validate: function (value) {
+        var done = this.async();
+
+        api.signup(email, value, (data) => {
+          if (data.status == 200) {
+            done(null, true)
+          } else {
+            done('Failed: ' + JSON.stringify(data.body) + '. Please try again:')
+          }
+        })
+      },
+      when: function (answers) {
+        return answers.has_account == 'No'
+      }
+    },
+    {
+      type: 'password',
+      name: 'password',
+      message: 'Enter your password:',
+      validate: function (value) {
+        var done = this.async();
+
+        api.login(email, value, (data) => {
+          if (data.status == 200) {
+            done(null, true)
+          } else {
+            done('Password seams to be wrong. Please try again:')
+          }
+        })
+      },
+      when: function (answers) {
+        return answers.has_account == 'Yes' || (!api.isAuthorized() && !answers.has_account)
+      }
+    },
+    {
+      type: 'input',
+      name: 'name',
+      message: 'How should your Project be named?',
+      validate: function (value) {
+        if (value.length > 0) {
+          return true
+        }
+        return 'Please enter a valid name for your project:'
+      },
+      filter: function (val) {
+        return val.replace(/\s+/g, '-').toLowerCase()
+      },
+      when: function (answers) {
+        return !argv.space
       }
     }
   ]
