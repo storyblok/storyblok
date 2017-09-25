@@ -11,6 +11,9 @@ You found an issue?<br>Tell us about it - <a href="https://github.com/storyblok/
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/storyblok/storyblok.svg?style=flat-square&v=1)](https://github.com/storyblok/storyblok/issues?q=is%3Aissue+is%3Aclosed)
 
 ## Installation
+
+Make sure you've node `>= 5.11.0` installed.
+
 ```
 $ npm i storyblok -g
 ```

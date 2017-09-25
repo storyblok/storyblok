@@ -1,4 +1,4 @@
-#!/usr/bin/env node --harmony
+#!/usr/bin/env node
 
 var chalk = require('chalk')
 var clear = require('clear')
