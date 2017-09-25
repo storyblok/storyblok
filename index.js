@@ -472,7 +472,8 @@ inquirer.prompt(questions).then(function (answers) {
       }
 
       api.setSpaceId(argv.space)
-      pushComponents(api, cliAttribute)
+      pushComponents(api, argv)
+
 
       break;
     case 'pull-components':
@@ -482,7 +483,7 @@ inquirer.prompt(questions).then(function (answers) {
       }
 
       api.setSpaceId(argv.space)
-      pullComponents(api, cliAttribute)
+      pullComponents(api, argv)
 
       break;
     case 'scaffold':
