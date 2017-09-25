@@ -18,6 +18,8 @@ Make sure you've node `>= 5.11.0` installed.
 $ npm i storyblok -g
 ```
 
+You can also follow our [tutorial for a complete walkthrough](https://www.storyblok.com/tp/quickstart-rendering-service).
+
 ## Usage for the quickstart
 ```
 $ storyblok quickstart
@@ -37,32 +39,6 @@ $ storyblok pull-components --space={{your_space_id}}
 ```
 $ storyblok push-components --space={{your_dest_space_id}} {{path/url}}
 ```
-
-## What it does
-We recommend to execute the quickstart command first to learn how easy it is to use Storyblok.
-
-The CLI allows developers to get started with a new Storyblok project by answering 3 questions:
-1. How should your Project be named?
-2. Select the type of your project (Theme/Boilerplate/Fieldtype)
-3. Select your Theme/Boilerplate (skipped for Fieldtypes)
-
-## How will it look like
-<img src="https://a.storyblok.com/f/39898/d26d369183/storyblok-cli.gif" alt="How to use the Storyblok cli">
-
-## Themes
-- Creator Theme (Blueprint) [https://github.com/storyblok/creator-theme]
-- City Theme [https://github.com/storyblok/city-theme]
-- Nexo Theme [https://github.com/storyblok/nexo-theme]
-
-## Boilerplates
-- PHP - Silex Boilerplate [https://github.com/storyblok/silex-boilerplate]
-- JavaScript - NodeJs Boilerplate [https://github.com/storyblok/nodejs-boilerplate]
-- Ruby - Sinatra Boilerplate [https://github.com/storyblok/sinatra-boilerplate]
-- Python - Django Boilerplate [https://github.com/storyblok/django-boilerplate]
-- JavaScript - VueJs Boilerplate [https://github.com/storyblok/vuejs-boilerplate]
-
-## Fieldtypes Development Environment
-- Fieldtype [https://github.com/storyblok/storyblok-fieldtype.git]
 
 ## Frequently asked questions
 - **[What is Storyblok?](https://www.storyblok.com/)**        
