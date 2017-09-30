@@ -11,6 +11,7 @@ var replace = require('./replace')
 var api = require('./api')
 var pushComponents = require('./tasks/push-components')
 var pullComponents = require('./tasks/pull-components')
+var deleteTemplates = require('./tasks/delete-templates')
 var scaffold = require('./tasks/scaffold')
 var opn = require('opn')
 var parseArgs = require('minimist')
@@ -149,7 +150,7 @@ if (['select'].indexOf(subcommand) > -1) {
   console.log();
   process.exit(0);
 
-} else if (['pull-components', 'push-components', 'scaffold', 'login'].indexOf(subcommand) > -1) {
+} else if (['delete-templates', 'pull-components', 'push-components', 'scaffold', 'login'].indexOf(subcommand) > -1) {
 
   var loginQuestions = [
     {
@@ -484,6 +485,16 @@ inquirer.prompt(questions).then(function (answers) {
 
       api.setSpaceId(argv.space)
       pullComponents(api, argv)
+
+      break;
+    case 'delete-templates':
+      if (!argv.space) {
+        console.log('Please provide the space id as argument --space=YOUR_SPACE_ID.')
+        process.exit(0)
+      }
+
+      api.setSpaceId(argv.space)
+      deleteTemplates(api, argv)
 
       break;
     case 'scaffold':
