@@ -52,7 +52,9 @@ You can directly access the API using simple HTTP GET Requests. We've done some 
 - **What features is storyblok capable of?**       
 You can find a full list of features which are available on the [feature](https://www.storyblok.com/features) page on our website.<br><br>
 - **I'm a developer and want to start a project with storyblok**   
-Glad to hear that! We've created a [CLI](https://www.storyblok.com/docs/Guides/Getting-Started) to easily bootstrap new projects directly from the command line. You can also check out our [boilerplates](https://www.storyblok.com/docs/terminology/boilerplates) and [themes](https://www.storyblok.com/docs/terminology/themes) - as well as the [content delivery api](https://www.storyblok.com/docs/Delivery-Api/introduction) itself.<br><br>
+Glad to hear that! We've created a [CLI](https://www.storyblok.com/docs/Guides/Getting-Started) to easily bootstrap new projects directly from the command line. You can also check out our [boilerplates](https://www.storyblok.com/docs/terminology/boilerplates) and [themes](https://www.storyblok.com/docs/terminology/themes) - as well as the [content delivery api](https://www.storyblok.com/docs/Delivery-Api/introduction) itself. A simple `storyblok` in the terminal should get you going.<br><br>
+- **I receive: { error: 'Unauthorized' }**   
+You can logout of the Storyblok CLI using `storyblok logout` so the current token will get destroyed. After that simple use the command you tried before - you should now be asked for your credentials again.
 
 ## [Terminology](https://www.storyblok.com/docs/terminology/introduction)
 - **[What is a Space?](https://www.storyblok.com/docs/terminology/space)**   
@@ -73,5 +75,3 @@ A collaborator is a person who is explicitly a member of your project. As an own
 If you want a hosting with our [Rendering Service](https://www.storyblok.com/docs/Rendering-Service/Theme-Documentation) so you won't have to setup a server on your own you can directly choose from one of...<br><br>
 - **[What is a Boilerplate?](https://www.storyblok.com/docs/terminology/themes)**   
 If you want to use your server or have already an existing project in which you want to integrate Storyblok you can use one of ...<br><br>
-- **I receive: { error: 'Unauthorized' }**
-You can logout of the Storyblok CLI using `storyblok logout` so the current token will get destroyed. After that simple use the command you tried before - you should now be asked for your credentials again.
