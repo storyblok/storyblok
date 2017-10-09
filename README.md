@@ -73,3 +73,5 @@ A collaborator is a person who is explicitly a member of your project. As an own
 If you want a hosting with our [Rendering Service](https://www.storyblok.com/docs/Rendering-Service/Theme-Documentation) so you won't have to setup a server on your own you can directly choose from one of...<br><br>
 - **[What is a Boilerplate?](https://www.storyblok.com/docs/terminology/themes)**   
 If you want to use your server or have already an existing project in which you want to integrate Storyblok you can use one of ...<br><br>
+- ** I receive: { error: 'Unauthorized' }**
+You can logout of the Storyblok CLI using `storyblok logout` so the current token will get destroyed. After that simple use the command you tried before - you should now be asked for your credentials again.
