@@ -1,6 +1,6 @@
 <p align="center">
   <h1 align="center">Storyblok CLI</h1>
-  <p align="center">A simple CLI for scaffolding <a href="https://storyblok.com" target="_blank">Storyblok</a> projects and fieldtypes.</p>
+  <p align="center">A simple CLI for scaffolding <a href="https://www.storyblok.com" target="_blank">Storyblok</a> projects and fieldtypes.</p>
 </p>
 
 You found an issue?<br>Tell us about it - <a href="https://github.com/storyblok/storyblok/issues/new">open an issue</a> or look if it was <a href="https://github.com/storyblok/storyblok/issues/">already reported</a>.
