@@ -1,7 +1,7 @@
 {
   "name": "storyblok",
-  "version": "1.3.8",
-  "description": "A simple CLI for scaffolding storyblok projects and fieldtypes",
+  "version": "1.4.0",
+  "description": "A simple CLI to start Storyblok from your command line.",
   "keywords": [
     "storyblok",
     "cli",

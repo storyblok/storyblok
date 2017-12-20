@@ -421,8 +421,7 @@ inquirer.prompt(questions).then(function (answers) {
         console.log('  Your project will be created now...')
 
         api.post('spaces', {
-          create_demo: false,
-          dup_id: 40288,
+          // create_demo: true,
           space: {
             name: answers.name
           }
