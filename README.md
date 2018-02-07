@@ -20,10 +20,10 @@ $ npm i storyblok -g
 
 # Commands
 
-## Usage for the CLI
+## Usage to kickstart a boilerplate, fieldtype or theme
 
 ```
-$ storyblok
+$ storyblok select
 ```
 
 ## Download your space's components schema as json
