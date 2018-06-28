@@ -18,26 +18,31 @@ Make sure you've node `>= 5.11.0` installed.
 $ npm i storyblok -g
 ```
 
-You can also follow our [tutorial for a complete walkthrough](https://www.storyblok.com/tp/quickstart-rendering-service).
+## Commands
 
-## Usage for the quickstart
-```
-$ storyblok quickstart
-```
-
-## Usage for fieldtypes and other boilerplates
+### Kickstart a storyblok project with a starter template
 ```
 $ storyblok select
 ```
 
-## Download your space's components schema as json
+### Download your space's components schema as json
 ```
 $ storyblok pull-components --space={{your_space_id}}
 ```
 
-## Push your components file to your/another space
+### Push your components file to your/another space
 ```
 $ storyblok push-components --space={{your_dest_space_id}} {{path/url}}
+```
+
+### Logout from the Storyblok cli
+```
+$ storyblok logout
+```
+
+### Login to the Storyblok cli
+```
+$ storyblok login
 ```
 
 ## Frequently asked questions
