@@ -1,11 +1,15 @@
 **The issue occurs while working with:** (check one with "x")   
-- [ ] *app.storyblok.com*   
-- [ ] *api.storyblok.com*   
+- [ ] *app.storyblok.com (CMS - Interface)*   
+- [ ] *api.storyblok.com (CMS - Content Delivery API)*
+- [ ] *mapi.storyblok.com (CMS - Management API)*
+- [ ] *capi.storyblok.com (Commerce - API)*     
+- [ ] *Commerce - Interface*   
 - [ ] *Other* <!-- => If you've got an issue with on of our boilerplates or themes - please create an issue in the specific repo -->
 
 **I'm submitting a ...**  (check one with "x")  
 - [ ] bug report  
 - [ ] feature request  
+- [ ] question
 
 **Current behavior:**
 <!-- Describe how the bug manifests. -->
