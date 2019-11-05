@@ -1,24 +1,20 @@
-var unirest = require('unirest')
-var fs = require('fs')
+const fs = require('fs')
 
-module.exports = function(api, argv) {
-
-  var name = argv._[1]
+module.exports = function (api, argv) {
+  const name = argv._[1]
 
   if (argv.space) {
     api.setSpaceId(argv.space)
     api.post('components', {
       component: {
-        name: name
+        name
       }
     }, (res) => {
-
-      if (res.status == 200) {
+      if (res.status === 200) {
         console.log(JSON.stringify(res.body, null, 2))
       } else {
         console.log(res.body)
       }
-
     })
   }
 

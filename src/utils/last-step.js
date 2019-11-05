@@ -4,10 +4,10 @@ const ghdownload = require('github-download')
 const replace = require('./replace')
 
 const lastStep = answers => {
-  var regex = /\[(.*?)\]/;
-  var gitRepo = '';
+  var regex = /\[(.*?)\]/
+  var gitRepo = ''
 
-  if (answers.type == 'Theme (Storyrenderer/Hosted)' || answers.type == 'Boilerplate (Selfhosted)') {
+  if (answers.type === 'Theme (Storyrenderer/Hosted)' || answers.type === 'Boilerplate (Selfhosted)') {
     if (answers.custom_theme_url) {
       gitRepo = answers.custom_theme_url + '.git'
     } else {
@@ -15,11 +15,11 @@ const lastStep = answers => {
     }
   }
 
-  if (answers.type == 'Fieldtype') {
+  if (answers.type === 'Fieldtype') {
     gitRepo = 'https://github.com/storyblok/storyblok-fieldtype.git'
   }
 
-  if (answers.type == 'quickstart') {
+  if (answers.type === 'quickstart') {
     gitRepo = 'https://github.com/storyblok/quickstart.git'
   }
 
@@ -28,7 +28,7 @@ const lastStep = answers => {
   console.log(chalk.green('✓') + ' - The github repository ' + gitRepo + ' will be cloned now...')
   ghdownload(gitRepo, outputDir)
     .on('error', function (err) {
-      if (err.code == 'ENOTEMPTY') {
+      if (err.code === 'ENOTEMPTY') {
         console.log()
         console.log(chalk.red('  Oh Snap! It seems that you already have a project with the name: ' + answers.name))
         console.log()
@@ -45,8 +45,8 @@ const lastStep = answers => {
     })
     .on('end', function () {
       var finalStep = 'gulp'
-      
-      if (answers.type == 'Fieldtype' || answers.type == 'quickstart') {
+
+      if (answers.type === 'Fieldtype' || answers.type === 'quickstart') {
         finalStep = 'npm run dev'
       }
 
@@ -59,25 +59,25 @@ const lastStep = answers => {
       console.log(chalk.white('  with the [storyblok] tag or live-chat with us on www.storyblok.com'))
       console.log()
 
-      if (answers.type == 'Theme (Storyrenderer/Hosted)' || answers.type == 'quickstart') {
+      if (answers.type === 'Theme (Storyrenderer/Hosted)' || answers.type === 'quickstart') {
         fs.renameSync(outputDir + '/_token.js', outputDir + '/token.js')
 
         if (answers.themeToken) {
-          replace(outputDir + '/token.js', { 'INSERT_TOKEN': answers.themeToken })
+          replace(outputDir + '/token.js', { INSERT_TOKEN: answers.themeToken })
         }
 
         var spaceConfig = {}
 
         if (answers.spaceId) {
-          spaceConfig['INSERT_SPACE_ID'] = answers.spaceId
+          spaceConfig.INSERT_SPACE_ID = answers.spaceId
         }
 
         if (answers.spaceDomain) {
-          spaceConfig['INSERT_YOUR_DOMAIN'] = answers.spaceDomain
+          spaceConfig.INSERT_YOUR_DOMAIN = answers.spaceDomain
         }
 
         if (answers.loginToken) {
-          spaceConfig['TEMP_QUICKSTART_TOKEN'] = answers.loginToken
+          spaceConfig.TEMP_QUICKSTART_TOKEN = answers.loginToken
         }
 
         replace(outputDir + '/config.js', spaceConfig)
