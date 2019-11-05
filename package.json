@@ -12,6 +12,10 @@
   "bin": {
     "storyblok": "src/cli.js"
   },
+  "scripts": {
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix"
+  },
   "author": "Dominik Angerer <dominikangerer1@gmail.com>, Alexander Feiglstorfer <delooks@gmail.com>",
   "license": "MIT",
   "dependencies": {
@@ -27,6 +31,14 @@
     "unirest": "^0.5.1"
   },
   "engines": {
-    "node" : ">=5.11.0"
+    "node": ">=5.11.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.6.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1"
   }
 }
