@@ -8,9 +8,9 @@
     "node",
     "javascript"
   ],
-  "main": "index.js",
+  "main": "src/cli.js",
   "bin": {
-    "storyblok": "./index.js"
+    "storyblok": "src/cli.js"
   },
   "author": "Dominik Angerer <dominikangerer1@gmail.com>, Alexander Feiglstorfer <delooks@gmail.com>",
   "license": "MIT",

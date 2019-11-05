@@ -1,9 +1,9 @@
 const fs = require('fs')
 const chalk = require('chalk')
 const ghdownload = require('github-download')
-const replace = require('../replace')
+const replace = require('./replace')
 
-const lastStep = (answers) => {
+const lastStep = answers => {
   var regex = /\[(.*?)\]/;
   var gitRepo = '';
 

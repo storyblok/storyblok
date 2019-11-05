@@ -6,8 +6,8 @@ var figlet = require('figlet')
 var inquirer = require('inquirer')
 var parseArgs = require('minimist')
 
-var api = require('./api')
-const lastStep = require('./lib/last-step')
+const api = require('./utils/api')
+const lastStep = require('./utils/last-step')
 
 var pushComponents = require('./tasks/push-components')
 var pullComponents = require('./tasks/pull-components')
@@ -281,8 +281,7 @@ if (['select'].indexOf(subcommand) > -1) {
   ]
 }
 
-
-inquirer.prompt(questions).then(function (answers) {
+const processAnswers = answers => {
   if (subcommand == 'quickstart') {
     answers.type = 'quickstart'
   }
@@ -341,4 +340,8 @@ inquirer.prompt(questions).then(function (answers) {
     default:
       lastStep(answers)
   }
-})
+}
+
+inquirer
+  .prompt(questions)
+  .then(processAnswers)

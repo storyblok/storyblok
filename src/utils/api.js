@@ -1,5 +1,5 @@
 var unirest = require('unirest')
-var creds = require('./lib/creds')
+var creds = require('./creds')
 
 module.exports = {
   accessToken: '',

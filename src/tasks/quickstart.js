@@ -1,6 +1,6 @@
 const opn = require('opn')
 const chalk = require('chalk')
-const lastStep = require('../lib/last-step')
+const lastStep = require('../utils/last-step')
 
 const quickstart = (api, answers, spaceId) => {
   if (typeof spaceId !== 'undefined') {
