@@ -15,7 +15,7 @@
   "scripts": {
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
-    "test": "jest",
+    "test": "jest --silent",
     "test:coverage": "jest --coverage"
   },
   "author": "Dominik Angerer <dominikangerer1@gmail.com>, Alexander Feiglstorfer <delooks@gmail.com>",

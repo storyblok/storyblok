@@ -2,10 +2,10 @@ const fs = jest.genMockFromModule('fs')
 
 const mockFiles = Object.create(null)
 
-const writeFileSync = jest.fn((key, data) => {
+const writeFile = jest.fn((key, data, _) => {
   mockFiles[key] = data
 })
 
-fs.writeFileSync = writeFileSync
+fs.writeFile = writeFile
 
 module.exports = fs

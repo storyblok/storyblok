@@ -1,41 +1,91 @@
+const fs = require('fs')
 const pullComponents = require('../../src/tasks/pull-components')
 
 jest.mock('fs')
 
-const fs = require('fs')
-
 describe('testing pullComponents', () => {
   it('api.get() should be called once time', () => {
     const api = {
-      get: jest.fn()
+      get: jest.fn(() => {})
     }
-    const argv = {}
 
-    pullComponents(api, argv)
-
-    expect(api.get.mock.calls.length).toBe(1)
+    pullComponents(api, {})
+      .then(() => {
+        expect(api.get.mock.calls.length).toBe(1)
+      })
   })
 
-  it('api.get() should be call fs.writeFileSync correctly', () => {
+  it('api.get() should be call fs.writeFile correctly', () => {
+    const SPACE = 12345
+    const BODY = {
+      components: [
+        {
+          name: 'teaser',
+          display_name: null,
+          created_at: '2019-10-15T17:00:32.212Z',
+          id: 581153,
+          schema: {
+            headline: {
+              type: 'text'
+            }
+          },
+          image: null,
+          preview_field: null,
+          is_root: false,
+          preview_tmpl: null,
+          is_nestable: true,
+          all_presets: [],
+          preset_id: null,
+          real_name: 'teaser',
+          component_group_uuid: null
+        }
+      ]
+    }
+
     const api = {
       get (_, fn) {
         fn({
           status: 200,
-          body: {}
+          body: BODY
         })
       }
     }
 
     const options = {
-      space: 12345
+      space: SPACE
     }
 
+    const expectFileName = `components.${SPACE}.json`
+
     pullComponents(api, options)
+      .then(_ => {
+        const [path, data] = fs.writeFile.mock.calls[0]
 
-    const [path, data] = fs.writeFileSync.mock.calls[0]
+        expect(fs.writeFile.mock.calls.length).toBe(1)
+        expect(path).toBe(`./${expectFileName}`)
+        expect(JSON.parse(data)).toEqual(BODY)
+      })
+      .catch(() => {})
+  })
 
-    expect(fs.writeFileSync.mock.calls.length).toBe(1)
-    expect(path).toBe(`./components.${12345}.json`)
-    expect(data).toBe(JSON.stringify({}))
+  it('api.get() when a error ocurred, catch the body response', () => {
+    const BODY = {
+      name: 'Storyblok CMS'
+    }
+
+    const _api = {
+      get (_, fn) {
+        fn({
+          status: 400,
+          body: BODY
+        })
+      }
+    }
+
+    pullComponents(_api, {})
+      .then(() => {})
+      .catch(err => {
+        expect(err).toBe(BODY)
+      })
   })
 })
