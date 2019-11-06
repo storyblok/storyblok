@@ -1,17 +1,39 @@
-var fs = require('fs')
+const fs = require('fs')
+const chalk = require('chalk')
 
-module.exports = function (api, options) {
+/**
+ * @method pullComponents
+ * @param  {Object} api
+ * @param  {Object} options { space: Number }
+ * @return {Promise<Object>}
+ */
+const pullComponents = (api, options) => {
   const { space } = options
 
-  api.get('components', (res) => {
-    if (res.status === 200) {
-      const file = `components.${space}.json`
-      console.log(`We've saved your components in the file: ${file}`)
-      fs.writeFileSync(`./${file}`, JSON.stringify(res.body, null, 2))
-      return
-    }
+  return new Promise((resolve, reject) => {
+    api.get('components', (res) => {
+      if (res.status !== 200) {
+        console.log(chalk.red('X') + 'An error ocurred in pull-components task')
+        console.log(res.body)
+        reject(res.body)
+        return
+      }
 
-    console.log(res.body)
-    return res.body
+      const file = `components.${space}.json`
+      const data = JSON.stringify(res.body, null, 2)
+
+      console.log(`${chalk.green('✓')} We've saved your components in the file: ${file}`)
+
+      fs.writeFile(`./${file}`, data, err => {
+        if (err) {
+          reject(err)
+          return
+        }
+
+        resolve(file)
+      })
+    })
   })
 }
+
+module.exports = pullComponents
