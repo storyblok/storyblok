@@ -68,7 +68,7 @@ describe('testing pullComponents', () => {
       .catch(() => {})
   })
 
-  it('api.get() when a error ocurred, catch the body response', () => {
+  it('api.get() when a error ocurred, catch the body response', async () => {
     const BODY = {
       name: 'Storyblok CMS'
     }
@@ -82,10 +82,6 @@ describe('testing pullComponents', () => {
       }
     }
 
-    pullComponents(_api, {})
-      .then(() => {})
-      .catch(err => {
-        expect(err).toBe(BODY)
-      })
+    await expect(pullComponents(_api, {})).rejects.toThrow('error')
   })
 })
