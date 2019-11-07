@@ -1,20 +1,15 @@
 #!/usr/bin/env node
 
-var chalk = require('chalk')
-var clear = require('clear')
-var figlet = require('figlet')
-var inquirer = require('inquirer')
-var parseArgs = require('minimist')
+const commander = require('commander')
+const program = new commander.Command()
 
-const api = require('./utils/api')
-const lastStep = require('./utils/last-step')
-const getOptions = require('./utils/get-options')
+const chalk = require('chalk')
+const clear = require('clear')
+const figlet = require('figlet')
+const inquirer = require('inquirer')
 
-var pushComponents = require('./tasks/push-components')
-var pullComponents = require('./tasks/pull-components')
-var deleteTemplates = require('./tasks/delete-templates')
-var scaffold = require('./tasks/scaffold')
-const quickstart = require('./tasks/quickstart')
+const tasks = require('./tasks')
+const { getQuestions, lastStep, api } = require('./utils')
 
 clear()
 console.log(chalk.cyan(figlet.textSync('Storyblok')))
@@ -23,88 +18,136 @@ console.log()
 console.log('Hi, welcome to the Storyblok CLI')
 console.log()
 
-var subcommand = 'quickstart'
-var cliAttribute = ''
-var argv = parseArgs(process.argv.slice(2))
+program
+  .option('-s, --space [value]', 'space ID')
 
-// TODO: refactor to use a function
-if (typeof argv._[0] !== 'undefined') {
-  subcommand = argv._[0]
+// login
+program
+  .command('login')
+  .description('Login to the Storyblok cli')
+  .action(async () => {
+    try {
+      const questions = getQuestions('login', {}, api)
+      const { email, password } = await inquirer.prompt(questions)
 
-  if (typeof argv._[1] !== 'undefined') {
-    cliAttribute = argv._[1]
-  }
-}
+      await api.login(email, password)
+      console.log(chalk.green('✓') + 'Log in successfully! Token has been added to .netrc file.')
+      process.exit(0)
+    } catch (e) {
+      console.log(chalk.red('X') + 'An error ocurred when login the user')
+      console.error(e)
+    }
+  })
 
-const questions = getOptions(subcommand, argv, api)
+// logout
+program
+  .command('logout')
+  .description('Logout from the Storyblok cli')
+  .action(async () => {
+    try {
+      await api.logout()
+      console.log('Logged out successfully! Token has been removed from .netrc file.')
+      process.exit(0)
+    } catch (e) {
+      console.log(chalk.red('X') + 'An error ocurred when logout the user')
+      console.error(e)
+    }
+  })
 
-if (subcommand === 'logout') {
-  api.logout()
-  console.log('Logged out successfully! Token has been removed from .netrc file.')
-  console.log()
-  process.exit(0)
-}
+// pull-components
+program
+  .command('pull-components')
+  .description("Download your space's components schema as json")
+  .action(async () => {
+    const space = program.space
+    if (!space) {
+      console.log('Please provide the space as argument --space YOUR_SPACE_ID.')
+      process.exit(0)
+    }
 
-const processAnswers = answers => {
-  if (subcommand === 'quickstart') {
-    answers.type = 'quickstart'
-  }
+    try {
+      const questions = await getQuestions('pull-components', { space }, api)
 
-  switch (subcommand) {
-    case 'quickstart':
-      var spaceId = argv.space
-      quickstart(api, answers, spaceId)
+      await inquirer.prompt(questions)
 
-      break
-    case 'push-components':
-      if (!argv.space) {
-        console.log('Please provide the space id as argument --space=YOUR_SPACE_ID.')
-        process.exit(0)
-      }
+      api.setSpaceId(space)
+      await tasks.pullComponents(api, { space })
+    } catch (e) {
+      console.log(chalk.red('X') + 'An error ocurred when execute the pull-components task')
+      console.error(e)
+      process.exit(0)
+    }
+  })
 
-      api.setSpaceId(argv.space)
-      pushComponents(api, argv)
+// push-components
+program
+  .command('push-components <source>')
+  .description("Download your space's components schema as json. The source parameter can be a URL to your JSON file or a path to it")
+  .action(async (source) => {
+    const space = program.space
+    if (!space) {
+      console.log('Please provide the space as argument --space YOUR_SPACE_ID.')
+      process.exit(0)
+    }
 
-      break
-    case 'pull-components':
-      if (!argv.space) {
-        console.log('Please provide the space id as argument --space=YOUR_SPACE_ID.')
-        process.exit(0)
-      }
+    try {
+      const questions = await getQuestions('push-components', { space }, api)
 
-      api.setSpaceId(argv.space)
-      pullComponents(api, argv)
+      await inquirer.prompt(questions)
 
-      break
-    case 'delete-templates':
-      if (!argv.space) {
-        console.log('Please provide the space id as argument --space=YOUR_SPACE_ID.')
-        process.exit(0)
-      }
+      api.setSpaceId(space)
+      await tasks.pushComponents(api, { source })
+    } catch (e) {
+      console.log(chalk.red('X') + 'An error ocurred when execute the push-components task')
+      console.error(e)
+      process.exit(0)
+    }
+  })
 
-      api.setSpaceId(argv.space)
-      deleteTemplates(api, argv)
+// scaffold
+program
+  .command('scaffold <name>')
+  .description('Scaffold <name> component')
+  .action(async (name) => {
+    try {
+      await tasks.scaffold(api, name, program.space)
+      console.log(chalk.green('✓') + 'Log in successfully! Token has been added to .netrc file.')
+      process.exit(0)
+    } catch (e) {
+      console.log(chalk.red('X') + 'An error ocurred execute operations to create the component')
+      console.error(e)
+    }
+  })
 
-      break
-    case 'scaffold':
-      if (!cliAttribute.length) {
-        console.log('Second cli argument is missing.')
-        process.exit(0)
-      }
+// select command
+program
+  .command('select')
+  .description('Usage to kickstart a boilerplate, fieldtype or theme')
+  .action(async () => {
+    try {
+      const questions = getQuestions('select')
+      const answers = await inquirer.prompt(questions)
 
-      scaffold(api, argv)
-
-      break
-    case 'login':
-      console.log('Logged in successfully! Token has been added to .netrc file.')
-      console.log()
-
-      break
-    default:
       lastStep(answers)
-  }
-}
+    } catch (e) {
+      console.error(e)
+      process.exit(0)
+    }
+  })
 
-inquirer
-  .prompt(questions)
-  .then(processAnswers)
+// quickstart
+program
+  .command('quickstart')
+  .description('Start a project quickly')
+  .action(async () => {
+    try {
+      const questions = getQuestions('quickstart', {}, api)
+      const answers = await inquirer.prompt(questions)
+      tasks.quickstart(api, answers, program.space)
+    } catch (e) {
+      console.log(chalk.red('X') + 'An error ocurred when execute quickstart operations')
+      console.error(e)
+    }
+  })
+
+program.parse(process.argv)
