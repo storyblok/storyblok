@@ -119,7 +119,7 @@ program
     }
   })
 
-// select command
+// select
 program
   .command('select')
   .description('Usage to kickstart a boilerplate, fieldtype or theme')
@@ -130,6 +130,35 @@ program
 
       lastStep(answers)
     } catch (e) {
+      console.error(e)
+      process.exit(0)
+    }
+  })
+
+// sync
+program
+  .command('sync')
+  .description('Sync schemas, roles, folders and stories between spaces')
+  .requiredOption('--token <TOKEN>', 'Your OAuth token from your Storyblok settings')
+  .requiredOption('--command <COMMAND>', 'Define what will be sync. Can be syncComponents, syncFolders, syncStories or syncRoles')
+  .requiredOption('--source <SPACE_ID>', 'Source space id')
+  .requiredOption('--target <SPACE_ID>', 'Target space id')
+  .action(async (options) => {
+    const {
+      token,
+      command,
+      source,
+      target
+    } = options
+
+    try {
+      await tasks.sync(command, {
+        token,
+        source,
+        target
+      })
+    } catch (e) {
+      console.error(chalk.red('X') + 'An error ocurred when sync spaces')
       console.error(e)
       process.exit(0)
     }

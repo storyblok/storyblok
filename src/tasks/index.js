@@ -1,6 +1,7 @@
 module.exports = {
-  pullComponents: require('./pull-components'),
-  pushComponents: require('./push-components'),
+  sync: require('./sync'),
+  scaffold: require('./scaffold'),
   quickstart: require('./quickstart'),
-  scaffold: require('./scaffold')
+  pullComponents: require('./pull-components'),
+  pushComponents: require('./push-components')
 }
