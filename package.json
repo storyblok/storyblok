@@ -31,6 +31,7 @@
     "netrc": "0.1.4",
     "opn": "^5.1.0",
     "path": "^0.12.7",
+    "storyblok-js-client": "^2.0.10",
     "unirest": "^0.5.1"
   },
   "engines": {
