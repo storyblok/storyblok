@@ -12,42 +12,125 @@ You found an issue?<br>Tell us about it - <a href="https://github.com/storyblok/
 
 ## Installation
 
-Make sure you've node `>= 5.11.0` installed.
+Make sure you've node `>= 9.11.0` installed.
 
-```
+```sh
 $ npm i storyblok -g
 ```
 
 ## Commands
 
-### Usage to kickstart a boilerplate, fieldtype or theme
+### select
 
-```
+Usage to kickstart a boilerplate, fieldtype or theme
+
+```sh
 $ storyblok select
 ```
 
-### Download your space's components schema as json
+### pull-components
 
-```
-$ storyblok pull-components --space={{your_space_id}}
-```
+Download your space's components schema as json
 
-### Push your components file to your/another space
-
-```
-$ storyblok push-components --space={{your_dest_space_id}} {{path/url}}
+```sh
+$ storyblok pull-components --space <SPACE_ID>
 ```
 
-### Logout from the Storyblok cli
+#### Options
+
+* `space`: your space id
+
+### push-components
+
+Push your components file to your/another space
+
+```sh
+$ storyblok push-components <SOURCE> --space <SPACE_ID>
 ```
+
+#### Parameters
+
+* `source`: can be a URL or path to JSON file.
+
+Using an **URL**
+
+```sh
+$ storyblok push-components https://raw.githubusercontent.com/storyblok/nuxtdoc/master/seed.components.json --space 67819
+```
+
+Using a **path** to file
+
+```sh
+$ storyblok push-components ./components.json --space 67819
+```
+
+#### Options
+
+* `space`: your space id
+
+### sync
+
+Sync components, folder, roles or stories between spaces
+
+$ storyblok sync --command <COMMAND> --token <YOUR_OAUTH_TOKEN> --source <SPACE_ID> --target <SPACE_ID>
+
+#### Options
+
+* `command`: a command to execute the syncronization. Available commands:
+  * `syncFolders`
+  * `syncComponents`
+  * `syncStories`
+  * `syncRoles`
+* `token`: your OAuth token. This token can be view in your Storyblok account
+* `source`: the source space to use to sync
+* `target`: the target space to use to sync
+
+#### Examples
+
+Sync components from `00001` space to `00002` space
+
+```sh
+$ storyblok sync --command syncComponents --token <YOUR_OAUTH_TOKEN> --source 00001 --target 00002
+```
+
+### quickstart
+
+Create a space in Storyblok and select the boilerplate to use
+
+```sh
+$ storyblok quickstart
+```
+
+### logout
+
+Logout from the Storyblok cli
+
+```sh
 $ storyblok logout
 ```
 
-### Login to the Storyblok cli
-```
+### login
+
+Login to the Storyblok cli
+
+```sh
 $ storyblok login
 ```
 
-### You're looking for a headstart?
+### Help
+
+For global help
+
+```sh
+$ storyblok --help
+```
+
+For command help
+
+```sh
+$ storyblok sync --help
+```
+
+## You're looking for a headstart?
 
 Check out our guides for client side apps (VueJS, Angular, React, ...), static site (Jekyll, NuxtJs, ...), dynamic site examples (Node, PHP, Python, Laravel, ...) on our [Getting Started](https://www.storyblok.com/getting-started) page.
