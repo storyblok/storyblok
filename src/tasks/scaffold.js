@@ -1,10 +1,8 @@
 const fs = require('fs')
 
-module.exports = function (api, argv) {
-  const name = argv._[1]
-
-  if (argv.space) {
-    api.setSpaceId(argv.space)
+module.exports = function (api, name, space) {
+  if (space) {
+    api.setSpaceId(space)
     api.post('components', {
       component: {
         name

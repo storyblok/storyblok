@@ -1,9 +1,7 @@
-const getOptions = (subcommand, argv, api) => {
+const getOptions = (subcommand, argv = '', api = {}) => {
   let email = ''
 
   if (subcommand === 'select') {
-    subcommand = 'select'
-
     return [
       {
         type: 'input',

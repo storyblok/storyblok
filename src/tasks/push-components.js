@@ -1,8 +1,8 @@
 var unirest = require('unirest')
 var fs = require('fs')
 
-module.exports = function (api, argv) {
-  var source = argv._[1]
+module.exports = function (api, options) {
+  const { source } = options
 
   if (source.indexOf('http') === 0) {
     var req = unirest('GET', source)

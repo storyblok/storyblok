@@ -13,9 +13,9 @@ const pullComponents = (api, options) => {
   return new Promise((resolve, reject) => {
     api.get('components', (res) => {
       if (res.status !== 200) {
-        console.log(chalk.red('X') + 'An error ocurred in pull-components task')
-        console.log(res.body)
-        reject(res.body)
+        const message = 'An error ocurred in pull-components task when load components data'
+        console.log(res)
+        reject(new Error(message))
         return
       }
 
