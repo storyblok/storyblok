@@ -35,7 +35,7 @@
     "unirest": "^0.5.1"
   },
   "engines": {
-    "node": ">=5.11.0"
+    "node": ">=9.11.0"
   },
   "devDependencies": {
     "eslint": "^6.6.0",
