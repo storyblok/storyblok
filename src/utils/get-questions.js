@@ -132,13 +132,11 @@ const getOptions = (subcommand, argv = '', api = {}) => {
         validate: function (value) {
           const done = this.async()
 
-          api.login(email, value, (data) => {
-            if (data.status === 200) {
-              done(null, true)
-            } else {
+          return api.login(email, value)
+            .then(_ => done(null, true))
+            .catch(_ => {
               done('Password seams to be wrong. Please try again:')
-            }
-          })
+            })
         }
       }
     ]
