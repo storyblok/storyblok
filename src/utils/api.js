@@ -46,18 +46,18 @@ module.exports = {
       .catch(err => Promise.reject(err))
   },
 
-  isAuthorized: function () {
-    var loginCreds = creds.get()
+  isAuthorized () {
+    const { token } = creds.get()
 
-    if (loginCreds !== null) {
-      this.accessToken = loginCreds.token
+    if (token !== null) {
+      this.accessToken = token
       return true
     }
 
     return false
   },
 
-  setSpaceId: function (spaceId) {
+  setSpaceId (spaceId) {
     this.spaceId = spaceId
   },
 
