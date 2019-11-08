@@ -26,16 +26,22 @@ program
   .command('login')
   .description('Login to the Storyblok cli')
   .action(async () => {
+    if (api.isAuthorized()) {
+      console.log(chalk.green('✓') + ' The user has been already logged. If you want to change the logged user, you must logout and login again')
+      return
+    }
+
     try {
       const questions = getQuestions('login', {}, api)
       const { email, password } = await inquirer.prompt(questions)
 
       await api.login(email, password)
-      console.log(chalk.green('✓') + 'Log in successfully! Token has been added to .netrc file.')
+      console.log(chalk.green('✓') + ' Log in successfully! Token has been added to .netrc file.')
       process.exit(0)
     } catch (e) {
-      console.log(chalk.red('X') + 'An error ocurred when login the user')
+      console.log(chalk.red('X') + ' An error ocurred when login the user')
       console.error(e)
+      process.exit(1)
     }
   })
 
