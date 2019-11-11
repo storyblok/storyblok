@@ -44,14 +44,16 @@ describe('testing pushComponents', () => {
 
       try {
         let components = await api.getComponents()
+        let exists = components.filter(comp => comp.name === 'doc')
 
-        expect(components.length).toBe(4)
+        expect(exists.length).toBe(0)
 
         await pushComponents(api, { source })
 
         components = await api.getComponents()
+        exists = components.filter(comp => comp.name === 'doc')
 
-        expect(components.length).toBe(5)
+        expect(exists.length).toBe(1)
       } catch (e) {
         console.error(e)
       }
