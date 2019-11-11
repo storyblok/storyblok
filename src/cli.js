@@ -91,6 +91,7 @@ program
   .command('push-components <source>')
   .description("Download your space's components schema as json. The source parameter can be a URL to your JSON file or a path to it")
   .action(async (source) => {
+    console.log(`${chalk.blue('-')} Executing push-components task`)
     const space = program.space
     if (!space) {
       console.log('Please provide the space as argument --space YOUR_SPACE_ID.')
@@ -105,7 +106,7 @@ program
       api.setSpaceId(space)
       await tasks.pushComponents(api, { source })
     } catch (e) {
-      console.log(chalk.red('X') + 'An error ocurred when execute the push-components task')
+      console.log(chalk.red('X') + ' An error ocurred when execute the push-components task')
       console.error(e)
       process.exit(0)
     }
