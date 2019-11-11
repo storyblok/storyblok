@@ -1,14 +1,28 @@
-var unirest = require('unirest')
 const axios = require('axios')
 const creds = require('./creds')
+const Storyblok = require('storyblok-js-client')
 
-const { LOGIN_URL, SIGNUP_URL } = require('../constants')
+const { LOGIN_URL, SIGNUP_URL, API_URL } = require('../constants')
 
 module.exports = {
   accessToken: '',
   spaceId: null,
 
-  async login (email, password) {
+  getClient () {
+    return new Storyblok({
+      oauthToken: this.accessToken
+    }, API_URL)
+  },
+
+  getPath (path) {
+    if (this.spaceId) {
+      return `spaces/${this.spaceId}/${path}`
+    }
+
+    return path
+  },
+
+  login (email, password) {
     return axios.post(LOGIN_URL, {
       email: email,
       password: password
@@ -47,9 +61,9 @@ module.exports = {
   },
 
   isAuthorized () {
-    const { token } = creds.get()
+    const { token } = creds.get() || {}
 
-    if (token !== null) {
+    if (token) {
       this.accessToken = token
       return true
     }
@@ -61,40 +75,57 @@ module.exports = {
     this.spaceId = spaceId
   },
 
-  post: function (path, props, callback) {
-    this.sendRequest(path, 'POST', props, callback)
+  getComponents () {
+    const client = this.getClient()
+
+    return client
+      .get(this.getPath('components'))
+      .then(data => data.data.components || [])
+      .catch(err => Promise.reject(err))
   },
 
-  put: function (path, props, callback) {
-    this.sendRequest(path, 'PUT', props, callback)
+  post (path, props) {
+    return this.sendRequest(path, 'post', props)
   },
 
-  get: function (path, callback) {
-    this.sendRequest(path, 'GET', null, callback)
+  put (path, props) {
+    return this.sendRequest(path, 'put', props)
   },
 
-  delete: function (path, callback) {
-    this.sendRequest(path, 'DELETE', null, callback)
+  get (path) {
+    return this.sendRequest(path, 'get')
   },
 
-  sendRequest: function (path, method, props, callback) {
-    if (this.spaceId) {
-      path = 'spaces/' + this.spaceId + '/' + path
-    }
+  delete (path) {
+    return this.sendRequest(path, 'delete')
+  },
 
-    var req = unirest(method, 'https://api.storyblok.com/v1/' + path)
+  sendRequest (path, method, props = null) {
+    const client = this.getClient()
+    const _path = this.getPath(path)
+    console.log({ _path })
 
-    req.headers({
-      Authorization: this.accessToken
-    })
-
-    req.type('json')
-
-    if (method === 'GET') {
-      req.end(callback)
-    } else {
-      req.send(props)
-      req.end(callback)
-    }
+    return client[method](_path, props)
   }
+
+  // sendRequest: function (path, method, props, callback) {
+  //   if (this.spaceId) {
+  //     path = 'spaces/' + this.spaceId + '/' + path
+  //   }
+
+  //   var req = unirest(method, 'https://api.storyblok.com/v1/' + path)
+
+  //   req.headers({
+  //     Authorization: this.accessToken
+  //   })
+
+  //   req.type('json')
+
+  //   if (method === 'GET') {
+  //     req.end(callback)
+  //   } else {
+  //     req.send(props)
+  //     req.end(callback)
+  //   }
+  // }
 }

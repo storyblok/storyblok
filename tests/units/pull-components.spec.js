@@ -4,18 +4,21 @@ const pullComponents = require('../../src/tasks/pull-components')
 jest.mock('fs')
 
 describe('testing pullComponents', () => {
-  it('api.get() should be called once time', () => {
+  it('api.getComponents() should be called once time', () => {
     const api = {
-      get: jest.fn(() => {})
+      getComponents: jest.fn(() => Promise.resolve(true))
     }
 
     pullComponents(api, {})
       .then(() => {
-        expect(api.get.mock.calls.length).toBe(1)
+        expect(api.getComponents.mock.calls.length).toBe(1)
+      })
+      .catch(err => {
+        console.error(err)
       })
   })
 
-  it('api.get() should be call fs.writeFile correctly', () => {
+  it('api.getComponents() should be call fs.writeFile correctly', () => {
     const SPACE = 12345
     const BODY = {
       components: [
@@ -43,11 +46,8 @@ describe('testing pullComponents', () => {
     }
 
     const api = {
-      get (_, fn) {
-        fn({
-          status: 200,
-          body: BODY
-        })
+      getComponents () {
+        return Promise.resolve(BODY.components)
       }
     }
 
@@ -65,23 +65,18 @@ describe('testing pullComponents', () => {
         expect(path).toBe(`./${expectFileName}`)
         expect(JSON.parse(data)).toEqual(BODY)
       })
-      .catch(() => {})
+      .catch(err => {
+        console.error(err)
+      })
   })
 
-  it('api.get() when a error ocurred, catch the body response', async () => {
-    const BODY = {
-      name: 'Storyblok CMS'
-    }
-
+  it('api.getComponents() when a error ocurred, catch the body response', async () => {
     const _api = {
-      get (_, fn) {
-        fn({
-          status: 400,
-          body: BODY
-        })
+      getComponents (_, fn) {
+        return Promise.reject(new Error('Failed'))
       }
     }
 
-    await expect(pullComponents(_api, {})).rejects.toThrow('error')
+    await expect(pullComponents(_api, {})).rejects.toThrow('Error: Failed')
   })
 })

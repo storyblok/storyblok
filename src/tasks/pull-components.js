@@ -10,30 +10,27 @@ const chalk = require('chalk')
 const pullComponents = (api, options) => {
   const { space } = options
 
-  return new Promise((resolve, reject) => {
-    api.get('components', (res) => {
-      if (res.status !== 200) {
-        const message = 'An error ocurred in pull-components task when load components data'
-        console.log(res)
-        reject(new Error(message))
-        return
-      }
-
+  return api
+    .getComponents()
+    .then(components => {
       const file = `components.${space}.json`
-      const data = JSON.stringify(res.body, null, 2)
+      const data = JSON.stringify({ components }, null, 2)
 
       console.log(`${chalk.green('✓')} We've saved your components in the file: ${file}`)
 
       fs.writeFile(`./${file}`, data, err => {
         if (err) {
-          reject(err)
+          Promise.reject(err)
           return
         }
 
-        resolve(file)
+        Promise.resolve(file)
       })
     })
-  })
+    .catch(err => {
+      console.error(`${chalk.red('X')} An error ocurred in pull-components task when load components data`)
+      return Promise.reject(new Error(err))
+    })
 }
 
 module.exports = pullComponents

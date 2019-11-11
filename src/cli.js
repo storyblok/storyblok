@@ -65,6 +65,7 @@ program
   .command('pull-components')
   .description("Download your space's components schema as json")
   .action(async () => {
+    console.log(`${chalk.blue('-')} Executing push-components task`)
     const space = program.space
     if (!space) {
       console.log('Please provide the space as argument --space YOUR_SPACE_ID.')
@@ -79,7 +80,7 @@ program
       api.setSpaceId(space)
       await tasks.pullComponents(api, { space })
     } catch (e) {
-      console.log(chalk.red('X') + 'An error ocurred when execute the pull-components task')
+      console.log(chalk.red('X') + ' An error ocurred when execute the pull-components task')
       console.error(e)
       process.exit(0)
     }
