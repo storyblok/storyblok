@@ -7,6 +7,11 @@ const writeFile = jest.fn((key, data, _) => {
   mockFiles[key] = data
 })
 
+// used by scaffold.spec.js
+const writeFileSync = jest.fn((key, data) => {
+  mockFiles[key] = data
+})
+
 // used by push-components.spec.js
 const readFileSync = jest.fn((key) => {
   if (key === 'components.js') {
@@ -40,5 +45,7 @@ const readFileSync = jest.fn((key) => {
 fs.writeFile = writeFile
 
 fs.readFileSync = readFileSync
+
+fs.writeFileSync = writeFileSync
 
 module.exports = fs

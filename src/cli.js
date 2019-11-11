@@ -9,7 +9,7 @@ const figlet = require('figlet')
 const inquirer = require('inquirer')
 
 const tasks = require('./tasks')
-const { getQuestions, lastStep, api } = require('./utils')
+const { getQuestions, lastStep, api, creds } = require('./utils')
 
 clear()
 console.log(chalk.cyan(figlet.textSync('Storyblok')))
@@ -118,9 +118,17 @@ program
   .command('scaffold <name>')
   .description('Scaffold <name> component')
   .action(async (name) => {
+    console.log(`${chalk.blue('-')} Scaffolding a component\n`)
+
+    if (api.isAuthorized()) {
+      api.accessToken = creds.get().token || null
+    }
+
     try {
       await tasks.scaffold(api, name, program.space)
-      console.log(chalk.green('✓') + ' Log in successfully! Token has been added to .netrc file.')
+      console.log(chalk.green('✓') + ' Generated files: ')
+      console.log(chalk.green('✓') + ' - views/components/_' + name + '.liquid')
+      console.log(chalk.green('✓') + ' - source/scss/components/below/_' + name + '.scss')
       process.exit(0)
     } catch (e) {
       console.log(chalk.red('X') + ' An error ocurred execute operations to create the component')
@@ -137,7 +145,7 @@ program
       const questions = getQuestions('select')
       const answers = await inquirer.prompt(questions)
 
-      lastStep(answers)
+      await lastStep(answers)
     } catch (e) {
       console.error(e)
       process.exit(0)

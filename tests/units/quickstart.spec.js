@@ -13,7 +13,6 @@ const TEST_PATH = path.join(__dirname, '../../space-test')
 
 describe('testing quickstart()', () => {
   beforeEach(() => {
-    console.log('deleted', TEST_PATH)
     fs.rmdirSync(TEST_PATH, { recursive: true })
 
     api.setSpaceId(null)
