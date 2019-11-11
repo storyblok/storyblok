@@ -55,7 +55,7 @@ program
       console.log('Logged out successfully! Token has been removed from .netrc file.')
       process.exit(0)
     } catch (e) {
-      console.log(chalk.red('X') + 'An error ocurred when logout the user')
+      console.log(chalk.red('X') + ' An error ocurred when logout the user')
       console.error(e)
     }
   })
@@ -68,7 +68,7 @@ program
     console.log(`${chalk.blue('-')} Executing push-components task`)
     const space = program.space
     if (!space) {
-      console.log('Please provide the space as argument --space YOUR_SPACE_ID.')
+      console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
       process.exit(0)
     }
 
@@ -93,8 +93,9 @@ program
   .action(async (source) => {
     console.log(`${chalk.blue('-')} Executing push-components task`)
     const space = program.space
+
     if (!space) {
-      console.log('Please provide the space as argument --space YOUR_SPACE_ID.')
+      console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
       process.exit(0)
     }
 
@@ -119,10 +120,10 @@ program
   .action(async (name) => {
     try {
       await tasks.scaffold(api, name, program.space)
-      console.log(chalk.green('✓') + 'Log in successfully! Token has been added to .netrc file.')
+      console.log(chalk.green('✓') + ' Log in successfully! Token has been added to .netrc file.')
       process.exit(0)
     } catch (e) {
-      console.log(chalk.red('X') + 'An error ocurred execute operations to create the component')
+      console.log(chalk.red('X') + ' An error ocurred execute operations to create the component')
       console.error(e)
     }
   })
@@ -166,7 +167,7 @@ program
         target
       })
     } catch (e) {
-      console.error(chalk.red('X') + 'An error ocurred when sync spaces')
+      console.error(chalk.red('X') + ' An error ocurred when sync spaces')
       console.error(e)
       process.exit(0)
     }
@@ -180,9 +181,9 @@ program
     try {
       const questions = getQuestions('quickstart', {}, api)
       const answers = await inquirer.prompt(questions)
-      tasks.quickstart(api, answers, program.space)
+      await tasks.quickstart(api, answers, program.space)
     } catch (e) {
-      console.log(chalk.red('X') + 'An error ocurred when execute quickstart operations')
+      console.log(chalk.red('X') + ' An error ocurred when execute quickstart operations')
       console.error(e)
     }
   })

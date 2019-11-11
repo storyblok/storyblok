@@ -2,9 +2,13 @@ const opn = require('opn')
 const chalk = require('chalk')
 const lastStep = require('../utils/last-step')
 
-const quickstart = (api, answers, spaceId) => {
-  if (typeof spaceId !== 'undefined') {
-    console.log('  Your project will be initialized now...')
+const hasSpaceId = spaceId => typeof spaceId !== 'undefined'
+
+const quickstart = async (api, answers, spaceId) => {
+  answers.type = 'quickstart'
+
+  if (hasSpaceId(spaceId)) {
+    console.log(`${chalk.blue('-')} Your project will be initialized now...`)
 
     const config = {
       space: {
@@ -14,46 +18,41 @@ const quickstart = (api, answers, spaceId) => {
 
     const spaceUrl = 'spaces/' + spaceId + '/'
 
-    api.put(spaceUrl, config, (spaceRes) => {
-      if (spaceRes.status === 200) {
-        answers.name = spaceRes.body.space.name.replace(/\s+/g, '-').toLowerCase()
-        console.log(chalk.green('✓') + ' - Space ' + answers.name + ' updated with dev environment in Storyblok')
+    try {
+      const spaceRes = await api.put(spaceUrl, config)
+      answers.name = spaceRes.data.space.name.replace(/\s+/g, '-').toLowerCase()
+      console.log(`${chalk.green('✓')} - Space ${answers.name} updated with dev environment in Storyblok`)
 
-        api.post('tokens', {}, (tokensRes) => {
-          console.log(chalk.green('✓') + ' - Configuration for your Space was loaded')
-          answers.loginToken = tokensRes.body.key
+      const tokensRes = await api.post('tokens', {})
+      console.log(`${chalk.green('✓')} - Configuration for your Space was loaded`)
+      answers.loginToken = tokensRes.data.key
 
-          api.setSpaceId(spaceRes.body.space.id)
-          api.get('api_keys', (keysRes) => {
-            if (keysRes.status === 200) {
-              answers.spaceId = spaceRes.body.space.id
-              answers.spaceDomain = spaceRes.body.space.domain.replace('https://', '')
-                .replace('/', '')
+      api.setSpaceId(spaceRes.data.space.id)
 
-              var tokens = keysRes.body.api_keys.filter((token) => {
-                return token.access === 'theme'
-              })
+      const keysRes = await api.get('api_keys')
 
-              // TODO: prevent erros when tokens is empty
-              answers.themeToken = tokens[0].token
+      answers.spaceId = spaceRes.data.space.id
+      answers.spaceDomain = spaceRes.data.space.domain.replace('https://', '').replace('/', '')
 
-              console.log(chalk.green('✓') + ' - Development Environment configured (./' + answers.name + '/config.js' + ')')
-              lastStep(answers)
-            } else {
-              console.log(keysRes.body)
-            }
-          })
-        })
-      } else {
-        console.log('  Something went wrong, be sure that you inserted the right space id.')
-        console.log(spaceRes.body)
+      const tokens = keysRes.data.api_keys.filter((token) => {
+        return token.access === 'theme'
+      })
+
+      if (tokens.length === 0) {
+        throw new Error('There is no theme token in this space')
       }
-    })
 
-    return
+      answers.themeToken = tokens[0].token
+
+      console.log(`${chalk.green('✓')} - Development Environment configured (./${answers.name}/config.js)`)
+      return lastStep(answers)
+    } catch (e) {
+      return Promise.reject(new Error(e.message))
+    }
   }
 
-  console.log('  Your project will be created now...')
+  console.log(`${chalk.blue('-')} Your project will be created now...`)
+
   const config = {
     // create_demo: true,
     space: {
@@ -61,37 +60,32 @@ const quickstart = (api, answers, spaceId) => {
     }
   }
 
-  api.post('spaces', config, (spaceRes) => {
-    if (spaceRes.status === 200) {
-      console.log(chalk.green('✓') + ' - Space ' + answers.name + ' has been created in Storyblok')
-      console.log(chalk.green('✓') + ' - Story "home" has been created in your Space')
+  try {
+    const spaceRes = await api.post('spaces', config)
+    console.log(`${chalk.green('✓')} - Space ${answers.name} has been created in Storyblok`)
+    console.log(`${chalk.green('✓')} - Story "home" has been created in your Space`)
 
-      api.post('tokens', {}, (tokensRes) => {
-        console.log(chalk.green('✓') + ' - Configuration for your Space was loaded')
-        answers.loginToken = tokensRes.body.key
+    const tokensRes = await api.post('tokens', {})
 
-        api.setSpaceId(spaceRes.body.space.id)
-        api.get('api_keys', (keysRes) => {
-          if (keysRes.status === 200) {
-            answers.spaceId = spaceRes.body.space.id
-            answers.spaceDomain = spaceRes.body.space.domain.replace('https://', '')
-              .replace('/', '')
+    api.setSpaceId(spaceRes.data.space.id)
 
-            console.log(chalk.green('✓') + ' - Starting Storyblok in your browser')
+    console.log(`${chalk.green('✓')} - Configuration for your Space was loaded`)
+    answers.loginToken = tokensRes.data.key
 
-            setTimeout(() => {
-              opn('http://' + answers.spaceDomain + '/_quickstart?quickstart=' + answers.loginToken)
-              process.exit(0)
-            }, 2000)
-          } else {
-            console.log(keysRes.body)
-          }
-        })
-      })
-    } else {
-      console.log(spaceRes.body)
-    }
-  })
+    answers.spaceId = spaceRes.data.space.id
+    answers.spaceDomain = spaceRes.data.space.domain.replace('https://', '')
+      .replace('/', '')
+
+    console.log(`${chalk.green('✓')} - Starting Storyblok in your browser`)
+
+    setTimeout(() => {
+      opn('http://' + answers.spaceDomain + '/_quickstart?quickstart=' + answers.loginToken)
+      process.exit(0)
+    }, 2000)
+  } catch (e) {
+    console.error(`${chalk.red('X')} An error occurred when create space and execute some tasks`)
+    console.error(e)
+  }
 }
 
 module.exports = quickstart

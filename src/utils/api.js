@@ -100,32 +100,11 @@ module.exports = {
     return this.sendRequest(path, 'delete')
   },
 
-  sendRequest (path, method, props = null) {
+  sendRequest (path, method, props = {}) {
     const client = this.getClient()
     const _path = this.getPath(path)
     console.log({ _path })
 
     return client[method](_path, props)
   }
-
-  // sendRequest: function (path, method, props, callback) {
-  //   if (this.spaceId) {
-  //     path = 'spaces/' + this.spaceId + '/' + path
-  //   }
-
-  //   var req = unirest(method, 'https://api.storyblok.com/v1/' + path)
-
-  //   req.headers({
-  //     Authorization: this.accessToken
-  //   })
-
-  //   req.type('json')
-
-  //   if (method === 'GET') {
-  //     req.end(callback)
-  //   } else {
-  //     req.send(props)
-  //     req.end(callback)
-  //   }
-  // }
 }
