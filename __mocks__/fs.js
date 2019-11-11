@@ -10,7 +10,7 @@ const writeFile = jest.fn((key, data, _) => {
 // used by push-components.spec.js
 const readFileSync = jest.fn((key) => {
   if (key === 'components.js') {
-    return JSON.parse({
+    return JSON.stringify({
       components: [
         {
           name: 'doc',

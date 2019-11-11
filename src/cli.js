@@ -179,9 +179,10 @@ program
   .description('Start a project quickly')
   .action(async () => {
     try {
-      const questions = getQuestions('quickstart', {}, api)
+      const space = program.space
+      const questions = getQuestions('quickstart', { space }, api)
       const answers = await inquirer.prompt(questions)
-      await tasks.quickstart(api, answers, program.space)
+      await tasks.quickstart(api, answers, space)
     } catch (e) {
       console.log(chalk.red('X') + ' An error ocurred when execute quickstart operations')
       console.error(e)
