@@ -13,13 +13,17 @@ const TEST_PATH = path.join(__dirname, '../../space-test')
 
 describe('testing quickstart()', () => {
   beforeEach(() => {
-    fs.rmdirSync(TEST_PATH, { recursive: true })
+    if (fs.existsSync(TEST_PATH)) {
+      fs.rmdirSync(TEST_PATH, { recursive: true })
+    }
 
     api.setSpaceId(null)
   })
 
   afterEach(() => {
-    fs.rmdirSync(TEST_PATH, { recursive: true })
+    if (fs.existsSync(TEST_PATH)) {
+      fs.rmdirSync(TEST_PATH, { recursive: true })
+    }
 
     api.setSpaceId(null)
   })
