@@ -81,7 +81,6 @@ $ storyblok sync --command <COMMAND> --token <YOUR_OAUTH_TOKEN> --source <SPACE_
   * `syncComponents`
   * `syncStories`
   * `syncRoles`
-* `token`: your OAuth token. This token can be view in your Storyblok account
 * `source`: the source space to use to sync
 * `target`: the target space to use to sync
 
@@ -90,7 +89,7 @@ $ storyblok sync --command <COMMAND> --token <YOUR_OAUTH_TOKEN> --source <SPACE_
 Sync components from `00001` space to `00002` space
 
 ```sh
-$ storyblok sync --command syncComponents --token <YOUR_OAUTH_TOKEN> --source 00001 --target 00002
+$ storyblok sync --command syncComponents --source 00001 --target 00002
 ```
 
 ### quickstart
