@@ -141,6 +141,8 @@ program
   .command('select')
   .description('Usage to kickstart a boilerplate, fieldtype or theme')
   .action(async () => {
+    console.log(`${chalk.blue('-')} Select a boilerplate, fieldtype or theme to initialize\n`)
+
     try {
       const questions = getQuestions('select')
       const answers = await inquirer.prompt(questions)
@@ -156,24 +158,36 @@ program
 program
   .command('sync')
   .description('Sync schemas, roles, folders and stories between spaces')
-  .requiredOption('--token <TOKEN>', 'Your OAuth token from your Storyblok settings')
   .requiredOption('--command <COMMAND>', 'Define what will be sync. Can be syncComponents, syncFolders, syncStories or syncRoles')
   .requiredOption('--source <SPACE_ID>', 'Source space id')
   .requiredOption('--target <SPACE_ID>', 'Target space id')
   .action(async (options) => {
+    console.log(`${chalk.blue('-')} Sync data between spaces\n`)
+
     const {
-      token,
       command,
       source,
       target
     } = options
 
     try {
+      if (!api.isAuthorized()) {
+        const questions = getQuestions('login', {}, api)
+        const { email, password } = await inquirer.prompt(questions)
+
+        await api.login(email, password)
+        console.log(chalk.green('✓') + ' Log in successfully! Token has been added to .netrc file.')
+      }
+
+      const token = creds.get().token || null
+
       await tasks.sync(command, {
         token,
         source,
         target
       })
+
+      console.log(chalk.green('✓') + ' Sync data between spaces successfully completed')
     } catch (e) {
       console.error(chalk.red('X') + ' An error ocurred when sync spaces')
       console.error(e)
