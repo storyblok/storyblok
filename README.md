@@ -72,7 +72,7 @@ $ storyblok push-components ./components.json --space 67819
 
 Sync components, folder, roles or stories between spaces
 
-$ storyblok sync --command <COMMAND> --token <YOUR_OAUTH_TOKEN> --source <SPACE_ID> --target <SPACE_ID>
+$ storyblok sync --command <COMMAND> --source <SPACE_ID> --target <SPACE_ID>
 
 #### Options
 
