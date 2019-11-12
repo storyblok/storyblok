@@ -6,7 +6,7 @@ const SyncSpaces = {
   sourceComponents: [],
 
   init (options) {
-    console.log(chalk.green('✓') + 'Loading options')
+    console.log(chalk.green('✓') + ' Loading options')
     this.sourceSpaceId = options.source
     this.targetSpaceId = options.target
     this.client = new StoryblokClient({
@@ -15,7 +15,7 @@ const SyncSpaces = {
   },
 
   async syncStories () {
-    console.log(chalk.green('✓') + 'Syncing stories...')
+    console.log(chalk.green('✓') + ' Syncing stories...')
     var targetFolders = await this.client.getAll(`spaces/${this.targetSpaceId}/stories`, {
       folder_only: 1,
       sort_by: 'slug:asc'
@@ -33,7 +33,7 @@ const SyncSpaces = {
     })
 
     for (let i = 0; i < all.length; i++) {
-      console.log('starting update ' + all[i].full_slug)
+      console.log(chalk.green('✓') + ' Starting update ' + all[i].full_slug)
 
       var storyResult = await this.client.get('spaces/' + this.sourceSpaceId + '/stories/' + all[i].id)
       var sourceStory = storyResult.data.story
@@ -47,7 +47,7 @@ const SyncSpaces = {
         if (folderMapping[folderSlug]) {
           folderId = folderMapping[folderSlug]
         } else {
-          console.log('the folder does not exist ' + folderSlug)
+          console.error(chalk.red('X') + 'The folder does not exist ' + folderSlug)
           continue
         }
       }
@@ -66,10 +66,10 @@ const SyncSpaces = {
 
         if (existingStory.data.stories.length === 1) {
           await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + existingStory.data.stories[0].id, payload)
-          console.log('updated ' + existingStory.data.stories[0].full_slug)
+          console.log(chalk.green('✓') + ' Updated ' + existingStory.data.stories[0].full_slug)
         } else {
           await this.client.post('spaces/' + this.targetSpaceId + '/stories', payload)
-          console.log('created ' + sourceStory.full_slug)
+          console.log(chalk.green('✓') + ' Created ' + sourceStory.full_slug)
         }
       } catch (e) {
         console.log(e)
@@ -80,7 +80,7 @@ const SyncSpaces = {
   },
 
   async syncFolders () {
-    console.log(chalk.green('✓') + 'Syncing folders...')
+    console.log(chalk.green('✓') + ' Syncing folders...')
     const sourceFolders = await this.client.getAll(`spaces/${this.sourceSpaceId}/stories`, {
       folder_only: 1,
       sort_by: 'slug:asc'
@@ -127,7 +127,7 @@ const SyncSpaces = {
   },
 
   async syncRoles () {
-    console.log(chalk.green('✓') + 'Syncing roles...')
+    console.log(chalk.green('✓') + ' Syncing roles...')
     const existingFolders = await this.client.getAll(`spaces/${this.targetSpaceId}/stories`, {
       folder_only: 1,
       sort_by: 'slug:asc'
@@ -165,12 +165,12 @@ const SyncSpaces = {
           space_role: spaceRole
         })
       }
-      console.log(`Role ${spaceRole.role} synced`)
+      console.log(chalk.green('✓') + ` Role ${spaceRole.role} synced`)
     }
   },
 
   async syncComponents () {
-    console.log(chalk.green('✓') + 'Syncing components...')
+    console.log(chalk.green('✓') + ' Syncing components...')
     this.targetComponents = await this.client.get(`spaces/${this.targetSpaceId}/components`)
     this.sourceComponents = await this.client.get(`spaces/${this.sourceSpaceId}/components`)
 
@@ -185,15 +185,15 @@ const SyncSpaces = {
         await this.client.post(`spaces/${this.targetSpaceId}/components`, {
           component: component
         })
-        console.log(`Component ${component.name} synced`)
+        console.log(chalk.green('✓') + ` Component ${component.name} synced`)
       } catch (e) {
         if (e.response.status === 422) {
           await this.client.put(`spaces/${this.targetSpaceId}/components/${this.getTargetComponentId(component.name)}`, {
             component: component
           })
-          console.log(`Component ${component.name} synced`)
+          console.log(chalk.green('✓') + ` Component ${component.name} synced`)
         } else {
-          console.log(`Component ${component.name} sync failed`)
+          console.error(chalk.red('X') + ` Component ${component.name} sync failed`)
         }
       }
     }

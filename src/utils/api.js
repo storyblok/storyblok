@@ -103,7 +103,6 @@ module.exports = {
   sendRequest (path, method, props = {}) {
     const client = this.getClient()
     const _path = this.getPath(path)
-    console.log({ _path })
 
     return client[method](_path, props)
   }

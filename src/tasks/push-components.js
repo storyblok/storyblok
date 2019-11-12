@@ -23,8 +23,6 @@ module.exports = (api, options) => {
   const data = fs.readFileSync(source, 'utf8')
   if (data) {
     const body = JSON.parse(data)
-    console.log('from file')
-    console.log({ body })
     if (body.components) {
       return push(api, body.components)
     }
