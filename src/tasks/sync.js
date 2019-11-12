@@ -1,7 +1,7 @@
 const chalk = require('chalk')
 const StoryblokClient = require('storyblok-js-client')
 
-const Sync = {
+const SyncSpaces = {
   targetComponents: [],
   sourceComponents: [],
 
@@ -76,7 +76,7 @@ const Sync = {
       }
     }
 
-    return all
+    return Promise.resolve(all)
   },
 
   async syncFolders () {
@@ -208,10 +208,16 @@ const Sync = {
   }
 }
 
-const syncSpaces = (command, options) => {
-  Sync.init(options)
+/**
+ * @method sync
+ * @param  {String} command
+ * @param  {*} options      { token: String, source: Number, target: Number, api: String }
+ * @return {Promise}
+ */
+const sync = (command, options) => {
+  SyncSpaces.init(options)
 
-  return Sync[command]()
+  return SyncSpaces[command]()
 }
 
-module.exports = syncSpaces
+module.exports = sync
