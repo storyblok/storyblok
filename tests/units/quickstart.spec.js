@@ -9,12 +9,25 @@ const { API_URL } = require('../../src/constants')
 jest.unmock('fs')
 jest.unmock('axios')
 
+const deleteFolderRecursive = path => {
+  fs.readdirSync(path).forEach(file => {
+    const curPath = path + '/' + file
+    if (fs.lstatSync(curPath).isDirectory()) {
+      deleteFolderRecursive(curPath)
+    } else {
+      fs.unlinkSync(curPath)
+    }
+  })
+
+  fs.rmdirSync(path)
+}
+
 const TEST_PATH = path.join(__dirname, '../../space-test')
 
 describe('testing quickstart()', () => {
   beforeEach(() => {
     if (fs.existsSync(TEST_PATH)) {
-      fs.rmdirSync(TEST_PATH, { recursive: true })
+      deleteFolderRecursive(TEST_PATH)
     }
 
     api.setSpaceId(null)
@@ -22,7 +35,7 @@ describe('testing quickstart()', () => {
 
   afterEach(() => {
     if (fs.existsSync(TEST_PATH)) {
-      fs.rmdirSync(TEST_PATH, { recursive: true })
+      deleteFolderRecursive(TEST_PATH)
     }
 
     api.setSpaceId(null)
