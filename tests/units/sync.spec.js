@@ -22,7 +22,9 @@ describe('testing sync function', () => {
       process.env.STORYBLOK_ANOTHER_SPACE
     ) {
       try {
-        await sync('syncStories', {
+        const _types = ['stories']
+
+        await sync(_types, {
           token: process.env.STORYBLOK_TOKEN,
           source: process.env.STORYBLOK_SPACE,
           target: process.env.STORYBLOK_ANOTHER_SPACE
@@ -70,7 +72,9 @@ describe('testing sync function', () => {
       process.env.STORYBLOK_ANOTHER_SPACE
     ) {
       try {
-        await sync('syncComponents', {
+        const _types = ['components']
+
+        await sync(_types, {
           token: process.env.STORYBLOK_TOKEN,
           source: process.env.STORYBLOK_SPACE,
           target: process.env.STORYBLOK_ANOTHER_SPACE
