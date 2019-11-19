@@ -76,20 +76,18 @@ $ storyblok sync --command <COMMAND> --source <SPACE_ID> --target <SPACE_ID>
 
 #### Options
 
-* `command`: a command to execute the syncronization. Available commands:
-  * `syncFolders`
-  * `syncComponents`
-  * `syncStories`
-  * `syncRoles`
+* `type`: describe the command type to execute. Can be: `folders`, `components`, `stories` or `roles`. It's possible pass multiple types separated by comma (`,`).
 * `source`: the source space to use to sync
 * `target`: the target space to use to sync
 
 #### Examples
 
-Sync components from `00001` space to `00002` space
-
 ```sh
-$ storyblok sync --command syncComponents --source 00001 --target 00002
+# Sync components from `00001` space to `00002` space
+$ storyblok sync --type components --source 00001 --target 00002
+
+# Sync components and stories from `00001` space to `00002` space
+$ storyblok sync --type components,stories --source 00001 --target 00002
 ```
 
 ### quickstart
