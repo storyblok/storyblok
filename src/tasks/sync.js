@@ -1,5 +1,6 @@
 const chalk = require('chalk')
 const StoryblokClient = require('storyblok-js-client')
+const { capitalize } = require('../utils')
 
 const SyncSpaces = {
   targetComponents: [],
@@ -210,14 +211,19 @@ const SyncSpaces = {
 
 /**
  * @method sync
- * @param  {String} command
+ * @param  {Array} types
  * @param  {*} options      { token: String, source: Number, target: Number, api: String }
  * @return {Promise}
  */
-const sync = (command, options) => {
+const sync = (types, options) => {
   SyncSpaces.init(options)
 
-  return SyncSpaces[command]()
+  return Promise.all(
+    types.map(_type => {
+      const command = `sync${capitalize(_type)}`
+      return SyncSpaces[command]()
+    })
+  )
 }
 
 module.exports = sync

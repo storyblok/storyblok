@@ -10,6 +10,7 @@ const inquirer = require('inquirer')
 
 const tasks = require('./tasks')
 const { getQuestions, lastStep, api, creds } = require('./utils')
+const { SYNC_TYPES } = require('./constants')
 
 clear()
 console.log(chalk.cyan(figlet.textSync('Storyblok')))
@@ -158,19 +159,27 @@ program
 program
   .command('sync')
   .description('Sync schemas, roles, folders and stories between spaces')
-  .requiredOption('--command <COMMAND>', 'Define what will be sync. Can be syncComponents, syncFolders, syncStories or syncRoles')
+  .requiredOption('--type <TYPE>', 'Define what will be sync. Can be components, folders, stories or roles')
   .requiredOption('--source <SPACE_ID>', 'Source space id')
   .requiredOption('--target <SPACE_ID>', 'Target space id')
   .action(async (options) => {
     console.log(`${chalk.blue('-')} Sync data between spaces\n`)
 
     const {
-      command,
+      type,
       source,
       target
     } = options
 
     try {
+      const _types = type.split(',') || []
+
+      _types.forEach(_type => {
+        if (!SYNC_TYPES.includes(_type)) {
+          throw new Error(`The type ${_type} is not valid`)
+        }
+      })
+
       if (!api.isAuthorized()) {
         const questions = getQuestions('login', {}, api)
         const { email, password } = await inquirer.prompt(questions)
@@ -181,7 +190,7 @@ program
 
       const token = creds.get().token || null
 
-      await tasks.sync(command, {
+      await tasks.sync(_types, {
         token,
         source,
         target
