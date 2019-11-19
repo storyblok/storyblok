@@ -80,40 +80,4 @@ const push = (api, components) => {
       console.error(`${chalk.red('X')} An error occurred when load components file from api`)
       return Promise.reject(err)
     })
-  // api.get('components', (res2) => {
-  //   if (res2.status === 200) {
-  //     for (var i = 0; i < body.components.length; i++) {
-  //       delete body.components[i].id
-  //       delete body.components[i].created_at
-
-  //       var exists = res2.body.components.filter(function (comp) {
-  //         return comp.name === body.components[i].name
-  //       })
-
-  //       if (exists.length > 0) {
-  //         api.put('components/' + exists[0].id, {
-  //           component: body.components[i]
-  //         }, (res) => {
-  //           if (res.status === 200) {
-  //             console.log('  Component ' + res.body.component.name + ' has been updated in Storyblok!')
-  //           } else {
-  //             console.log(res.body)
-  //           }
-  //         })
-  //       } else {
-  //         api.post('components', {
-  //           component: body.components[i]
-  //         }, (res) => {
-  //           if (res.status === 200) {
-  //             console.log('  Component ' + res.body.component.name + ' has been created in Storyblok!')
-  //           } else {
-  //             console.log(res.body)
-  //           }
-  //         })
-  //       }
-  //     }
-  //   } else {
-  //     console.log(res2.body)
-  //   }
-  // })
 }
