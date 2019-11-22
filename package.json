@@ -8,15 +8,23 @@
     "node",
     "javascript"
   ],
-  "main": "index.js",
+  "main": "src/cli.js",
   "bin": {
-    "storyblok": "./index.js"
+    "storyblok": "src/cli.js"
+  },
+  "scripts": {
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "test": "jest --silent",
+    "test:coverage": "jest --coverage"
   },
   "author": "Dominik Angerer <dominikangerer1@gmail.com>, Alexander Feiglstorfer <delooks@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.19.0",
     "chalk": "^1.1.3",
     "clear": "0.0.1",
+    "commander": "^4.0.0",
     "figlet": "^1.2.0",
     "github-download": "^0.5.0",
     "inquirer": "^3.0.1",
@@ -24,9 +32,21 @@
     "netrc": "0.1.4",
     "opn": "^5.1.0",
     "path": "^0.12.7",
+    "storyblok-js-client": "^2.0.10",
     "unirest": "^0.5.1"
   },
   "engines": {
-    "node" : ">=5.11.0"
+    "node": ">=9.11.0"
+  },
+  "devDependencies": {
+    "concat-stream": "^2.0.0",
+    "eslint": "^6.6.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jest": "^23.0.2",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "jest": "^24.9.0"
   }
 }
