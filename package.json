@@ -1,6 +1,6 @@
 {
   "name": "storyblok",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "description": "A simple CLI to start Storyblok from your command line.",
   "keywords": [
     "storyblok",
