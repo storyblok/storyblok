@@ -1,6 +1,8 @@
-const axios = require('axios')
 const creds = require('./creds')
+
+const axios = require('axios')
 const Storyblok = require('storyblok-js-client')
+const inquirer = require('inquirer')
 
 const { LOGIN_URL, SIGNUP_URL, API_URL } = require('../constants')
 
@@ -22,23 +24,58 @@ module.exports = {
     return path
   },
 
-  login (email, password) {
-    return axios.post(LOGIN_URL, {
-      email: email,
-      password: password
-    })
-      .then(response => {
-        const token = this.extractToken(response)
-        this.accessToken = token
-        creds.set(email, token)
-
-        return Promise.resolve(true)
+  async login (email, password) {
+    try {
+      const response = await axios.post(LOGIN_URL, {
+        email: email,
+        password: password
       })
-      .catch(err => Promise.reject(err))
+
+      const { data } = response
+
+      if (data.otp_required) {
+        const questions = [
+          {
+            type: 'input',
+            name: 'otp_attempt',
+            message: 'We sent a code to your email/phone, please insert the authentication code:',
+            validate (value) {
+              if (value.length > 0) {
+                return true
+              }
+
+              return 'Code cannot blank'
+            }
+          }
+        ]
+
+        const { otp_attempt: code } = await inquirer.prompt(questions)
+
+        const newResponse = await axios.post(LOGIN_URL, {
+          email: email,
+          password: password,
+          otp_attempt: code
+        })
+
+        return this.processLogin(email, newResponse.data || {})
+      }
+
+      return this.processLogin(email, data)
+    } catch (e) {
+      return Promise.reject(e)
+    }
   },
 
-  extractToken (response) {
-    return response.data.access_token
+  processLogin (email, data) {
+    const token = this.extractToken(data)
+    this.accessToken = token
+    creds.set(email, token)
+
+    return Promise.resolve(data)
+  },
+
+  extractToken (data) {
+    return data.access_token
   },
 
   logout () {
