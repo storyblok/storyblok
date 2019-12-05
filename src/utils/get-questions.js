@@ -1,7 +1,7 @@
-const getOptions = (subcommand, argv = {}, api = {}) => {
+const getOptions = (subCommand, argv = {}, api = {}) => {
   let email = ''
 
-  if (subcommand === 'select') {
+  if (subCommand === 'select') {
     return [
       {
         type: 'input',
@@ -103,15 +103,43 @@ const getOptions = (subcommand, argv = {}, api = {}) => {
     ]
   }
 
+  if (subCommand === 'login') {
+    return [
+      {
+        type: 'input',
+        name: 'email',
+        message: 'Enter your email address:',
+        validate: function (value) {
+          email = value
+          if (value.length > 0) {
+            return true
+          }
+          return 'Please enter a valid email:'
+        }
+      },
+      {
+        type: 'password',
+        name: 'password',
+        message: 'Enter your password:',
+        validate: function (value) {
+          if (value.length > 0) {
+            return true
+          }
+
+          return 'Please enter a valid password:'
+        }
+      }
+    ]
+  }
+
   const moreOptions = [
     'delete-templates',
     'pull-components',
     'push-components',
-    'scaffold',
-    'login'
+    'scaffold'
   ]
 
-  if (moreOptions.indexOf(subcommand) > -1) {
+  if (moreOptions.indexOf(subCommand) > -1) {
     const loginQuestions = [
       {
         type: 'input',
@@ -199,16 +227,14 @@ const getOptions = (subcommand, argv = {}, api = {}) => {
       type: 'password',
       name: 'password',
       message: 'Enter your password:',
-      validate: function (value) {
+      validate (value) {
         var done = this.async()
 
-        api.login(email, value, (data) => {
-          if (data.status === 200) {
-            done(null, true)
-          } else {
+        api.login(email, value)
+          .then(_ => done(null, true))
+          .catch(_ => {
             done('Password seams to be wrong. Please try again:')
-          }
-        })
+          })
       },
       when: function (answers) {
         return answers.has_account === 'Yes' || (!api.isAuthorized() && !answers.has_account)
