@@ -6,7 +6,10 @@ jest.mock('fs')
 describe('testing pullComponents', () => {
   it('api.getComponents() should be called once time', () => {
     const api = {
-      getComponents: jest.fn(() => Promise.resolve(true))
+      getComponents: jest.fn(() => Promise.resolve(true)),
+      getComponentGroups () {
+        return Promise.resolve([])
+      }
     }
 
     pullComponents(api, {})
@@ -48,6 +51,9 @@ describe('testing pullComponents', () => {
     const api = {
       getComponents () {
         return Promise.resolve(BODY.components)
+      },
+      getComponentGroups () {
+        return Promise.resolve([])
       }
     }
 
@@ -74,6 +80,9 @@ describe('testing pullComponents', () => {
     const _api = {
       getComponents (_, fn) {
         return Promise.reject(new Error('Failed'))
+      },
+      getComponentGroups () {
+        return Promise.resolve([])
       }
     }
 
