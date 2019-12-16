@@ -121,6 +121,15 @@ module.exports = {
       .catch(err => Promise.reject(err))
   },
 
+  getComponentGroups () {
+    const client = this.getClient()
+
+    return client
+      .get(this.getPath('component_groups'))
+      .then(data => data.data.component_groups || [])
+      .catch(err => Promise.reject(err))
+  },
+
   post (path, props) {
     return this.sendRequest(path, 'post', props)
   },
