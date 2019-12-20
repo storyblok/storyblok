@@ -220,4 +220,8 @@ program
     }
   })
 
+if (!program._args.length) {
+  program.help()
+}
+
 program.parse(process.argv)
