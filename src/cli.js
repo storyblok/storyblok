@@ -8,6 +8,9 @@ const clear = require('clear')
 const figlet = require('figlet')
 const inquirer = require('inquirer')
 
+const updateNotifier = require('update-notifier')
+const pkg = require('../package.json')
+
 const tasks = require('./tasks')
 const { getQuestions, lastStep, api, creds } = require('./utils')
 const { SYNC_TYPES } = require('./constants')
@@ -18,6 +21,14 @@ console.log()
 console.log()
 console.log('Hi, welcome to the Storyblok CLI')
 console.log()
+
+// non-intrusive notify users if an update available
+const notifyOptions = {
+  isGlobal: true
+}
+
+updateNotifier({ pkg })
+  .notify(notifyOptions)
 
 program
   .option('-s, --space [value]', 'space ID')

@@ -33,7 +33,8 @@
     "opn": "^5.1.0",
     "path": "^0.12.7",
     "storyblok-js-client": "^2.0.10",
-    "unirest": "^0.5.1"
+    "unirest": "^0.5.1",
+    "update-notifier": "^4.0.0"
   },
   "engines": {
     "node": ">=9.11.0"
