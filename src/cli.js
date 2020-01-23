@@ -231,8 +231,8 @@ program
     }
   })
 
-if (!program._args.length) {
+program.parse(process.argv)
+
+if (program.rawArgs.length <= 2) {
   program.help()
 }
-
-program.parse(process.argv)
