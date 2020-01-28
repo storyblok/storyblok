@@ -30,6 +30,8 @@ const notifyOptions = {
 updateNotifier({ pkg })
   .notify(notifyOptions)
 
+program.version(pkg.version)
+
 program
   .option('-s, --space [value]', 'space ID')
 
