@@ -130,6 +130,14 @@ For command help
 $ storyblok sync --help
 ```
 
+### Version
+
+For view the CLI version
+
+```sh
+$ storyblok -V # or --version
+```
+
 ## You're looking for a headstart?
 
 Check out our guides for client side apps (VueJS, Angular, React, ...), static site (Jekyll, NuxtJs, ...), dynamic site examples (Node, PHP, Python, Laravel, ...) on our [Getting Started](https://www.storyblok.com/getting-started) page.
