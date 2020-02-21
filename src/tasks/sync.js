@@ -1,3 +1,4 @@
+const pSeries = require('p-series')
 const chalk = require('chalk')
 const StoryblokClient = require('storyblok-js-client')
 const { capitalize } = require('../utils')
@@ -218,12 +219,12 @@ const SyncSpaces = {
 const sync = (types, options) => {
   SyncSpaces.init(options)
 
-  return Promise.all(
-    types.map(_type => {
-      const command = `sync${capitalize(_type)}`
-      return SyncSpaces[command]()
-    })
-  )
+  const tasks = types.map(_type => {
+    const command = `sync${capitalize(_type)}`
+    return () => SyncSpaces[command]()
+  })
+
+  return pSeries(tasks)
 }
 
 module.exports = sync
