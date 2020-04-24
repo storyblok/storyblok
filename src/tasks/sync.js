@@ -174,7 +174,7 @@ const SyncSpaces = {
   async syncComponents () {
     let sourcePresets = []
 
-    console.log(chalk.green('✓') + ' Syncing components...')
+    console.log(chalk.green('-') + ' Syncing components...')
 
     try {
       this.targetComponents = await this.getComponents(this.targetSpaceId)
@@ -190,7 +190,7 @@ const SyncSpaces = {
     for (var i = 0; i < this.sourceComponents.data.components.length; i++) {
       console.log()
       const component = this.sourceComponents.data.components[i]
-      console.log(chalk.blue('✓') + ` Processing component ${component.name}`)
+      console.log(chalk.blue('-') + ` Processing component ${component.name}`)
 
       const componentPresets = this.getComponentPresets(
         sourcePresets, component
@@ -212,17 +212,25 @@ const SyncSpaces = {
         }
       } catch (e) {
         if (e.response.status === 422) {
-          console.log(chalk.yellow('✓') + ` Component ${component.name} already exists, updating it...`)
+          console.log(chalk.yellow('-') + ` Component ${component.name} already exists, updating it...`)
 
-          const componentTargetId = this.getTargetComponentId(component.name)
-          await this.client.put(`spaces/${this.targetSpaceId}/components/${componentTargetId}`, {
+          const componentTarget = this.getTargetComponent(component.name)
+          await this.client.put(`spaces/${this.targetSpaceId}/components/${componentTarget.id}`, {
             component: component
           })
           console.log(chalk.green('✓') + ` Component ${component.name} synced`)
 
-          if (componentPresets.length) {
-            await this.createPresets(componentPresets, componentTargetId)
+          const presetsToSave = this.filterPresetsFromTargetComponent(
+            componentPresets || [],
+            componentTarget.all_presets || []
+          )
+
+          if (presetsToSave.length) {
+            await this.createPresets(presetsToSave, componentTarget.id)
+            return
           }
+
+          console.log(chalk.blue('✓') + ' Presets were already in sync')
         } else {
           console.error(chalk.red('X') + ` Component ${component.name} sync failed`)
           console.error(e.message)
@@ -249,16 +257,27 @@ const SyncSpaces = {
     return this.client.get(`spaces/${spaceId}/components`)
   },
 
-  getTargetComponentId (name) {
+  getTargetComponent (name) {
     const comps = this.targetComponents.data.components.filter((comp) => {
       return comp.name === name
     })
 
-    return comps[0].id
+    return comps[0]
+  },
+
+  filterPresetsFromTargetComponent (presets, targetPresets) {
+    console.log(chalk.blue('-') + ' Checking target presets to sync')
+    const targetPresetsNames = targetPresets.map(preset => {
+      return preset.name.toLowerCase()
+    })
+
+    return presets.filter(preset => {
+      return !targetPresetsNames.includes(preset.name.toLowerCase())
+    })
   },
 
   async getPresets (spaceId) {
-    console.log(`${chalk.green('✓')} Load presets from space #${spaceId}`)
+    console.log(`${chalk.green('-')} Load presets from space #${spaceId}`)
 
     try {
       const response = await this.client.get(
@@ -274,7 +293,7 @@ const SyncSpaces = {
   },
 
   getComponentPresets (sourcePresets = [], component = {}) {
-    console.log(`${chalk.green('✓')} Get presets from component ${component.name}`)
+    console.log(`${chalk.green('-')} Get presets from component ${component.name}`)
 
     return sourcePresets.filter(preset => {
       return preset.component_id === component.id
@@ -283,7 +302,7 @@ const SyncSpaces = {
 
   async createPresets (presets = [], componentId) {
     const presetsSize = presets.length
-    console.log(`${chalk.green('✓')} Saving ${presetsSize} presets to space #${this.targetSpaceId}`)
+    console.log(`${chalk.green('-')} Syncing ${presetsSize} presets to space #${this.targetSpaceId}`)
 
     try {
       for (let i = 0; i < presetsSize; i++) {
@@ -299,7 +318,7 @@ const SyncSpaces = {
         })
       }
 
-      console.log(`${chalk.green('✓')} Saved successfully ${presetsSize} presets in target space (#${this.targetSpaceId})`)
+      console.log(`${chalk.green('✓')} ${presetsSize} presets sync in space (#${this.targetSpaceId})`)
     } catch (e) {
       console.error('An error ocurred when save the presets' + e.message)
 
