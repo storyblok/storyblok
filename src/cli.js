@@ -209,7 +209,7 @@ program
         target
       })
 
-      console.log(chalk.green('✓') + ' Sync data between spaces successfully completed')
+      console.log('\n' + chalk.green('✓') + ' Sync data between spaces successfully completed')
     } catch (e) {
       console.error(chalk.red('X') + ' An error ocurred when sync spaces')
       console.error(e)
