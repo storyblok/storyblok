@@ -337,7 +337,6 @@ const sync = (types, options) => {
   SyncSpaces.init(options)
 
   const tasks = types.map(_type => {
-    console.log()
     const command = `sync${capitalize(_type)}`
 
     return () => SyncSpaces[command]()
