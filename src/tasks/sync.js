@@ -172,41 +172,158 @@ const SyncSpaces = {
   },
 
   async syncComponents () {
-    console.log(chalk.green('✓') + ' Syncing components...')
-    this.targetComponents = await this.client.get(`spaces/${this.targetSpaceId}/components`)
-    this.sourceComponents = await this.client.get(`spaces/${this.sourceSpaceId}/components`)
+    let sourcePresets = []
+
+    console.log(chalk.green('-') + ' Syncing components...')
+
+    try {
+      this.targetComponents = await this.getComponents(this.targetSpaceId)
+      this.sourceComponents = await this.getComponents(this.sourceSpaceId)
+
+      sourcePresets = await this.getPresets(this.sourceSpaceId)
+    } catch (e) {
+      console.error('An error ocurred when load data to sync components and presets' + e.message)
+
+      return Promise.reject(e)
+    }
 
     for (var i = 0; i < this.sourceComponents.data.components.length; i++) {
+      console.log()
       const component = this.sourceComponents.data.components[i]
+      console.log(chalk.blue('-') + ` Processing component ${component.name}`)
+
+      const componentPresets = this.getComponentPresets(
+        sourcePresets, component
+      )
 
       delete component.id
       delete component.created_at
 
       // Create new component on target space
       try {
-        await this.client.post(`spaces/${this.targetSpaceId}/components`, {
-          component: component
-        })
+        const componentCreated = await this.createComponent(
+          this.targetSpaceId, component
+        )
+
         console.log(chalk.green('✓') + ` Component ${component.name} synced`)
+
+        if (componentPresets.length) {
+          await this.createPresets(componentPresets, componentCreated.id)
+        }
       } catch (e) {
         if (e.response.status === 422) {
-          await this.client.put(`spaces/${this.targetSpaceId}/components/${this.getTargetComponentId(component.name)}`, {
+          console.log(chalk.yellow('-') + ` Component ${component.name} already exists, updating it...`)
+
+          const componentTarget = this.getTargetComponent(component.name)
+          await this.client.put(`spaces/${this.targetSpaceId}/components/${componentTarget.id}`, {
             component: component
           })
           console.log(chalk.green('✓') + ` Component ${component.name} synced`)
+
+          const presetsToSave = this.filterPresetsFromTargetComponent(
+            componentPresets || [],
+            componentTarget.all_presets || []
+          )
+
+          if (presetsToSave.length) {
+            await this.createPresets(presetsToSave, componentTarget.id)
+            return
+          }
+
+          console.log(chalk.blue('✓') + ' Presets were already in sync')
         } else {
           console.error(chalk.red('X') + ` Component ${component.name} sync failed`)
+          console.error(e.message)
         }
       }
     }
   },
 
-  getTargetComponentId (name) {
+  createComponent (spaceId, componentData) {
+    return this
+      .client
+      .post(`spaces/${spaceId}/components`, {
+        component: componentData
+      })
+      .then(response => {
+        const component = response.data.component || {}
+
+        return component
+      })
+      .catch(error => Promise.reject(error))
+  },
+
+  getComponents (spaceId) {
+    return this.client.get(`spaces/${spaceId}/components`)
+  },
+
+  getTargetComponent (name) {
     const comps = this.targetComponents.data.components.filter((comp) => {
       return comp.name === name
     })
 
-    return comps[0].id
+    return comps[0]
+  },
+
+  filterPresetsFromTargetComponent (presets, targetPresets) {
+    console.log(chalk.blue('-') + ' Checking target presets to sync')
+    const targetPresetsNames = targetPresets.map(preset => {
+      return preset.name.toLowerCase()
+    })
+
+    return presets.filter(preset => {
+      return !targetPresetsNames.includes(preset.name.toLowerCase())
+    })
+  },
+
+  async getPresets (spaceId) {
+    console.log(`${chalk.green('-')} Load presets from space #${spaceId}`)
+
+    try {
+      const response = await this.client.get(
+        `spaces/${spaceId}/presets`
+      )
+
+      return response.data.presets || []
+    } catch (e) {
+      console.error('An error ocurred when load presets ' + e.message)
+
+      return Promise.reject(e)
+    }
+  },
+
+  getComponentPresets (sourcePresets = [], component = {}) {
+    console.log(`${chalk.green('-')} Get presets from component ${component.name}`)
+
+    return sourcePresets.filter(preset => {
+      return preset.component_id === component.id
+    })
+  },
+
+  async createPresets (presets = [], componentId) {
+    const presetsSize = presets.length
+    console.log(`${chalk.green('-')} Syncing ${presetsSize} presets to space #${this.targetSpaceId}`)
+
+    try {
+      for (let i = 0; i < presetsSize; i++) {
+        const presetData = presets[i]
+
+        await this.client.post(`spaces/${this.targetSpaceId}/presets`, {
+          preset: {
+            name: presetData.name,
+            component_id: componentId,
+            space_id: this.targetSpaceId,
+            preset: presetData.preset
+          }
+        })
+      }
+
+      console.log(`${chalk.green('✓')} ${presetsSize} presets sync in space (#${this.targetSpaceId})`)
+    } catch (e) {
+      console.error('An error ocurred when save the presets' + e.message)
+
+      return Promise.reject(e)
+    }
   }
 }
 
@@ -221,6 +338,7 @@ const sync = (types, options) => {
 
   const tasks = types.map(_type => {
     const command = `sync${capitalize(_type)}`
+
     return () => SyncSpaces[command]()
   })
 
