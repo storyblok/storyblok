@@ -1,7 +1,7 @@
 const pSeries = require('p-series')
 const chalk = require('chalk')
 const StoryblokClient = require('storyblok-js-client')
-const { capitalize } = require('../utils')
+const { capitalize, findByProperty } = require('../utils')
 
 const SyncSpaces = {
   targetComponents: [],
@@ -173,31 +173,94 @@ const SyncSpaces = {
 
   async syncComponents () {
     let sourcePresets = []
+    let componentsGroups = []
+    let targetComponentGroups = []
 
-    console.log(chalk.green('-') + ' Syncing components...')
+    console.log(`${chalk.green('-')} Syncing components...`)
 
     try {
+      // load data from target and source spaces
       this.targetComponents = await this.getComponents(this.targetSpaceId)
       this.sourceComponents = await this.getComponents(this.sourceSpaceId)
 
       sourcePresets = await this.getPresets(this.sourceSpaceId)
+      componentsGroups = await this.getComponentGroups(this.sourceSpaceId)
+      targetComponentGroups = await this.getComponentGroups(this.targetSpaceId)
+
+      console.log(
+        `${chalk.blue('-')} In source space #${this.sourceSpaceId}, found: `
+      )
+      console.log(`  - ${sourcePresets.length} presets`)
+      console.log(`  - ${componentsGroups.length} groups`)
     } catch (e) {
-      console.error('An error ocurred when load data to sync components and presets' + e.message)
+      console.error('An error ocurred when load data to sync: ' + e.message)
 
       return Promise.reject(e)
     }
 
     for (var i = 0; i < this.sourceComponents.data.components.length; i++) {
       console.log()
+
       const component = this.sourceComponents.data.components[i]
       console.log(chalk.blue('-') + ` Processing component ${component.name}`)
 
       const componentPresets = this.getComponentPresets(
-        sourcePresets, component
+        sourcePresets,
+        component
       )
 
       delete component.id
       delete component.created_at
+
+      const sourceGroupUuid = component.component_group_uuid
+
+      // if the component belongs to a group
+      if (sourceGroupUuid) {
+        const sourceGroup = findByProperty(
+          componentsGroups,
+          'uuid',
+          sourceGroupUuid
+        )
+
+        const targetGroupData = findByProperty(
+          targetComponentGroups,
+          'name',
+          sourceGroup.name
+        )
+
+        // check if the component group have already been created in target space
+        if (targetGroupData.name) {
+          console.log(
+            `${chalk.yellow('-')} Component group ${targetGroupData.name} already exists`
+          )
+          component.component_group_uuid = targetGroupData.uuid
+        } else {
+          // the group don't exists in target space, creating one
+          const sourceGroupName = sourceGroup.name
+
+          try {
+            console.log(
+              `${chalk.blue('-')} Creating the ${sourceGroupName} component group`
+            )
+            const groupCreated = await this.createComponentGroup(
+              this.targetSpaceId,
+              sourceGroupName
+            )
+
+            component.component_group_uuid = groupCreated.uuid
+
+            targetComponentGroups.push(groupCreated)
+
+            console.log(
+              `${chalk.green('✓')} Component group ${sourceGroupName} synced`
+            )
+          } catch (e) {
+            console.error(
+              `${chalk.red('X')} Component Group ${sourceGroupName} creating failed: ${e.message}`
+            )
+          }
+        }
+      }
 
       // Create new component on target space
       try {
@@ -212,12 +275,16 @@ const SyncSpaces = {
         }
       } catch (e) {
         if (e.response.status === 422) {
-          console.log(chalk.yellow('-') + ` Component ${component.name} already exists, updating it...`)
+          console.log(
+            `${chalk.yellow('-')} Component ${component.name} already exists, updating it...`
+          )
 
           const componentTarget = this.getTargetComponent(component.name)
-          await this.client.put(`spaces/${this.targetSpaceId}/components/${componentTarget.id}`, {
-            component: component
-          })
+          await this.updateComponent(
+            this.targetSpaceId,
+            componentTarget.id,
+            component
+          )
           console.log(chalk.green('✓') + ` Component ${component.name} synced`)
 
           const presetsToSave = this.filterPresetsFromTargetComponent(
@@ -230,10 +297,9 @@ const SyncSpaces = {
             return
           }
 
-          console.log(chalk.blue('✓') + ' Presets were already in sync')
+          console.log(chalk.green('✓') + ' Presets were already in sync')
         } else {
-          console.error(chalk.red('X') + ` Component ${component.name} sync failed`)
-          console.error(e.message)
+          console.error(chalk.red('X') + ` Component ${component.name} sync failed: ${e.message}`)
         }
       }
     }
@@ -253,8 +319,43 @@ const SyncSpaces = {
       .catch(error => Promise.reject(error))
   },
 
+  updateComponent (spaceId, componentId, componentData) {
+    return this
+      .client
+      .put(`spaces/${spaceId}/components/${componentId}`, {
+        component: componentData
+      })
+  },
+
   getComponents (spaceId) {
+    console.log(
+      `${chalk.green('-')} Load components from space #${spaceId}`
+    )
+
     return this.client.get(`spaces/${spaceId}/components`)
+  },
+
+  createComponentGroup (spaceId, componentGroupName) {
+    return this
+      .client
+      .post(`spaces/${spaceId}/component_groups`, {
+        component_group: {
+          name: componentGroupName
+        }
+      })
+      .then(response => response.data.component_group || {})
+      .catch(error => Promise.reject(error))
+  },
+
+  getComponentGroups (spaceId) {
+    console.log(
+      `${chalk.green('-')} Load component groups from space #${spaceId}`
+    )
+
+    return this.client
+      .get(`spaces/${spaceId}/component_groups`)
+      .then(response => response.data.component_groups || [])
+      .catch(err => Promise.reject(err))
   },
 
   getTargetComponent (name) {

@@ -3,5 +3,6 @@ module.exports = {
   lastStep: require('./last-step'),
   api: require('./api'),
   creds: require('./creds'),
-  capitalize: require('./capitalize')
+  capitalize: require('./capitalize'),
+  findByProperty: require('./find-by-property')
 }
