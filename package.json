@@ -26,6 +26,7 @@
     "clear": "0.1.0",
     "commander": "^4.0.0",
     "figlet": "^1.4.0",
+    "fs-extra": "^9.0.1",
     "github-download": "^0.5.0",
     "inquirer": "^3.0.1",
     "netrc": "0.1.4",
