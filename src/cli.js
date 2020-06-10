@@ -219,6 +219,36 @@ program
     }
   })
 
+program
+  .command('generate-migration')
+  .description('Generate a migration file to Storyblok components schema')
+  .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component in Storyblok space')
+  .requiredOption('-f, --field <FIELD_NAME>', 'Name of the field in this component')
+  .action(async (options) => {
+    const field = options.field || ''
+    const component = options.component.toLowerCase()
+
+    const space = program.space
+    if (!space) {
+      console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
+      process.exit(1)
+    }
+
+    console.log(`${chalk.blue('-')} Creating the migration file to component ${component}->${field}\n`)
+
+    try {
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
+
+      api.setSpaceId(space)
+      await tasks.generateMigration(api, component, field)
+    } catch (e) {
+      console.log(chalk.red('X') + ' An error ocurred when generate the migration file: ' + e.message)
+      process.exit(1)
+    }
+  })
+
 program.parse(process.argv)
 
 if (program.rawArgs.length <= 2) {
