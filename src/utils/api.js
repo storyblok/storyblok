@@ -1,9 +1,10 @@
-const creds = require('./creds')
-
+const chalk = require('chalk')
 const axios = require('axios')
 const Storyblok = require('storyblok-js-client')
 const inquirer = require('inquirer')
 
+const creds = require('./creds')
+const getQuestions = require('./get-questions')
 const { LOGIN_URL, SIGNUP_URL, API_URL } = require('../constants')
 
 module.exports = {
@@ -57,21 +58,43 @@ module.exports = {
           otp_attempt: code
         })
 
-        return this.processLogin(email, newResponse.data || {})
+        return this.persistCredentials(email, newResponse.data || {})
       }
 
-      return this.processLogin(email, data)
+      return this.persistCredentials(email, data)
     } catch (e) {
       return Promise.reject(e)
     }
   },
 
-  processLogin (email, data) {
+  persistCredentials (email, data) {
     const token = this.extractToken(data)
     this.accessToken = token
     creds.set(email, token)
 
     return Promise.resolve(data)
+  },
+
+  async processLogin () {
+    try {
+      const questions = getQuestions('login')
+      const { email, password } = await inquirer.prompt(questions)
+
+      const data = await this.login(email, password)
+
+      console.log(chalk.green('✓') + ' Log in successfully! Token has been added to .netrc file.')
+
+      return Promise.resolve(data)
+    } catch (e) {
+      if (e.response && e.response.data && e.response.data.error) {
+        console.error(chalk.red('X') + ' An error ocurred when login the user: ' + e.response.data.error)
+
+        return Promise.reject(e)
+      }
+
+      console.error(chalk.red('X') + ' An error ocurred when login the user')
+      return Promise.reject(e)
+    }
   },
 
   extractToken (data) {
