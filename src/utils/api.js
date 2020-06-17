@@ -161,8 +161,23 @@ module.exports = {
     return this.sendRequest(path, 'put', props)
   },
 
-  get (path) {
-    return this.sendRequest(path, 'get')
+  get (path, options = {}) {
+    return this.sendRequest(path, 'get', options)
+  },
+
+  getStories (params = {}) {
+    const client = this.getClient()
+    const _path = this.getPath('stories')
+
+    return client.getAll(_path, params)
+  },
+
+  getSingleStory (id, options = {}) {
+    const client = this.getClient()
+    const _path = this.getPath(`stories/${id}`)
+
+    return client.get(_path, options)
+      .then(response => response.data.story || {})
   },
 
   delete (path) {

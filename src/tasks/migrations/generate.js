@@ -36,7 +36,6 @@ const generateMigration = async (api, component, field) => {
 
     console.log(`${chalk.green('✓')} File created with success. Check the file ${fileName} in migrations folder`)
   } catch (e) {
-    console.log('Deu erro')
     return Promise.reject(e)
   }
 }

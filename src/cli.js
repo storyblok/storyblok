@@ -249,6 +249,38 @@ program
     }
   })
 
+program
+  .command('run-migration')
+  .description('Run a migration file and update a component in Storyblok')
+  .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component in Storyblok space')
+  .requiredOption('-f, --field <FIELD_NAME>', 'Name of the field in this component')
+  .option('--dryrun', 'Name of the field in this component')
+  .action(async (options) => {
+    const field = options.field || ''
+    const component = options.component.toLowerCase()
+    const isDryrun = !!options.dryrun
+
+    const space = program.space
+    if (!space) {
+      console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
+      process.exit(1)
+    }
+
+    console.log(`${chalk.blue('-')} Creating the migration file to component ${component}->${field}\n`)
+
+    try {
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
+
+      api.setSpaceId(space)
+      await tasks.runMigration(api, component, field, isDryrun)
+    } catch (e) {
+      console.log(chalk.red('X') + ' An error ocurred when run the migration file: ' + e.message)
+      process.exit(1)
+    }
+  })
+
 program.parse(process.argv)
 
 if (program.rawArgs.length <= 2) {

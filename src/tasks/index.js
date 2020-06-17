@@ -4,5 +4,6 @@ module.exports = {
   quickstart: require('./quickstart'),
   pullComponents: require('./pull-components'),
   pushComponents: require('./push-components'),
-  generateMigration: require('./migrations/generate')
+  generateMigration: require('./migrations/generate'),
+  runMigration: require('./migrations/run')
 }
