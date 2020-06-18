@@ -101,11 +101,9 @@ const checkComponentExists = async (api, component) => {
  * @return {Promise<Boolean>}
  */
 const checkFileExists = async (fileName) => {
-  return new Promise((resolve, reject) => {
-    const PATH = getPathToFile(fileName)
+  const PATH = getPathToFile(fileName)
 
-    fs.pathExists(PATH, (_, exists) => resolve(exists))
-  })
+  return fs.pathExists(PATH)
 }
 
 /**
@@ -114,17 +112,9 @@ const checkFileExists = async (fileName) => {
  * @return {Promise<Boolean>}
  */
 const createMigrationFile = (fileName) => {
-  return new Promise((resolve, reject) => {
-    console.log(`${chalk.blue('-')} Creating the migration file in migrations folder`)
+  console.log(`${chalk.blue('-')} Creating the migration file in migrations folder`)
 
-    fs.outputFile(getPathToFile(fileName), migrationTemplate, err => {
-      if (err) {
-        reject(err)
-      }
-
-      resolve(true)
-    })
-  })
+  return fs.outputFile(getPathToFile(fileName), migrationTemplate)
 }
 
 /**

@@ -9,6 +9,13 @@ const {
   getNameOfMigrationFile
 } = require('./utils')
 
+/**
+ * @method generateMigration
+ * @param  {Object} api       API instance
+ * @param  {String} component component name
+ * @param  {String} field     field name
+ * @return {Promise<{fileName: string, created: boolean}>}
+ */
 const generateMigration = async (api, component, field) => {
   try {
     const componentExists = await checkComponentExists(api, component)
@@ -27,14 +34,23 @@ const generateMigration = async (api, component, field) => {
       const answer = await inquirer.prompt(questions)
 
       if (!answer.choice) {
-        console.log(`${chalk.blue('-')} The file was not overwrite`)
-        return Promise.resolve(true)
+        console.log(`${chalk.blue('-')} The file will not overwrite`)
+
+        return Promise.resolve({
+          fileName,
+          created: false
+        })
       }
     }
 
     await createMigrationFile(fileName)
 
     console.log(`${chalk.green('✓')} File created with success. Check the file ${fileName} in migrations folder`)
+
+    return Promise.resolve({
+      fileName,
+      created: true
+    })
   } catch (e) {
     return Promise.reject(e)
   }
