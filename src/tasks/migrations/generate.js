@@ -2,6 +2,7 @@ const chalk = require('chalk')
 const inquirer = require('inquirer')
 
 const {
+  getPathToFile,
   checkFileExists,
   getInquirerOptions,
   createMigrationFile,
@@ -25,7 +26,8 @@ const generateMigration = async (api, component, field) => {
     }
 
     const fileName = getNameOfMigrationFile(component, field)
-    const fileExists = await checkFileExists(fileName)
+    const pathToFile = getPathToFile(fileName)
+    const fileExists = await checkFileExists(pathToFile)
 
     if (fileExists) {
       console.log(`${chalk.yellow('!')} The file to migration already exists.`)

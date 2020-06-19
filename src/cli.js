@@ -274,7 +274,7 @@ program
       }
 
       api.setSpaceId(space)
-      await tasks.runMigration(api, component, field, isDryrun)
+      await tasks.runMigration(api, component, field, { isDryrun })
     } catch (e) {
       console.log(chalk.red('X') + ' An error ocurred when run the migration file: ' + e.message)
       process.exit(1)

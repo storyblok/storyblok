@@ -1,4 +1,4 @@
-const { isArray, isPlainObject, has } = require('lodash')
+const { isArray, isPlainObject, has, isEmpty } = require('lodash')
 const fs = require('fs-extra')
 const chalk = require('chalk')
 
@@ -8,14 +8,22 @@ const MIGRATIONS_DIRECTORY = `${process.cwd()}/migrations`
 
 /**
  * @method getPathToFile
- * @param  {String} fileName
+ * @param  {String} fileName      name of the file
+ * @param  {String} migrationPath migrations folder
  * @return {String}
  *
  * @example
  * // path/to/migrations/change_teaser_subtitle.js
  * getPathToFile('change_teaser_subtitle.js')
+ *
+ * // ./migrations/change_teaser_subtitle.js
+ * getPathToFile('change_teaser_subtitle.js', './migrations')
  */
-const getPathToFile = fileName => `${MIGRATIONS_DIRECTORY}/${fileName}`
+const getPathToFile = (fileName, migrationPath = null) => {
+  const pathTo = isEmpty(migrationPath) ? MIGRATIONS_DIRECTORY : migrationPath
+
+  return `${pathTo}/${fileName}`
+}
 
 /**
  * @method getNameOfMigrationFile
@@ -97,14 +105,10 @@ const checkComponentExists = async (api, component) => {
 
 /**
  * @method checkFileExists
- * @param  {String} fileName
+ * @param  {String} filePath
  * @return {Promise<Boolean>}
  */
-const checkFileExists = async (fileName) => {
-  const PATH = getPathToFile(fileName)
-
-  return fs.pathExists(PATH)
-}
+const checkFileExists = async (filePath) => fs.pathExists(filePath)
 
 /**
  * @method createMigrationFile

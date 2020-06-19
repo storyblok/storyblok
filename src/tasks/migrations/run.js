@@ -9,10 +9,20 @@ const {
   getNameOfMigrationFile
 } = require('./utils')
 
-const generateMigration = async (api, component, field, isDryrun) => {
+/**
+ * @method runMigration
+ * @param  {Object} api       API instance
+ * @param  {String} component component name
+ * @param  {String} field     field name
+ * @param  {{ isDryrun?: boolean, migrationPath?: string }} options disable execution
+ * @return {Promise<{ executed: boolean, motive?: string }>}
+ */
+const runMigration = async (api, component, field, options = {}) => {
+  const migrationPath = options.migrationPath || null
   try {
     const fileName = getNameOfMigrationFile(component, field)
-    const fileExists = await checkFileExists(fileName)
+    const pathToFile = getPathToFile(fileName, migrationPath)
+    const fileExists = await checkFileExists(pathToFile)
 
     if (!fileExists) {
       throw new Error(`The migration to combination ${fileName} doesn't exists`)
@@ -21,8 +31,7 @@ const generateMigration = async (api, component, field, isDryrun) => {
     console.log(
       `${chalk.blue('-')} Getting the user defined migration function`
     )
-    const migrationFunctionPath = getPathToFile(fileName)
-    const migrationFn = require(migrationFunctionPath)
+    const migrationFn = require(pathToFile)
 
     if (typeof migrationFn !== 'function') {
       throw new Error("The migration file doesn't export a function")
@@ -35,7 +44,10 @@ const generateMigration = async (api, component, field, isDryrun) => {
 
     if (isEmpty(stories)) {
       console.log(`${chalk.blue('-')} There are no stories for component ${component}!`)
-      return Promise.resolve(true)
+      return Promise.resolve({
+        executed: false,
+        motive: 'NO_STORIES'
+      })
     }
 
     for (const story of stories) {
@@ -46,7 +58,7 @@ const generateMigration = async (api, component, field, isDryrun) => {
         const storyData = await api.getSingleStory(story.id)
         await processMigration(storyData.content, component, migrationFn)
 
-        if (!isDryrun) {
+        if (!options.isDryrun) {
           console.log(
             `${chalk.blue('-')} Updating story #${story.name}`
           )
@@ -68,10 +80,12 @@ const generateMigration = async (api, component, field, isDryrun) => {
     }
 
     console.log(`${chalk.green('✓')} The migration was executed with success!`)
-    return Promise.resolve(true)
+    return Promise.resolve({
+      executed: true
+    })
   } catch (e) {
     return Promise.reject(e)
   }
 }
 
-module.exports = generateMigration
+module.exports = runMigration
