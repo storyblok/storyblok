@@ -45,7 +45,7 @@ const generateMigration = async (api, component, field) => {
       }
     }
 
-    await createMigrationFile(fileName)
+    await createMigrationFile(fileName, field)
 
     console.log(`${chalk.green('✓')} File created with success. Check the file ${fileName} in migrations folder`)
 
