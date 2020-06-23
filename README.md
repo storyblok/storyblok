@@ -116,6 +116,35 @@ Login to the Storyblok cli
 $ storyblok login
 ```
 
+### generate-migration
+
+Create a migration file (with the name `change_<COMPONENT>_<FIELD>.js`) inside the `migrations` folder. Check **Migrations** section to more details
+
+```sh
+$ storyblok generate-migration --space <SPACE_ID> --component <COMPONENT_NAME> --field <FIELD>
+```
+
+#### Options
+
+* `space`: space where the component is
+* `component`: component name. It needs to be a valid component
+* `field`: name of field
+
+### run-migration
+
+Execute a specific migration file. Check **Migrations** section to more details
+
+```sh
+$ storyblok run-migration --space <SPACE_ID> --component <COMPONENT_NAME> --field <FIELD> --dryrun
+```
+
+#### Options
+
+* `space`: space where the component is
+* `component`: component name. It needs to be a valid component
+* `field`: name of field
+* `dryrun`: when passed as an argument, does not perform the migration
+
 ### Help
 
 For global help
@@ -136,6 +165,81 @@ For view the CLI version
 
 ```sh
 $ storyblok -V # or --version
+```
+
+## Migrations
+
+Migrations are a convenient way to update stories in Storyblok. This section shows how to create a migration file and execute it using the CLI.
+
+### Creating a migration file
+
+To create a migration file, you need to execute the `generate-migration` command:
+
+```sh
+# creating a migration file to product component to update the price
+$ storyblok generate-migration --space 00000 --component product --field price
+```
+
+When you run this command, a folder called `migrations` will be created in the location where you ran the command (if this folder does not exist) and a file called `change_product_price.js` will be created inside it.
+
+The created file will have the following content:
+
+```js
+// here, 'subtitle' is the name of the field defined when you execute the generate command
+module.exports = function (block) {
+  // Example to change a string to boolean
+  // block.subtitle = !!(blok.subtitle)
+
+  // Example to transfer content from other field
+  // block.subtitle = block.other_field
+
+  // Example to transform a markdown field into a richtext field
+  // const { MarkdownParser } = require('prosemirror-markdown')
+  // const defaultMarkdownParser = new MarkdownParser()
+  // if (typeof block.subtitle == 'string') {
+  //   block.subtitle = defaultMarkdownParser.parse(block.subtitle).toJSON()
+  // }
+}
+```
+
+As you can see, this file takes two parameters:
+
+* `block`: the component content from the story
+* `field`: the field content from this component
+
+Inside the migration function, you can manipulate the blok whatever you want, because the blok content will be used to update the story. This will be occurr recursively for all content in the story, so, this change will be affect the entirely content.
+
+### Running the migration file
+
+To run the migration function, you need to execute the `run-migration` command, as the following:
+
+```sh
+# you can use the --dryrun option to don't execute, only show the component updates
+$ storyblok run-migration --space 00000 --component product --field price
+```
+
+### Example
+
+Let's create an example to update all occurrences of the image field in product component. Let's replace the url from `//a.storyblok.com` to `//img2.storyblok.com`.
+
+First, you need to create the migration function:
+
+```sh
+$ storyblok generate-migration --space 00000 --component product --field image
+```
+
+After, let's update the default file:
+
+```js
+module.exports = function (block) {
+  block.image = block.image.replace('a.storyblok.com', 'img2.storyblok.com')
+}
+```
+
+Lastly, let's execute the migration file:
+
+```sh
+$ storyblok run-migration --space 00000 --component product --field image
 ```
 
 ## You're looking for a headstart?
