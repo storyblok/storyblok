@@ -3702,6 +3702,11 @@ object.values@^1.1.1:
     function-bind "^1.1.1"
     has "^1.0.3"
 
+on-change@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/on-change/-/on-change-2.0.1.tgz#bd0c54c7e272f96f2daf084aa30ebe5b4676c7a3"
+  integrity sha512-M/XA/VXeR3ElAlyYBv2Bow0BtNt6qKI8mNmBI+cw+wyjatoZ3tJQPq6RNYWCaV81uKKbm3svROi6TDS3TtWVzQ==
+
 once@^1.3.0, once@^1.3.1, once@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/once/-/once-1.4.0.tgz#583b1aa775961d4b113ac17d9c50baef9dd76bd1"
