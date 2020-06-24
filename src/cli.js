@@ -226,7 +226,7 @@ program
   .requiredOption('-f, --field <FIELD_NAME>', 'Name of the field in this component')
   .action(async (options) => {
     const field = options.field || ''
-    const component = options.component.toLowerCase()
+    const component = options.component || ''
 
     const space = program.space
     if (!space) {
@@ -257,7 +257,7 @@ program
   .option('--dryrun', 'Name of the field in this component')
   .action(async (options) => {
     const field = options.field || ''
-    const component = options.component.toLowerCase()
+    const component = options.component || ''
     const isDryrun = !!options.dryrun
 
     const space = program.space
