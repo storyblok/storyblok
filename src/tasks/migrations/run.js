@@ -53,14 +53,14 @@ const runMigration = async (api, component, field, options = {}) => {
     for (const story of stories) {
       try {
         console.log(
-          `${chalk.blue('-')} Processing story #${story.name}`
+          `${chalk.blue('-')} Processing story ${story.full_slug}`
         )
         const storyData = await api.getSingleStory(story.id)
         await processMigration(storyData.content, component, migrationFn, options.isDryrun)
 
         if (!options.isDryrun) {
           console.log(
-            `${chalk.blue('-')} Updating story #${story.name}`
+            `${chalk.blue('-')} Updating story ${story.full_slug}`
           )
           const url = `stories/${story.id}`
           const payload = {
