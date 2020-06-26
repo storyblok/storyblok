@@ -81,7 +81,7 @@ const getComponentsFromName = async (api, componentName) => {
     return {}
   } catch (e) {
     const error = parseError(e)
-    console.error(`${chalk.red('X')} An error ocurred when load the components from space: ${error.message}`)
+    console.error(`${chalk.red('X')} An error occurred when loading the components from space: ${error.message}`)
 
     return Promise.reject(error.error)
   }

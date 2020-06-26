@@ -49,6 +49,7 @@ program
       await api.processLogin()
       process.exit(0)
     } catch (e) {
+      console.log(chalk.red('X') + ' An error occurred when logging the user: ' + e.message)
       process.exit(1)
     }
   })
@@ -63,7 +64,8 @@ program
       console.log('Logged out successfully! Token has been removed from .netrc file.')
       process.exit(0)
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred when logout the user: ' + e.message)
+      console.log(chalk.red('X') + ' An error occurred when logging out the user: ' + e.message)
+      process.exit(1)
     }
   })
 
@@ -87,7 +89,7 @@ program
       api.setSpaceId(space)
       await tasks.pullComponents(api, { space })
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred when execute the pull-components task: ' + e.message)
+      console.log(chalk.red('X') + ' An error occurred when executing the pull-components task: ' + e.message)
       process.exit(1)
     }
   })
@@ -113,7 +115,7 @@ program
       api.setSpaceId(space)
       await tasks.pushComponents(api, { source })
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred when execute the push-components task: ' + e.message)
+      console.log(chalk.red('X') + ' An error occurred when executing the push-components task: ' + e.message)
       process.exit(1)
     }
   })
@@ -136,7 +138,7 @@ program
       console.log(chalk.green('✓') + ' - source/scss/components/below/_' + name + '.scss')
       process.exit(0)
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred execute operations to create the component: ' + e.message)
+      console.log(chalk.red('X') + ' An error occurred when executing operations to create the component: ' + e.message)
       process.exit(1)
     }
   })
@@ -198,7 +200,7 @@ program
 
       console.log('\n' + chalk.green('✓') + ' Sync data between spaces successfully completed')
     } catch (e) {
-      console.error(chalk.red('X') + ' An error ocurred when sync spaces: ' + e.message)
+      console.error(chalk.red('X') + ' An error ocurred when syncing spaces: ' + e.message)
       process.exit(1)
     }
   })
@@ -221,9 +223,9 @@ program
 
 program
   .command('generate-migration')
-  .description('Generate a migration file to Storyblok components schema')
-  .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component in Storyblok space')
-  .requiredOption('-f, --field <FIELD_NAME>', 'Name of the field in this component')
+  .description('Generate a content migration file')
+  .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
+  .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
   .action(async (options) => {
     const field = options.field || ''
     const component = options.component || ''
@@ -234,7 +236,7 @@ program
       process.exit(1)
     }
 
-    console.log(`${chalk.blue('-')} Creating the migration file to component ${component}->${field}\n`)
+    console.log(`${chalk.blue('-')} Creating the migration file in ./migrations/change_${component}_${field}.js\n`)
 
     try {
       if (!api.isAuthorized()) {
@@ -266,7 +268,7 @@ program
       process.exit(1)
     }
 
-    console.log(`${chalk.blue('-')} Creating the migration file to component ${component}->${field}\n`)
+    console.log(`${chalk.blue('-')} Processing the migration ./migrations/change_${component}_${field}.js\n`)
 
     try {
       if (!api.isAuthorized()) {
