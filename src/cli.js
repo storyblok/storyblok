@@ -253,10 +253,10 @@ program
 
 program
   .command('run-migration')
-  .description('Run a migration file and update a component in Storyblok')
-  .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component in Storyblok space')
-  .requiredOption('-f, --field <FIELD_NAME>', 'Name of the field in this component')
-  .option('--dryrun', 'Name of the field in this component')
+  .description('Run a migration file')
+  .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
+  .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
+  .option('--dryrun', 'Do not update the story content')
   .action(async (options) => {
     const field = options.field || ''
     const component = options.component || ''
