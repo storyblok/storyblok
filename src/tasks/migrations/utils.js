@@ -185,22 +185,17 @@ const showMigrationChanges = (path, value, oldValue) => {
  * @param  {Object}   content component structure from Storyblok
  * @param  {String}   component    name of the component that is processing
  * @param  {Function} migrationFn  the migration function defined by user
- * @param  {Boolean}  isDryrun     if true, watch changes
  * @return {Promise<Boolean>}
  */
-const processMigration = async (content = {}, component = '', migrationFn, isDryrun) => {
+const processMigration = async (content = {}, component = '', migrationFn) => {
   // I'm processing the component that I want
   if (content.component === component) {
-    if (isDryrun) {
-      const watchedContent = onChange(
-        content,
-        showMigrationChanges
-      )
+    const watchedContent = onChange(
+      content,
+      showMigrationChanges
+    )
 
-      migrationFn(watchedContent)
-    } else {
-      migrationFn(content)
-    }
+    await migrationFn(watchedContent)
   }
 
   for (const key in content) {
@@ -209,7 +204,7 @@ const processMigration = async (content = {}, component = '', migrationFn, isDry
     if (isArray(value)) {
       try {
         await Promise.all(
-          value.map(_item => processMigration(_item, component, migrationFn, isDryrun))
+          value.map(_item => processMigration(_item, component, migrationFn))
         )
       } catch (e) {
         console.error(e)
@@ -218,7 +213,7 @@ const processMigration = async (content = {}, component = '', migrationFn, isDry
 
     if (isPlainObject(value) && has(value, 'component')) {
       try {
-        await processMigration(value, component, migrationFn, isDryrun)
+        await processMigration(value, component, migrationFn)
       } catch (e) {
         console.error(e)
       }

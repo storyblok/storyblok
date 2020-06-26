@@ -56,7 +56,7 @@ const runMigration = async (api, component, field, options = {}) => {
           `${chalk.blue('-')} Processing story ${story.full_slug}`
         )
         const storyData = await api.getSingleStory(story.id)
-        await processMigration(storyData.content, component, migrationFn, options.isDryrun)
+        await processMigration(storyData.content, component, migrationFn)
 
         if (!options.isDryrun) {
           console.log(
