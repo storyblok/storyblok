@@ -1,5 +1,5 @@
 const chalk = require('chalk')
-const { isEmpty } = require('lodash')
+const { isEmpty, cloneDeep, isEqual } = require('lodash')
 
 const {
   getPathToFile,
@@ -56,9 +56,14 @@ const runMigration = async (api, component, field, options = {}) => {
           `${chalk.blue('-')} Processing story ${story.full_slug}`
         )
         const storyData = await api.getSingleStory(story.id)
+        const oldContent = cloneDeep(storyData.content)
+
         await processMigration(storyData.content, component, migrationFn)
 
-        if (!options.isDryrun) {
+        const isChangeContent = !isEqual(oldContent, storyData.content)
+
+        // to prevent api unnecessary api executions
+        if (!options.isDryrun && isChangeContent) {
           console.log(
             `${chalk.blue('-')} Updating story ${story.full_slug}`
           )

@@ -2,7 +2,8 @@ const EMAIL_TEST = 'test@storyblok.com'
 const PASSWORD_TEST = 'test'
 const TOKEN_TEST = 'storyblok1234'
 
-const FAKE_COMPONENTS = [
+// use functions to always returns "new" data
+const FAKE_COMPONENTS = () => [
   {
     name: 'teaser',
     display_name: null,
@@ -58,7 +59,8 @@ const FAKE_COMPONENTS = [
   }
 ]
 
-const FAKE_STORIES = [
+// use functions to always returns "new" data
+const FAKE_STORIES = () => [
   {
     name: 'About',
     id: 0,

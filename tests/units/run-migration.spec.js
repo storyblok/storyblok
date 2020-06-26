@@ -1,6 +1,9 @@
 const path = require('path')
 const migrationFile = require('./migrations/change_teaser_subtitle')
 
+// migration that does not execute any change in content
+const headlineMigrationFile = require('./migrations/change_teaser_headline')
+
 const { FAKE_STORIES } = require('../constants')
 const runMigration = require('../../src/tasks/migrations/run')
 
@@ -99,9 +102,9 @@ describe('testing runMigration', () => {
 
   describe('when the execution is executed as expected', () => {
     const FAKE_API = {
-      getStories: jest.fn(() => Promise.resolve(FAKE_STORIES)),
+      getStories: jest.fn(() => Promise.resolve(FAKE_STORIES())),
       getSingleStory: jest.fn(id => {
-        const data = FAKE_STORIES.filter(story => story.id === id)[0] || {}
+        const data = FAKE_STORIES().filter(story => story.id === id)[0] || {}
         return Promise.resolve(data)
       }),
       put: jest.fn(() => {})
@@ -218,9 +221,9 @@ describe('testing runMigration', () => {
 
   describe('when execute with isDryrun enable', () => {
     const FAKE_API = {
-      getStories: jest.fn(() => Promise.resolve(FAKE_STORIES)),
+      getStories: jest.fn(() => Promise.resolve(FAKE_STORIES())),
       getSingleStory: jest.fn(id => {
-        const data = FAKE_STORIES.filter(story => story.id === id)[0] || {}
+        const data = FAKE_STORIES().filter(story => story.id === id)[0] || {}
         return Promise.resolve(data)
       }),
       put: jest.fn(() => {})
@@ -256,6 +259,54 @@ describe('testing runMigration', () => {
     it('does not execute the api.put function', async () => {
       try {
         await runMigration(FAKE_API, 'teaser', 'subtitle', opt)
+      } catch (e) {
+        console.error(e)
+      }
+
+      // check how many times the put function was executed
+      expect(FAKE_API.put.mock.calls.length).toBe(0)
+    })
+  })
+
+  describe('when migration does not change the content', () => {
+    const FAKE_API = {
+      getStories: jest.fn(() => Promise.resolve(FAKE_STORIES())),
+      getSingleStory: jest.fn(id => {
+        const data = FAKE_STORIES().filter(story => story.id === id)[0] || {}
+        return Promise.resolve(data)
+      }),
+      put: jest.fn(() => {})
+    }
+
+    const opt = {
+      migrationPath
+    }
+
+    beforeEach(() => {
+      require('fs-extra').__clearMockFiles()
+      require('fs-extra').__setMockFiles({
+        [getFilePath('headline')]: 'module.exports = {}'
+      })
+    })
+
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
+
+    it('it execute the migration function', async () => {
+      try {
+        await runMigration(FAKE_API, 'teaser', 'headline', opt)
+      } catch (e) {
+        console.error(e)
+      }
+
+      // check how many times the migration function was executed
+      expect(headlineMigrationFile.mock.calls.length).toBe(2)
+    })
+
+    it('does not execute the api.put function', async () => {
+      try {
+        await runMigration(FAKE_API, 'teaser', 'headline', opt)
       } catch (e) {
         console.error(e)
       }

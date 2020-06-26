@@ -10,7 +10,7 @@ jest.mock('fs-extra')
 const getPath = fileName => `${process.cwd()}/migrations/${fileName}`
 
 const FAKE_API = {
-  getComponents: jest.fn(() => Promise.resolve(FAKE_COMPONENTS))
+  getComponents: jest.fn(() => Promise.resolve(FAKE_COMPONENTS()))
 }
 
 const FILE_NAME = 'change_teaser_subtitle.js'
