@@ -167,11 +167,13 @@ For view the CLI version
 $ storyblok -V # or --version
 ```
 
-## Migrations
+## Content migrations
 
-Migrations are a convenient way to update stories in Storyblok. This section shows how to create a migration file and execute it using the CLI.
+Content migrations are a convenient way to change fields of your content.
 
-### Creating a migration file
+To execute a migration you first need to create a migration file. This file is a pure Javascript function where the content of a specific content type or compontent gets passed through.
+
+### 1. Creating a migration file
 
 To create a migration file, you need to execute the `generate-migration` command:
 
@@ -180,7 +182,7 @@ To create a migration file, you need to execute the `generate-migration` command
 $ storyblok generate-migration --space 00000 --component product --field price
 ```
 
-When you run this command, a folder called `migrations` will be created in the location where you ran the command (if this folder does not exist) and a file called `change_product_price.js` will be created inside it.
+When you run this command a file called `change_product_price.js` will be created inside a folder called `migrations`.
 
 The created file will have the following content:
 
@@ -195,25 +197,26 @@ module.exports = function (block) {
 }
 ```
 
-As you can see, this file takes two parameters:
+In the migration function you can manipulate the block variable to add or modify existing fields of the component.
 
-* `block`: the component content from the story
-* `field`: the field content from this component
+### 2. Running the migration file
 
-Inside the migration function, you can manipulate the blok whatever you want, because the blok content will be used to update the story. This will be occurr recursively for all content in the story, so, this change will be affect the entirely content.
-
-### Running the migration file
-
-To run the migration function, you need to execute the `run-migration` command, as the following:
+To run the migration function you need to execute the `run-migration` command. Pass the --dryrun option to not execute the updates and only show the changes in the terminal:
 
 ```sh
-# you can use the --dryrun option to don't execute, only show the component updates
+$ storyblok run-migration --space 00000 --component product --field price --dryrun
+```
+
+After checking the output of the dryrun you can execute the updates:
+
+```sh
+# you can use the --dryrun option to not execute the updates
 $ storyblok run-migration --space 00000 --component product --field price
 ```
 
 ### Example
 
-Let's create an example to update all occurrences of the image field in product component. Let's replace the url from `//a.storyblok.com` to `//my-custom-domain.com`.
+Let's create an example to update all occurrences of the image field in product component. In the example we replace the url from `//a.storyblok.com` to `//my-custom-domain.com`.
 
 First, you need to create the migration function:
 
@@ -221,7 +224,7 @@ First, you need to create the migration function:
 $ storyblok generate-migration --space 00000 --component product --field image
 ```
 
-After, let's update the default file:
+Then let's update the default image field:
 
 ```js
 module.exports = function (block) {
@@ -229,10 +232,10 @@ module.exports = function (block) {
 }
 ```
 
-Lastly, let's execute the migration file:
+Now you can execute the migration file:
 
 ```sh
-$ storyblok run-migration --space 00000 --component product --field image
+$ storyblok run-migration --space 00000 --component product --field image --dryrun
 ```
 
 ## You're looking for a headstart?
