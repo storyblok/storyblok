@@ -188,17 +188,10 @@ The created file will have the following content:
 // here, 'subtitle' is the name of the field defined when you execute the generate command
 module.exports = function (block) {
   // Example to change a string to boolean
-  // block.subtitle = !!(blok.subtitle)
+  // block.subtitle = !!(block.subtitle)
 
   // Example to transfer content from other field
   // block.subtitle = block.other_field
-
-  // Example to transform a markdown field into a richtext field
-  // const { MarkdownParser } = require('prosemirror-markdown')
-  // const defaultMarkdownParser = new MarkdownParser()
-  // if (typeof block.subtitle == 'string') {
-  //   block.subtitle = defaultMarkdownParser.parse(block.subtitle).toJSON()
-  // }
 }
 ```
 
@@ -220,7 +213,7 @@ $ storyblok run-migration --space 00000 --component product --field price
 
 ### Example
 
-Let's create an example to update all occurrences of the image field in product component. Let's replace the url from `//a.storyblok.com` to `//img2.storyblok.com`.
+Let's create an example to update all occurrences of the image field in product component. Let's replace the url from `//a.storyblok.com` to `//my-custom-domain.com`.
 
 First, you need to create the migration function:
 
@@ -232,7 +225,7 @@ After, let's update the default file:
 
 ```js
 module.exports = function (block) {
-  block.image = block.image.replace('a.storyblok.com', 'img2.storyblok.com')
+  block.image = block.image.replace('a.storyblok.com', 'my-custom-domain.com')
 }
 ```
 
