@@ -4,5 +4,6 @@ module.exports = {
   api: require('./api'),
   creds: require('./creds'),
   capitalize: require('./capitalize'),
-  findByProperty: require('./find-by-property')
+  findByProperty: require('./find-by-property'),
+  parseError: require('./parse-error')
 }

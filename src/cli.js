@@ -46,15 +46,10 @@ program
     }
 
     try {
-      const questions = getQuestions('login', {}, api)
-      const { email, password } = await inquirer.prompt(questions)
-
-      await api.login(email, password)
-      console.log(chalk.green('✓') + ' Log in successfully! Token has been added to .netrc file.')
+      await api.processLogin()
       process.exit(0)
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred when login the user')
-      console.error(e)
+      console.log(chalk.red('X') + ' An error occurred when logging the user: ' + e.message)
       process.exit(1)
     }
   })
@@ -69,8 +64,8 @@ program
       console.log('Logged out successfully! Token has been removed from .netrc file.')
       process.exit(0)
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred when logout the user')
-      console.error(e)
+      console.log(chalk.red('X') + ' An error occurred when logging out the user: ' + e.message)
+      process.exit(1)
     }
   })
 
@@ -79,7 +74,7 @@ program
   .command('pull-components')
   .description("Download your space's components schema as json")
   .action(async () => {
-    console.log(`${chalk.blue('-')} Executing push-components task`)
+    console.log(`${chalk.blue('-')} Executing pull-components task`)
     const space = program.space
     if (!space) {
       console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
@@ -87,16 +82,15 @@ program
     }
 
     try {
-      const questions = await getQuestions('pull-components', { space }, api)
-
-      await inquirer.prompt(questions)
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
 
       api.setSpaceId(space)
       await tasks.pullComponents(api, { space })
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred when execute the pull-components task')
-      console.error(e)
-      process.exit(0)
+      console.log(chalk.red('X') + ' An error occurred when executing the pull-components task: ' + e.message)
+      process.exit(1)
     }
   })
 
@@ -114,16 +108,15 @@ program
     }
 
     try {
-      const questions = await getQuestions('push-components', { space }, api)
-
-      await inquirer.prompt(questions)
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
 
       api.setSpaceId(space)
       await tasks.pushComponents(api, { source })
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred when execute the push-components task')
-      console.error(e)
-      process.exit(0)
+      console.log(chalk.red('X') + ' An error occurred when executing the push-components task: ' + e.message)
+      process.exit(1)
     }
   })
 
@@ -145,8 +138,8 @@ program
       console.log(chalk.green('✓') + ' - source/scss/components/below/_' + name + '.scss')
       process.exit(0)
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred execute operations to create the component')
-      console.error(e)
+      console.log(chalk.red('X') + ' An error occurred when executing operations to create the component: ' + e.message)
+      process.exit(1)
     }
   })
 
@@ -163,8 +156,8 @@ program
 
       await lastStep(answers)
     } catch (e) {
-      console.error(e)
-      process.exit(0)
+      console.error(chalk.red('X') + ' An error ocurred when execute the select command: ' + e.message)
+      process.exit(1)
     }
   })
 
@@ -194,11 +187,7 @@ program
       })
 
       if (!api.isAuthorized()) {
-        const questions = getQuestions('login', {}, api)
-        const { email, password } = await inquirer.prompt(questions)
-
-        await api.login(email, password)
-        console.log(chalk.green('✓') + ' Log in successfully! Token has been added to .netrc file.')
+        await api.processLogin()
       }
 
       const token = creds.get().token || null
@@ -211,9 +200,8 @@ program
 
       console.log('\n' + chalk.green('✓') + ' Sync data between spaces successfully completed')
     } catch (e) {
-      console.error(chalk.red('X') + ' An error ocurred when sync spaces')
-      console.error(e)
-      process.exit(0)
+      console.error(chalk.red('X') + ' An error ocurred when syncing spaces: ' + e.message)
+      process.exit(1)
     }
   })
 
@@ -228,8 +216,70 @@ program
       const answers = await inquirer.prompt(questions)
       await tasks.quickstart(api, answers, space)
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred when execute quickstart operations')
-      console.error(e)
+      console.log(chalk.red('X') + ' An error ocurred when execute quickstart operations: ' + e.message)
+      process.exit(1)
+    }
+  })
+
+program
+  .command('generate-migration')
+  .description('Generate a content migration file')
+  .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
+  .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
+  .action(async (options) => {
+    const field = options.field || ''
+    const component = options.component || ''
+
+    const space = program.space
+    if (!space) {
+      console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
+      process.exit(1)
+    }
+
+    console.log(`${chalk.blue('-')} Creating the migration file in ./migrations/change_${component}_${field}.js\n`)
+
+    try {
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
+
+      api.setSpaceId(space)
+      await tasks.generateMigration(api, component, field)
+    } catch (e) {
+      console.log(chalk.red('X') + ' An error ocurred when generate the migration file: ' + e.message)
+      process.exit(1)
+    }
+  })
+
+program
+  .command('run-migration')
+  .description('Run a migration file')
+  .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
+  .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
+  .option('--dryrun', 'Do not update the story content')
+  .action(async (options) => {
+    const field = options.field || ''
+    const component = options.component || ''
+    const isDryrun = !!options.dryrun
+
+    const space = program.space
+    if (!space) {
+      console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
+      process.exit(1)
+    }
+
+    console.log(`${chalk.blue('-')} Processing the migration ./migrations/change_${component}_${field}.js\n`)
+
+    try {
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
+
+      api.setSpaceId(space)
+      await tasks.runMigration(api, component, field, { isDryrun })
+    } catch (e) {
+      console.log(chalk.red('X') + ' An error ocurred when run the migration file: ' + e.message)
+      process.exit(1)
     }
   })
 
