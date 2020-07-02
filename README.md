@@ -214,7 +214,10 @@ After checking the output of the dryrun you can execute the updates:
 $ storyblok run-migration --space 00000 --component product --field price
 ```
 
-### Example
+### Examples
+
+
+#### 1. Change an image field
 
 Let's create an example to update all occurrences of the image field in product component. In the example we replace the url from `//a.storyblok.com` to `//my-custom-domain.com`.
 
@@ -236,6 +239,33 @@ Now you can execute the migration file:
 
 ```sh
 $ storyblok run-migration --space 00000 --component product --field image --dryrun
+```
+
+#### 2. Transform a Markdown field into a Richtext field
+
+
+To transform a markdown or html field into a richtext field you first need to install a converter library.
+
+```sh
+$ npm install storyblok-markdown-richtext -g
+```
+
+Now check the path to the global node modules folder
+
+```sh
+$ npm root -g
+```
+
+Generate the migration with ```storyblok generate-migration --space 00000 --component blog --field intro``` and apply the transformation:
+
+```js
+var richtextConverter = require('/usr/local/lib/node_modules/storyblok-markdown-richtext')
+
+module.exports = function (block) {
+  if (typeof block.intro == 'string') {
+    block.intro = richtextConverter.markdownToRichtext(block.intro)
+  }
+}
 ```
 
 ## You're looking for a headstart?
