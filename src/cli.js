@@ -283,6 +283,25 @@ program
     }
   })
 
+// list spaces
+program
+  .command('spaces')
+  .description('List all spaces')
+  .action(async (options) => {
+    
+    try {
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
+
+      await tasks.listSpaces(options)
+    } catch (e) {
+      console.log(chalk.red('X') + ' An error ocurred to listing sapces : ' + e.message)
+      process.exit(1)
+    }
+  })
+
+
 program.parse(process.argv)
 
 if (program.rawArgs.length <= 2) {
