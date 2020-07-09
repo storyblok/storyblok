@@ -328,5 +328,119 @@ describe('testing runMigration', () => {
 
       expect(secondExecutionPayload.force_update).toBe('1')
     })
+
+    it('should publish undefined', async () => {
+      try {
+        await runMigration(FAKE_API, 'teaser', 'subtitle', opt)
+      } catch (e) {
+        console.error(e)
+      }
+
+      // check how many times the put function was executed
+      expect(FAKE_API.put.mock.calls.length).toBe(2)
+
+      // the first execution
+      const firstExecution = FAKE_API.put.mock.calls[0]
+      const firstExecutiontionPayload = firstExecution[1]
+
+      expect(firstExecutiontionPayload.publish).toBeUndefined()
+
+      const secondExecution = FAKE_API.put.mock.calls[1]
+      const secondExecutiontionPayload = secondExecution[1]
+
+      expect(secondExecutiontionPayload.publish).toBeUndefined()
+    })
+  })
+
+  describe('when the user pass the publish option', async () => {
+    const FAKE_API = {
+      getStories: jest.fn(() => Promise.resolve(FAKE_STORIES())),
+      getSingleStory: jest.fn(id => {
+        const data = FAKE_STORIES().filter(story => story.id === id)[0] || {}
+        return Promise.resolve(data)
+      }),
+      put: jest.fn(() => {})
+    }
+
+    const defaultOption = {
+      migrationPath
+    }
+
+    beforeEach(() => {
+      require('fs-extra').__clearMockFiles()
+      require('fs-extra').__setMockFiles({
+        [getFilePath('subtitle')]: 'module.exports = {}'
+      })
+    })
+
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
+
+    it('should publish=1 when the user pass all for all stories', async () => {
+      try {
+        await runMigration(FAKE_API, 'teaser', 'subtitle', {
+          ...defaultOption,
+          publish: 'all'
+        })
+      } catch (e) {
+        console.error(e)
+      }
+
+      // the both stories should be publish
+      const firstExecution = FAKE_API.put.mock.calls[0]
+      const firstExecutiontionPayload = firstExecution[1]
+
+      expect(firstExecutiontionPayload.publish).toBe('1')
+
+      const secondExecution = FAKE_API.put.mock.calls[1]
+      const secondExecutiontionPayload = secondExecution[1]
+
+      expect(secondExecutiontionPayload.publish).toBe('1')
+    })
+
+    it('should publish=1 for unpublished_changes stories when the user pass the published-with-changes option', async () => {
+      try {
+        await runMigration(FAKE_API, 'teaser', 'subtitle', {
+          ...defaultOption,
+          publish: 'published-with-changes'
+        })
+      } catch (e) {
+        console.error(e)
+      }
+
+      // the both stories should be publish
+      const firstExecution = FAKE_API.put.mock.calls[0]
+      const firstExecutiontionPayload = firstExecution[1]
+
+      expect(firstExecutiontionPayload.publish).toBe('1')
+
+      const secondExecution = FAKE_API.put.mock.calls[1]
+      const secondExecutiontionPayload = secondExecution[1]
+
+      expect(secondExecutiontionPayload.publish).toBeUndefined()
+    })
+
+    it('should publish=1 for stories already publish when the user pass the published option', async () => {
+      try {
+        await runMigration(FAKE_API, 'teaser', 'subtitle', {
+          ...defaultOption,
+          publish: 'published'
+        })
+      } catch (e) {
+        console.error(e)
+      }
+
+      // the both stories should be publish
+      const firstExecution = FAKE_API.put.mock.calls[0]
+      const firstExecutiontionPayload = firstExecution[1]
+
+      expect(firstExecutiontionPayload.publish).toBeUndefined()
+
+      const secondExecution = FAKE_API.put.mock.calls[1]
+      const secondExecutiontionPayload = secondExecution[1]
+
+      expect(secondExecutiontionPayload.publish).toBe('1')
+    })
   })
 })

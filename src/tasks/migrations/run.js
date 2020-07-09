@@ -9,16 +9,35 @@ const {
   getNameOfMigrationFile
 } = require('./utils')
 
+const isStoryPublishedWithoutChanges = story => {
+  return story.published && !story.unpublished_changes
+}
+
+const isStoryWithUnpublishedChanges = story => {
+  return story.published && story.unpublished_changes
+}
+
+/**
+ * @typedef {'all'|'published'|'published-with-changes'} PublishOptions
+ *
+ * @typedef {Object} RunMigrationOptions
+ * @property {boolean} isDryrun indicates the function will be execute or not
+ * @property {string}  migrationPath indicates where is the location to migration function
+ * @property {PublishOptions} publish
+ * /
+
 /**
  * @method runMigration
  * @param  {Object} api       API instance
  * @param  {String} component component name
  * @param  {String} field     field name
- * @param  {{ isDryrun?: boolean, migrationPath?: string }} options disable execution
+ * @param  {RunMigrationOptions} options disable execution
  * @return {Promise<{ executed: boolean, motive?: string }>}
  */
 const runMigration = async (api, component, field, options = {}) => {
   const migrationPath = options.migrationPath || null
+  const publish = options.publish || null
+
   try {
     const fileName = getNameOfMigrationFile(component, field)
     const pathToFile = getPathToFile(fileName, migrationPath)
@@ -70,8 +89,21 @@ const runMigration = async (api, component, field, options = {}) => {
           const url = `stories/${story.id}`
           const payload = {
             story: storyData,
-            forceUpdate: '1'
+            force_update: '1'
           }
+
+          if (publish === 'published' && isStoryPublishedWithoutChanges(storyData)) {
+            payload.publish = '1'
+          }
+
+          if (publish === 'published-with-changes' && isStoryWithUnpublishedChanges(story)) {
+            payload.publish = '1'
+          }
+
+          if (publish === 'all') {
+            payload.publish = '1'
+          }
+
           await api.put(url, payload)
           console.log(
             `${chalk.blue('-')} Story updated with success!`
