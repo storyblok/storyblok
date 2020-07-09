@@ -272,6 +272,16 @@ program
       process.exit(1)
     }
 
+    const publishOptionsAvailable = [
+      'all',
+      'published',
+      'published-with-changes'
+    ]
+    if (publish && !publishOptionsAvailable.includes(publish)) {
+      console.log(chalk.red('X') + ' Please provide a correct publish option: all, published, or published-with-changes')
+      process.exit(1)
+    }
+
     console.log(`${chalk.blue('-')} Processing the migration ./migrations/change_${component}_${field}.js\n`)
 
     try {
