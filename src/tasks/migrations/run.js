@@ -9,10 +9,20 @@ const {
   getNameOfMigrationFile
 } = require('./utils')
 
+/**
+ * @method isStoryPublishedWithoutChanges
+ * @param  {Object} story
+ * @return {Boolean}
+ */
 const isStoryPublishedWithoutChanges = story => {
   return story.published && !story.unpublished_changes
 }
 
+/**
+ * @method isStoryWithUnpublishedChanges
+ * @param  {Object} story
+ * @return {Boolean}
+ */
 const isStoryWithUnpublishedChanges = story => {
   return story.published && story.unpublished_changes
 }
@@ -24,6 +34,7 @@ const isStoryWithUnpublishedChanges = story => {
  * @property {boolean} isDryrun indicates the function will be execute or not
  * @property {string}  migrationPath indicates where is the location to migration function
  * @property {PublishOptions} publish
+ * @property {string}  publishLanguages
  * /
 
 /**
@@ -37,6 +48,7 @@ const isStoryWithUnpublishedChanges = story => {
 const runMigration = async (api, component, field, options = {}) => {
   const migrationPath = options.migrationPath || null
   const publish = options.publish || null
+  const publishLanguages = options.publishLanguages || null
 
   try {
     const fileName = getNameOfMigrationFile(component, field)
@@ -102,6 +114,10 @@ const runMigration = async (api, component, field, options = {}) => {
 
           if (publish === 'all') {
             payload.publish = '1'
+          }
+
+          if (!isEmpty(publishLanguages)) {
+            payload.lang = publishLanguages
           }
 
           await api.put(url, payload)

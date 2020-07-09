@@ -258,11 +258,13 @@ program
   .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
   .option('--dryrun', 'Do not update the story content')
   .option('--publish <PUBLISH_OPTION>', 'Publish the content. It can be: all, published or published-with-changes')
+  .option('--publish-languages <LANGUAGES>', 'Publish specific languages')
   .action(async (options) => {
     const field = options.field || ''
     const component = options.component || ''
     const isDryrun = !!options.dryrun
     const publish = options.publish || null
+    const publishLanguages = options.publishLanguages || ''
 
     const space = program.space
     if (!space) {
@@ -282,7 +284,7 @@ program
         api,
         component,
         field,
-        { isDryrun, publish }
+        { isDryrun, publish, publishLanguages }
       )
     } catch (e) {
       console.log(chalk.red('X') + ' An error ocurred when run the migration file: ' + e.message)

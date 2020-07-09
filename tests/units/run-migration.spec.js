@@ -329,7 +329,7 @@ describe('testing runMigration', () => {
       expect(secondExecutionPayload.force_update).toBe('1')
     })
 
-    it('should publish undefined', async () => {
+    it('should publish be undefined', async () => {
       try {
         await runMigration(FAKE_API, 'teaser', 'subtitle', opt)
       } catch (e) {
@@ -349,6 +349,28 @@ describe('testing runMigration', () => {
       const secondExecutiontionPayload = secondExecution[1]
 
       expect(secondExecutiontionPayload.publish).toBeUndefined()
+    })
+
+    it('should lang be undefined', async () => {
+      try {
+        await runMigration(FAKE_API, 'teaser', 'subtitle', opt)
+      } catch (e) {
+        console.error(e)
+      }
+
+      // check how many times the put function was executed
+      expect(FAKE_API.put.mock.calls.length).toBe(2)
+
+      // the first execution
+      const firstExecution = FAKE_API.put.mock.calls[0]
+      const firstExecutiontionPayload = firstExecution[1]
+
+      expect(firstExecutiontionPayload.lang).toBeUndefined()
+
+      const secondExecution = FAKE_API.put.mock.calls[1]
+      const secondExecutiontionPayload = secondExecution[1]
+
+      expect(secondExecutiontionPayload.lang).toBeUndefined()
     })
   })
 
@@ -441,6 +463,76 @@ describe('testing runMigration', () => {
       const secondExecutiontionPayload = secondExecution[1]
 
       expect(secondExecutiontionPayload.publish).toBe('1')
+    })
+  })
+
+  describe('when the user pass the publish-languages option', async () => {
+    const FAKE_API = {
+      getStories: jest.fn(() => Promise.resolve(FAKE_STORIES())),
+      getSingleStory: jest.fn(id => {
+        const data = FAKE_STORIES().filter(story => story.id === id)[0] || {}
+        return Promise.resolve(data)
+      }),
+      put: jest.fn(() => {})
+    }
+
+    const defaultOption = {
+      migrationPath,
+      publish: 'all'
+    }
+
+    beforeEach(() => {
+      require('fs-extra').__clearMockFiles()
+      require('fs-extra').__setMockFiles({
+        [getFilePath('subtitle')]: 'module.exports = {}'
+      })
+    })
+
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
+
+    it('should lang be undefined when the user pass anything', async () => {
+      try {
+        await runMigration(FAKE_API, 'teaser', 'subtitle', {
+          ...defaultOption
+        })
+      } catch (e) {
+        console.error(e)
+      }
+
+      // the both stories should be publish
+      const firstExecution = FAKE_API.put.mock.calls[0]
+      const firstExecutiontionPayload = firstExecution[1]
+
+      expect(firstExecutiontionPayload.lang).toBeUndefined()
+
+      const secondExecution = FAKE_API.put.mock.calls[1]
+      const secondExecutiontionPayload = secondExecution[1]
+
+      expect(secondExecutiontionPayload.lang).toBeUndefined()
+    })
+
+    it('should lang=pt when the user pass pt', async () => {
+      try {
+        await runMigration(FAKE_API, 'teaser', 'subtitle', {
+          ...defaultOption,
+          publishLanguages: 'pt'
+        })
+      } catch (e) {
+        console.error(e)
+      }
+
+      // the both stories should be publish
+      const firstExecution = FAKE_API.put.mock.calls[0]
+      const firstExecutiontionPayload = firstExecution[1]
+
+      expect(firstExecutiontionPayload.lang).toBe('pt')
+
+      const secondExecution = FAKE_API.put.mock.calls[1]
+      const secondExecutiontionPayload = secondExecution[1]
+
+      expect(secondExecutiontionPayload.lang).toBe('pt')
     })
   })
 })
