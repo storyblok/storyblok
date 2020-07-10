@@ -3,7 +3,7 @@ const StoryblokClient = require('storyblok-js-client')
 
 const getAllSpaces = async (token) => {
   try {
-    let Storyblok = new StoryblokClient({
+    const Storyblok = new StoryblokClient({
       oauthToken: token
     })
 
@@ -21,7 +21,6 @@ const getAllSpaces = async (token) => {
     return response
   } catch (error) {
     console.log(chalk.red('X') + ' Error making the request ' + error)
-    return
   }
 }
 
@@ -41,8 +40,7 @@ const listSpaces = async (token) => {
     return []
   }
 
-  let spaces = await getAllSpaces(token)
-  
+  const spaces = await getAllSpaces(token)
   if (!spaces) {
     console.log(chalk.red('X') + ' No spaces were found for this user ')
     return []

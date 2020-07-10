@@ -288,7 +288,6 @@ program
   .command('spaces')
   .description('List all spaces of the logged account')
   .action(async () => {
-    
     try {
       if (!api.isAuthorized()) {
         await api.processLogin()
@@ -302,7 +301,6 @@ program
       process.exit(1)
     }
   })
-
 
 program.parse(process.argv)
 
