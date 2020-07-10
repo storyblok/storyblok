@@ -145,6 +145,14 @@ $ storyblok run-migration --space <SPACE_ID> --component <COMPONENT_NAME> --fiel
 * `field`: name of field
 * `dryrun`: when passed as an argument, does not perform the migration
 
+### spaces
+
+List all spaces of the logged account
+
+```sh
+$ storyblok spaces
+```
+
 ### Help
 
 For global help

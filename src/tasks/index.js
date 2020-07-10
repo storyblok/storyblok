@@ -5,5 +5,6 @@ module.exports = {
   pullComponents: require('./pull-components'),
   pushComponents: require('./push-components'),
   generateMigration: require('./migrations/generate'),
-  runMigration: require('./migrations/run')
+  runMigration: require('./migrations/run'),
+  listSpaces: require('./list-spaces')
 }

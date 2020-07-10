@@ -189,5 +189,12 @@ module.exports = {
     const _path = this.getPath(path)
 
     return client[method](_path, props)
+  },
+
+  async getAllSpaces () {
+    return await this.getClient()
+      .get('spaces/', {})
+      .then(res => res.data.spaces || [])
+      .catch(err => Promise.reject(err))
   }
 }

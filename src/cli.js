@@ -283,6 +283,23 @@ program
     }
   })
 
+// list spaces
+program
+  .command('spaces')
+  .description('List all spaces of the logged account')
+  .action(async () => {
+    try {
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
+
+      await tasks.listSpaces(api)
+    } catch (e) {
+      console.log(chalk.red('X') + ' An error ocurred to listing sapces : ' + e.message)
+      process.exit(1)
+    }
+  })
+
 program.parse(process.argv)
 
 if (program.rawArgs.length <= 2) {
