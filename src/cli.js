@@ -287,14 +287,16 @@ program
 program
   .command('spaces')
   .description('List all spaces')
-  .action(async (options) => {
+  .action(async () => {
     
     try {
       if (!api.isAuthorized()) {
         await api.processLogin()
       }
 
-      await tasks.listSpaces(options)
+      const token = creds.get().token || null
+
+      await tasks.listSpaces(token)
     } catch (e) {
       console.log(chalk.red('X') + ' An error ocurred to listing sapces : ' + e.message)
       process.exit(1)

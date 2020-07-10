@@ -1,14 +1,9 @@
 const chalk = require('chalk')
 const StoryblokClient = require('storyblok-js-client')
 
-/**
- * @method listSpaces
- * @return {Promise}
- */
-
-const getAllSpaces = async (options) => {
+const getAllSpaces = async (token) => {
   let Storyblok = new StoryblokClient({
-    oauthToken: ''
+    oauthToken: token
   })
 
   let response = []
@@ -25,11 +20,23 @@ const getAllSpaces = async (options) => {
   return response
 }
 
-const listSpaces = async (options) => {
+/**
+ * @method listSpaces
+ * @return {Promise}
+ */
+
+const listSpaces = async (token) => {
+  console.log()
   console.log(chalk.green('✓') + ' Loading spaces...')
   console.log()
 
-  let spaces = await getAllSpaces()
+  let spaces = await getAllSpaces(token)
+  
+  if (spaces.length <= 0) {
+    console.log(chalk.red('X') + ' No spaces were found for this user ')
+    return []
+  }
+
   spaces.map(space => {
     console.log(`${space.name} (id: ${space.id})`)
   })
