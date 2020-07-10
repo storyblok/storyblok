@@ -126,10 +126,34 @@ const FAKE_STORIES = () => [
   }
 ]
 
+const FAKE_SPACES = () => [
+  {
+    name: 'Example Space',
+    domain: 'https://example.storyblok.com',
+    uniq_domain: null,
+    plan: 'starter',
+    plan_level: 0,
+    limits: {},
+    created_at: '2018-11-10T15:33:18.402Z',
+    id: 0
+  },
+  {
+    name: 'Example Space Two',
+    domain: 'https://example-two.storyblok.com',
+    uniq_domain: null,
+    plan: 'starter',
+    plan_level: 0,
+    limits: {},
+    created_at: '2018-11-10T15:33:18.402Z',
+    id: 1
+  }
+]
+
 module.exports = {
   EMAIL_TEST,
   TOKEN_TEST,
   FAKE_STORIES,
   PASSWORD_TEST,
-  FAKE_COMPONENTS
+  FAKE_COMPONENTS,
+  FAKE_SPACES
 }

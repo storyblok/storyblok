@@ -1,5 +1,5 @@
-const { api } = require('../../src/utils/')
 const { listSpaces } = require('../../src/tasks/')
+const { FAKE_SPACES } = require('../constants')
 
 describe('Test spaces method', () => {
   it('Testing list-spaces funtion without api instance', async () => {
@@ -9,23 +9,14 @@ describe('Test spaces method', () => {
     } catch (e) {
       console.error(e)
     }
-  }) 
-
+  })
   it('Testing list-spaces funtion with api instance', async () => {
-    try {
-      const spaces = await listSpaces(api)
-      expect(spaces).toStrictEqual(![])
-    } catch (e) {
-      console.error(e)
+    const FAKE_API = {
+      getAllSpaces: jest.fn(() => Promise.resolve(FAKE_SPACES()))
     }
-  }) 
-
-  it('Testing get-all-spaces method in api file', async () => {
-    try {
-      const spaces = await api.getAllSpaces()
-      expect(spaces).toStrictEqual([])
-    } catch (e) {
-      console.error(e)
-    }
-  }) 
+    expect(
+      await listSpaces(FAKE_API)
+    ).toEqual(FAKE_SPACES())
+    expect(FAKE_API.getAllSpaces).toHaveBeenCalled()
+  })
 })
