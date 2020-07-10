@@ -1,14 +1,31 @@
-const { TOKEN_TEST } = require('../constants')
-const listSpaces = require('../../src/tasks/list-spaces')
+const { api } = require('../../src/utils/')
+const { listSpaces } = require('../../src/tasks/')
 
-describe('list spaces method', () => {
-  it('if the token not pass in request', async () => {
-    let spaces = await listSpaces('')
-    expect(spaces).toStrictEqual([])
+describe('Test spaces method', () => {
+  it('Testing list-spaces funtion without api instance', async () => {
+    try {
+      const spaces = await listSpaces()
+      expect(spaces).toStrictEqual([])
+    } catch (e) {
+      console.error(e)
+    }
   }) 
 
-  it('if the user no have spaces in your account', async () => {
-    let spaces = await listSpaces(TOKEN_TEST)
-    expect(spaces).toStrictEqual([])
+  it('Testing list-spaces funtion with api instance', async () => {
+    try {
+      const spaces = await listSpaces(api)
+      expect(spaces).toStrictEqual(![])
+    } catch (e) {
+      console.error(e)
+    }
+  }) 
+
+  it('Testing get-all-spaces method in api file', async () => {
+    try {
+      const spaces = await api.getAllSpaces()
+      expect(spaces).toStrictEqual([])
+    } catch (e) {
+      console.error(e)
+    }
   }) 
 })
