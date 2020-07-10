@@ -293,9 +293,7 @@ program
         await api.processLogin()
       }
 
-      const token = creds.get().token || null
-
-      await tasks.listSpaces(token)
+      await tasks.listSpaces(api)
     } catch (e) {
       console.log(chalk.red('X') + ' An error ocurred to listing sapces : ' + e.message)
       process.exit(1)

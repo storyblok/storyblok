@@ -1,46 +1,25 @@
 const chalk = require('chalk')
-const StoryblokClient = require('storyblok-js-client')
-
-const getAllSpaces = async (token) => {
-  try {
-    const Storyblok = new StoryblokClient({
-      oauthToken: token
-    })
-
-    let response = []
-
-    await Storyblok
-      .get('spaces/', {})
-      .then((spaces) => {
-        response = spaces.data.spaces
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-
-    return response
-  } catch (error) {
-    console.log(chalk.red('X') + ' Error making the request ' + error)
-  }
-}
 
 /**
  * @method listSpaces
- * @param token - This is a storyblok token to oauth access
+ * @param api - Pass the api instance as a parameter
  * @return {Promise}
  */
 
-const listSpaces = async (token) => {
+const listSpaces = async (api) => {
   console.log()
   console.log(chalk.green('✓') + ' Loading spaces...')
   console.log()
 
-  if (token === null || token === '') {
-    console.log(chalk.red('X') + ' This operation need a user token ')
+  if (!api) {
+    console.log(chalk.red('X') + 'Api instance is required to make the request')
     return []
   }
 
-  const spaces = await getAllSpaces(token)
+  const spaces = await api.getAllSpaces()
+    .then(res => res)
+    .catch(err => Promise.reject(err))
+
   if (!spaces) {
     console.log(chalk.red('X') + ' No spaces were found for this user ')
     return []
