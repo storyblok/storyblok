@@ -25,6 +25,7 @@
     "chalk": "^4.1.0",
     "clear": "0.1.0",
     "commander": "^5.1.0",
+    "fast-csv": "^4.3.1",
     "figlet": "^1.4.0",
     "fs-extra": "^9.0.1",
     "github-download": "^0.5.0",
