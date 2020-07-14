@@ -4,15 +4,20 @@ const csvReader = require('fast-csv')
 
 /**
  * @method importData
- * @param opts - Array with arguments, [Name of the file, Type of content, Folder ID]
+ * @param options - Array with arguments, [Name of the file, Type of content, Folder ID, Delimiter (For csv files)]
  * @param api - Pass the api instance as a parameter
  * @return {Promise}
  */
 
-const readCsv = async (stream, typeOfContent, folderID = 0, api, delimiter = ';') => {
+const readAndLoadCsv = async (stream, typeOfContent, api, folderID = 0, delimiter = ';') => {
+  console.log()
+  console.log(chalk.green('✓') + ' Reading file... ')
+  console.log()
+
   csvReader.parseStream(stream, { headers: true, delimiter: delimiter })
-    .on('data', (line) => {
-      const story = {
+    .on('error', error => console.error(error))
+    .on('data', line => {
+      const sourceStory = {
         slug: line.path,
         name: line.title,
         parent_id: folderID,
@@ -25,27 +30,27 @@ const readCsv = async (stream, typeOfContent, folderID = 0, api, delimiter = ';'
         }
       }
 
-      return api.post(`spaces/${75070}/stories/`, { story })
+      api.getClient()
+        .post(`spaces/${api.spaceId}/stories`, { story: sourceStory })
         .then(res => {
-          console.log(`Success: ${res.data.story.name} was created.`)
-        }).catch(err => {
-          console.log(`Error: ${err}`)
+          console.log(chalk.green('✓') + ` ${res.data.story.name} was created `)
         })
-    })
-    .on('end', () => {
-      return
+        .catch(err => Promise.reject(err))
     })
 }
 
-const importData = async (opts, api) => {
-  const fileName = opts[0] || ''
-  const typeOfContent = opts[1] || ''
-  const folderID = opts[2] !== undefined ? opts[2] : ''
+const importData = async (options, api) => {
+  const {
+    file,
+    type,
+    folder,
+    delimiter
+  } = options
 
-  const dataFromFile = fs.createReadStream(fileName)
+  const dataFromFile = fs.createReadStream(file)
+  await readAndLoadCsv(dataFromFile, type, api, folder, delimiter)
 
-  return await readCsv(dataFromFile, typeOfContent, folderID, api)
-
+  return
 }
 
 module.exports = importData

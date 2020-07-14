@@ -304,10 +304,10 @@ program
 program 
   .command('import')
   .description('Import data from other systems and relational databases.')
-  .requiredOption('-f', '--file <FILE_NAME>', 'Name of the file')
-  .requiredOption('-t', '--type <TYPE>', 'Type of the content')
-  .option('-fr', '--folder <FOLDER_ID>', '(Optional) This is a Id of folder in storyblok')
-  // .option('--delimiter', 'If you are using a csv file, put the file delimiter, the default is ";"')
+  .requiredOption('-f, --file <FILE_NAME>', 'Name of the file')
+  .requiredOption('-t, --type <TYPE>', 'Type of the content')
+  .option('-fr, --folder <FOLDER_ID>', '(Optional) This is a Id of folder in storyblok')
+  .option('-d, --delimiter', 'If you are using a csv file, put the file delimiter, the default is ";"')
   .action(async (options) => {
     const space = program.space
     
@@ -322,7 +322,7 @@ program
       }
 
       api.setSpaceId(space)
-      await tasks.import(options.args)
+      await tasks.import(options, api)
     } catch (e) {
       console.log(chalk.red('X') + ' An error ocurred to import data : ' + e.message)
       process.exit(1)
