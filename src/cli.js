@@ -301,7 +301,7 @@ program
   })
 
 // import data
-program 
+program
   .command('import')
   .description('Import data from other systems and relational databases.')
   .requiredOption('-f, --file <FILE_NAME>', 'Name of the file')
@@ -310,7 +310,6 @@ program
   .option('-d, --delimiter', 'If you are using a csv file, put the file delimiter, the default is ";"')
   .action(async (options) => {
     const space = program.space
-    
     try {
       if (!api.isAuthorized()) {
         await api.processLogin()
@@ -322,7 +321,7 @@ program
       }
 
       api.setSpaceId(space)
-      await tasks.import(options, api)
+      await tasks.importFiles(api, options)
     } catch (e) {
       console.log(chalk.red('X') + ' An error ocurred to import data : ' + e.message)
       process.exit(1)
