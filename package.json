@@ -37,7 +37,8 @@
     "p-series": "^2.1.0",
     "path": "^0.12.7",
     "storyblok-js-client": "^2.5.0",
-    "update-notifier": "^4.1.0"
+    "update-notifier": "^4.1.0",
+    "xml-js": "^1.6.11"
   },
   "engines": {
     "node": ">=10.0.0"
