@@ -161,6 +161,13 @@ This command gives the possibility to import files directly to a specific space,
 $ storyblok import --file <FILE_NAME> --type <TYPE_OF_CONTENT> --folder
 <FOLDER_ID> --delimiter <DELIMITER_TO_CSV_FILES> --space <SPACE_ID>
 ```
+**Important**, for interopability with all files, we must follow some specifics in each supported file type.
+
+For `.json` files, the keys must be the story slugs.
+For `.xml` files, these must contain a <path> tag with the slug inside
+For `.csv` files, these must have a column named `path`
+
+For more information on how to create stories, see the [documentation](https://www.storyblok.com/docs/api/management#core-resources/stories/create-story).
 
 #### Options
 
