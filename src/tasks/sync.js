@@ -283,7 +283,8 @@ const SyncSpaces = {
           await this.updateComponent(
             this.targetSpaceId,
             componentTarget.id,
-            component
+            component,
+            componentTarget
           )
           console.log(chalk.green('✓') + ` Component ${component.name} synced`)
 
@@ -319,12 +320,49 @@ const SyncSpaces = {
       .catch(error => Promise.reject(error))
   },
 
-  updateComponent (spaceId, componentId, componentData) {
+  updateComponent (spaceId, componentId, sourceComponentData, targetComponentData) {
+    const payload = {
+      component: this.mergeComponents(sourceComponentData, targetComponentData)
+    }
     return this
       .client
-      .put(`spaces/${spaceId}/components/${componentId}`, {
-        component: componentData
-      })
+      .put(`spaces/${spaceId}/components/${componentId}`, payload)
+  },
+
+  mergeComponents (sourceComponent, targetComponent) {
+    const data = {
+      ...sourceComponent,
+      ...targetComponent
+    }
+
+    // handle specifically
+    data.schema = this.mergeComponentSchema(
+      sourceComponent.schema,
+      targetComponent.schema
+    )
+
+    return data
+  },
+
+  mergeComponentSchema (sourceSchema, targetSchema) {
+    return Object.keys(sourceSchema).reduce((acc, key) => {
+      // handle blocks separately
+      if (key === 'blocks') {
+        const sourceSchemaItem = sourceSchema[key]
+        const targetSchemaItem = targetSchema[key]
+
+        acc[key] = {
+          ...sourceSchemaItem,
+          // prevent missing refence to group in whitelist
+          component_group_whitelist: targetSchemaItem.component_group_whitelist || []
+        }
+        return acc
+      }
+
+      acc[key] = sourceSchema[key]
+
+      return acc
+    }, {})
   },
 
   getComponents (spaceId) {
