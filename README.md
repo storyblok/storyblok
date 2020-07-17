@@ -153,6 +153,23 @@ List all spaces of the logged account
 $ storyblok spaces
 ```
 
+### import
+
+This command gives the possibility to import files directly to a specific space, thus being able to create stories with ease. The layer supports `.csv`, `.xml` and `.json` files.
+
+```sh
+$ storyblok import --file <FILE_NAME> --type <TYPE_OF_CONTENT> --folder
+<FOLDER_ID> --delimiter <DELIMITER_TO_CSV_FILES> --space <SPACE_ID>
+```
+
+#### Options
+
+* `file`: name of the file where the data is
+* `type`: this is the name of the content type you want to create
+* `folder`: id of the folder where you want to upload the stories (Default value is **0** )
+* `delimiter`: delimiter of the `.cvs` files, only necessary if you are uploading a csv file (Default value is **;** )
+* `space`: space where data will be loaded
+
 ### Help
 
 For global help
