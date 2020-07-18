@@ -135,7 +135,7 @@ $ storyblok generate-migration --space <SPACE_ID> --component <COMPONENT_NAME> -
 Execute a specific migration file. Check **Migrations** section to more details
 
 ```sh
-$ storyblok run-migration --space <SPACE_ID> --component <COMPONENT_NAME> --field <FIELD> --dryrun
+$ storyblok run-migration --space <SPACE_ID> --component <COMPONENT_NAME> --field <FIELD> --publish <PUBLISH_OPTION> --publish-languages <LANGUAGES> --dryrun
 ```
 
 #### Options
@@ -144,6 +144,11 @@ $ storyblok run-migration --space <SPACE_ID> --component <COMPONENT_NAME> --fiel
 * `component`: component name. It needs to be a valid component
 * `field`: name of field
 * `dryrun`: when passed as an argument, does not perform the migration
+* `publish`: publish the content when update
+  * `all`: publish all stories, even if they have not yet been published
+  * `publish`: only publish stories that already publish and doesn't have unpublished changes
+  * `published-with-changes`: allow publish stories with unpublished changes
+* `publish-languages`: publish specific languages. You can publish more than one language at a time by separating the languages by `,`
 
 ### spaces
 
@@ -222,8 +227,25 @@ After checking the output of the dryrun you can execute the updates:
 $ storyblok run-migration --space 00000 --component product --field price
 ```
 
-### Examples
+### 3. Publishing the content
 
+You can execute the migration and, when update the content, publish it using the `--publish` and `--publish-languages` options. When you use the `publish` option, **you need to specific one of these following options**: 'all', 'published' or 'published-with-changes':
+
+```sh
+$ storyblok run-migration --space 00000 --component product --field price --publish all
+```
+
+You can specify the languages to update using `--publish-languages=<LANGUAGE>` or update all languages using `--publish-languages=ALL_LANGUAGES`:
+
+```sh
+# to update only one language
+$ storyblok run-migration --space 00000 --component product --field price --publish all --publish-languages=de
+
+# to update more than one language
+$ storyblok run-migration --space 00000 --component product --field price --publish all --publish-languages=de,pt
+```
+
+### Examples
 
 #### 1. Change an image field
 
