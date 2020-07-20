@@ -1,12 +1,11 @@
 const chalk = require('chalk')
 const fs = require('fs')
 const {
-  readAndLoadCsv,
-  readAndLoadXml,
-  readAndLoadJson,
-  isCsv,
-  isJson,
-  isXml
+  csvParser,
+  xmlParser,
+  jsonParser,
+  sendContent,
+  discoverExtension
 } = require('./utils')
 
 /**
@@ -29,21 +28,44 @@ const importFiles = async (api, options) => {
     return []
   }
 
-  let extensionOfFile = file.split('.')
-  extensionOfFile = extensionOfFile[extensionOfFile.length - 1]
-
-  if (isCsv(extensionOfFile)) {
-    const stream = fs.createReadStream(file)
-    return await readAndLoadCsv(stream, type, api, folder, delimiter)
-  } else if (isXml(extensionOfFile)) {
-    const dataFromFile = fs.readFileSync(file)
-    return await readAndLoadXml(dataFromFile, type, api, folder)
-  } else if (isJson(extensionOfFile)) {
-    const dataFromFile = fs.readFileSync(file, 'utf-8')
-    return await readAndLoadJson(dataFromFile, type, api, folder)
-  } else {
-    console.log(chalk.red('X') + ' The file extension is not supported. ')
+  const extension = discoverExtension(file)
+  if (extension === 'csv') {
+    const dataFromFile = fs.createReadStream(file)
+    const convertData = await csvParser(dataFromFile, type, folder, delimiter)
+      .then(res => {
+        sendContent(api, res)
+      })
+      .catch(err => {
+        console.error(`${chalk.red('X')} An error occurred while converting the file`)
+        return Promise.reject(new Error(err))
+      })
+    return convertData
   }
-}
+  if (extension === 'xml') {
+    const dataFromFile = fs.readFileSync(file)
+    const convertData = await xmlParser(dataFromFile, type, folder)
+      .then(res => {
+        sendContent(api, res)
+      })
+      .catch(err => {
+        console.error(`${chalk.red('X')} An error occurred while converting the file`)
+        return Promise.reject(new Error(err))
+      })
+    return convertData
+  }
+  if (extension === 'json') {
+    const dataFromFile = fs.readFileSync(file, 'utf-8')
+    const convertData = await jsonParser(dataFromFile, type, folder)
+      .then(res => {
+        sendContent(api, res)
+      })
+      .catch(err => {
+        console.error(`${chalk.red('X')} An error occurred while converting the file`)
+        return Promise.reject(new Error(err))
+      })
+    return convertData
+  }
 
+  console.log(chalk.red('X') + ' The file extension is not supported. ')
+}
 module.exports = importFiles
