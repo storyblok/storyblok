@@ -257,14 +257,28 @@ program
   .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
   .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
   .option('--dryrun', 'Do not update the story content')
+  .option('--publish <PUBLISH_OPTION>', 'Publish the content. It can be: all, published or published-with-changes')
+  .option('--publish-languages <LANGUAGES>', 'Publish specific languages')
   .action(async (options) => {
     const field = options.field || ''
     const component = options.component || ''
     const isDryrun = !!options.dryrun
+    const publish = options.publish || null
+    const publishLanguages = options.publishLanguages || ''
 
     const space = program.space
     if (!space) {
       console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
+      process.exit(1)
+    }
+
+    const publishOptionsAvailable = [
+      'all',
+      'published',
+      'published-with-changes'
+    ]
+    if (publish && !publishOptionsAvailable.includes(publish)) {
+      console.log(chalk.red('X') + ' Please provide a correct publish option: all, published, or published-with-changes')
       process.exit(1)
     }
 
@@ -276,7 +290,12 @@ program
       }
 
       api.setSpaceId(space)
-      await tasks.runMigration(api, component, field, { isDryrun })
+      await tasks.runMigration(
+        api,
+        component,
+        field,
+        { isDryrun, publish, publishLanguages }
+      )
     } catch (e) {
       console.log(chalk.red('X') + ' An error ocurred when run the migration file: ' + e.message)
       process.exit(1)

@@ -77,7 +77,9 @@ const FAKE_STORIES = () => [
       component: 'page'
     },
     slug: 'about',
-    full_slug: 'about'
+    full_slug: 'about',
+    published: true,
+    unpublished_changes: true
   },
   {
     name: 'Home',
@@ -122,7 +124,9 @@ const FAKE_STORIES = () => [
       component: 'page'
     },
     slug: 'home',
-    full_slug: 'home'
+    full_slug: 'home',
+    published: true,
+    unpublished_changes: false
   }
 ]
 
