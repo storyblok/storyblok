@@ -2,6 +2,7 @@ const csvReader = require('fast-csv')
 const xmlConverter = require('xml-js')
 const chalk = require('chalk')
 const path = require('path')
+const { isArray } = require('lodash')
 
 /**
  * @method discoverExtension
@@ -15,6 +16,8 @@ const discoverExtension = (fileName) => {
   if (extension !== '') {
     return extension.replace('.', '')
   }
+
+  return ''
 }
 
 /**
@@ -25,9 +28,9 @@ const discoverExtension = (fileName) => {
  */
 
 const sendContent = async (api, contents) => {
-  for (const key in contents) {
-    await api.getClient()
-      .post(`spaces/${api.spaceId}/stories`, { story: contents[key] })
+  for (const story of contents) {
+    return await api.getClient()
+      .post(`spaces/${api.spaceId}/stories`, { story })
       .then(res => {
         console.log(`${chalk.green('✓')} ${res.data.story.name} was created `)
         return res.data.story.name
@@ -52,38 +55,61 @@ const removeJsonTextAttribute = (value, parentElement) => {
  * @param  {String} typeOfContent - Content type
  * @param  {Number} folderID - Storyblok folder id, default value is 0
  * @param  {String} delimiter - Csv file delimiter, default value is ';'
- * @return {Array}
+ * @return {Promise}
  */
 
-const csvParser = (stream, typeOfContent, folderID = 0, delimiter = ';') => new Promise(resolve => {
-  console.log()
-  console.log(`${chalk.blue('-')} Reading CSV file... `)
-  console.log()
+const csvParser = (stream, typeOfContent, folderID = 0, delimiter = ';') => {
+  return new Promise((resolve, reject) => {
+    console.log()
+    console.log(`${chalk.blue('-')} Reading CSV file... `)
+    console.log()
 
-  const story = []
+    const story = []
 
-  csvReader.parseStream(stream, { headers: true, delimiter: delimiter })
-    .on('error', error => console.error(error))
-    .on('data', line => {
-      const content = Object.keys(line).reduce((acc, key) => {
-        acc[key] = line[key]
-        return acc
-      }, {})
+    csvReader.parseStream(stream, { headers: true, delimiter: delimiter })
+      .on('error', error => reject(error))
+      .on('data', line => {
+        const content = Object.keys(line).reduce((acc, key) => {
+          acc[key] = line[key]
+          return acc
+        }, {})
 
-      story.push({
-        slug: line.path,
-        name: line.title,
-        parent_id: folderID,
-        content: {
-          component: typeOfContent,
-          ...content
-        }
+        story.push({
+          slug: line.path || '',
+          name: line.title || '',
+          parent_id: folderID,
+          content: {
+            component: typeOfContent,
+            ...content
+          }
+        })
       })
-    })
-    .on('end', () => {
-      resolve(story)
-    })
-})
+      .on('end', () => {
+        resolve(story)
+      })
+  })
+}
+
+const xmlFactoryOfStoryes = (line, typeOfContent, folderID) => {
+  const content = Object.keys(line).reduce((acc, key) => {
+    acc[key] = line[key]
+    return acc
+  }, {})
+
+  if (content.path) {
+    delete content.path
+  }
+
+  return {
+    slug: line.path || '',
+    name: line.title || '',
+    parent_id: folderID,
+    content: {
+      component: typeOfContent,
+      ...content
+    }
+  }
+}
 
 /**
  * @method xmlParser
@@ -94,37 +120,30 @@ const csvParser = (stream, typeOfContent, folderID = 0, delimiter = ';') => new 
  */
 
 const xmlParser = async (data, typeOfContent, folderID = 0) => {
-  console.log()
-  console.log(`${chalk.blue('-')} Reading XML file... `)
-  console.log()
+  return new Promise((resolve, reject) => {
+    console.log()
+    console.log(`${chalk.blue('-')} Reading XML file... `)
+    console.log()
 
-  const options = {
-    compact: true,
-    trim: true,
-    ignoreDoctype: true,
-    textFn: removeJsonTextAttribute
-  }
-  const contentParsed = xmlConverter.xml2js(data, options)
-  const story = []
-
-  contentParsed.root.row.map(line => {
-    const content = Object.keys(line).reduce((acc, key) => {
-      acc[key] = line[key]
-      return acc
-    }, {})
-
-    story.push({
-      slug: line.path,
-      name: line.title,
-      parent_id: folderID,
-      content: {
-        component: typeOfContent,
-        ...content
+    try {
+      const options = {
+        compact: true,
+        trim: true,
+        ignoreDoctype: true,
+        textFn: removeJsonTextAttribute
       }
-    })
-  })
+      const contentParsed = xmlConverter.xml2js(data, options)
 
-  return Promise.resolve(story)
+      if (isArray(contentParsed.root.row)) {
+        const story = contentParsed.root.row.map(line => xmlFactoryOfStoryes(line, typeOfContent, folderID))
+        return resolve(story)
+      }
+      const story = xmlFactoryOfStoryes(contentParsed.root.row, typeOfContent, folderID)
+      return resolve([story])
+    } catch (error) {
+      return reject(error)
+    }
+  })
 }
 
 /**
@@ -132,7 +151,7 @@ const xmlParser = async (data, typeOfContent, folderID = 0) => {
  * @param  {Object} data - Json with content
  * @param  {String} typeOfContent - Content type
  * @param  {Number} folderID - Storyblok folder id, default value is 0
- * @return {Array}
+ * @return {Promise}
  */
 
 const jsonParser = async (data, typeOfContent, folderID = 0) => {
@@ -145,8 +164,8 @@ const jsonParser = async (data, typeOfContent, folderID = 0) => {
 
   for (const key in copyData) {
     story.push({
-      slug: key,
-      name: copyData[key].title || key,
+      slug: key || '',
+      name: copyData[key].title || '',
       parent_id: folderID,
       content: {
         component: typeOfContent,
