@@ -29,7 +29,7 @@ const discoverExtension = (fileName) => {
 
 const sendContent = async (api, contents) => {
   for (const story of contents) {
-    return await api.getClient()
+    await api.getClient()
       .post(`spaces/${api.spaceId}/stories`, { story })
       .then(res => {
         console.log(`${chalk.green('✓')} ${res.data.story.name} was created `)
