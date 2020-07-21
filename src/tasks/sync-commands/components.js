@@ -34,8 +34,8 @@ class SyncComponents {
 
       console.log(`${chalk.green('-')} Syncing components...`)
       // load data from target and source spaces
-      this.targetComponents = await this.getComponents(this.targetSpaceId)
       this.sourceComponents = await this.getComponents(this.sourceSpaceId)
+      this.targetComponents = await this.getComponents(this.targetSpaceId)
 
       this.sourcePresets = await this.getPresets(this.sourceSpaceId)
 
@@ -85,7 +85,7 @@ class SyncComponents {
         )
 
         console.log(
-          `${chalk.yellow('-')} Component group ${targetGroupData.name} already exists`
+          `${chalk.yellow('-')} Linking the component to the group ${targetGroupData.name}`
         )
         component.component_group_uuid = targetGroupData.uuid
       }

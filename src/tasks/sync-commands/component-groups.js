@@ -90,6 +90,7 @@ class SyncComponentGroups {
       console.error(
         `${chalk.red('-')} Error on sync component groups: ${e.message}`
       )
+      return Promise.reject(e)
     }
   }
 
