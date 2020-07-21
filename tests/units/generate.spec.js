@@ -4,6 +4,7 @@ const fs = require('fs-extra')
 const { FAKE_COMPONENTS } = require('../constants')
 const generateMigration = require('../../src/tasks/migrations/generate')
 const templateFile = require('../../src/tasks/templates/migration-file')
+const templateFileData = templateFile.replace(/{{ fieldname }}/g, 'subtitle')
 
 jest.mock('fs-extra')
 
@@ -32,9 +33,6 @@ describe('testing generateMigration', () => {
 
           expect(data.created).toBe(true)
         })
-        .catch(err => {
-          console.error(err)
-        })
     })
 
     it('It checks if the file exists', async () => {
@@ -47,9 +45,6 @@ describe('testing generateMigration', () => {
 
           // the first call receives the file path
           expect(fs.pathExists.mock.calls[0][0]).toBe(filePath)
-        })
-        .catch(err => {
-          console.error(err)
         })
     })
 
@@ -65,10 +60,7 @@ describe('testing generateMigration', () => {
           expect(fs.outputFile.mock.calls[0][0]).toBe(filePath)
 
           // the first call receives a string with template
-          expect(fs.outputFile.mock.calls[0][1]).toBe(templateFile)
-        })
-        .catch(err => {
-          console.error(err)
+          expect(fs.outputFile.mock.calls[0][1]).toBe(templateFileData)
         })
     })
   })
@@ -107,9 +99,6 @@ describe('testing generateMigration', () => {
 
           expect(data.created).toBe(false)
         })
-        .catch(err => {
-          console.error(err)
-        })
     })
 
     it('It checks if the file exists', async () => {
@@ -123,9 +112,6 @@ describe('testing generateMigration', () => {
           // the first call receives the file path
           expect(fs.pathExists.mock.calls[0][0]).toBe(filePath)
         })
-        .catch(err => {
-          console.error(err)
-        })
     })
 
     it('It does not create the file', async () => {
@@ -133,9 +119,6 @@ describe('testing generateMigration', () => {
         .then(() => {
           // don't call
           expect(fs.outputFile.mock.calls.length).toBe(0)
-        })
-        .catch(err => {
-          console.error(err)
         })
     })
   })
@@ -166,9 +149,6 @@ describe('testing generateMigration', () => {
 
           expect(data.created).toBe(true)
         })
-        .catch(err => {
-          console.error(err)
-        })
     })
 
     it('It checks if the file exists', async () => {
@@ -181,9 +161,6 @@ describe('testing generateMigration', () => {
 
           // the first call receives the file path
           expect(fs.pathExists.mock.calls[0][0]).toBe(filePath)
-        })
-        .catch(err => {
-          console.error(err)
         })
     })
 
@@ -199,10 +176,7 @@ describe('testing generateMigration', () => {
           expect(fs.outputFile.mock.calls[0][0]).toBe(filePath)
 
           // the first call receives a string with template
-          expect(fs.outputFile.mock.calls[0][1]).toBe(templateFile)
-        })
-        .catch(err => {
-          console.error(err)
+          expect(fs.outputFile.mock.calls[0][1]).toBe(templateFileData)
         })
     })
   })
