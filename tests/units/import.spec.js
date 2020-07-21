@@ -1,5 +1,4 @@
 const { FAKE_STORIES, EMAIL_TEST, PASSWORD_TEST } = require('../constants')
-const { Readable } = require('stream')
 
 const { 
   jsonParser,
@@ -78,10 +77,8 @@ describe('Test utils functions to import command', () => {
   })
 
   it('Test csv parser', () => {
-    let data = Readable.from(`
-      path;title;text;image;category
-      this-is-my-title;This is my title;"Lorem ipsum dolor sit amet.;https://a.storyblok.com/corporate-website.svg;press
-    `)
+    let data = `path;title;text;image;category
+      this-is-my-title;This is my title;"Lorem ipsum dolor sit amet";https://a.storyblok.com/f/51376/x/1502f01431/corporate-website.svg;press`
 
     csvParser(data, 'About', 0)
       .then(res => {

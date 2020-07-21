@@ -30,7 +30,7 @@ const importFiles = async (api, options) => {
 
   const extension = discoverExtension(file)
   if (extension === 'csv') {
-    const dataFromFile = fs.createReadStream(file)
+    const dataFromFile = fs.readFileSync(file)
     const convertData = await csvParser(dataFromFile, type, folder, delimiter)
       .then(res => {
         sendContent(api, res)

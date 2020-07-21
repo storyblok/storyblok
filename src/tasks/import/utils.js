@@ -51,14 +51,14 @@ const removeJsonTextAttribute = (value, parentElement) => {
 
 /**
  * @method csvParser
- * @param  {String} stream - Stream with a CSV content
+ * @param  {String} data - CSV content
  * @param  {String} typeOfContent - Content type
  * @param  {Number} folderID - Storyblok folder id, default value is 0
  * @param  {String} delimiter - Csv file delimiter, default value is ';'
  * @return {Promise}
  */
 
-const csvParser = (stream, typeOfContent, folderID = 0, delimiter = ';') => {
+const csvParser = (data, typeOfContent, folderID = 0, delimiter = ';') => {
   return new Promise((resolve, reject) => {
     console.log()
     console.log(`${chalk.blue('-')} Reading CSV file... `)
@@ -66,13 +66,17 @@ const csvParser = (stream, typeOfContent, folderID = 0, delimiter = ';') => {
 
     const story = []
 
-    csvReader.parseStream(stream, { headers: true, delimiter: delimiter })
+    csvReader.parseString(data, { headers: true, delimiter: delimiter })
       .on('error', error => reject(error))
       .on('data', line => {
         const content = Object.keys(line).reduce((acc, key) => {
           acc[key] = line[key]
           return acc
         }, {})
+
+        if (content.path) {
+          delete content.path
+        }
 
         story.push({
           slug: line.path || '',
