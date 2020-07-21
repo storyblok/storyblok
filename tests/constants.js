@@ -56,6 +56,82 @@ const FAKE_COMPONENTS = () => [
     preset_id: null,
     real_name: 'feature',
     component_group_uuid: null
+  },
+  {
+    name: 'logo',
+    display_name: null,
+    id: 1,
+    schema: {
+      image: {
+        type: 'image'
+      }
+    },
+    image: null,
+    preview_field: null,
+    is_root: false,
+    preview_tmpl: null,
+    is_nestable: true,
+    all_presets: [],
+    preset_id: null,
+    real_name: 'logo',
+    component_group_uuid: '529cc32a-1d97-4b4a-b0b6-28e33dc56c0d'
+  },
+  {
+    name: 'blocks',
+    display_name: null,
+    id: 2,
+    schema: {
+      other: {
+        type: 'bloks',
+        max_length: '',
+        translatable: false,
+        restrict_components: true,
+        restrict_type: 'groups',
+        component_group_whitelist: [
+          '529cc32a-1d97-4b4a-b0b6-28e33dc56c0d'
+        ]
+      }
+    },
+    image: null,
+    preview_field: null,
+    is_root: false,
+    preview_tmpl: null,
+    is_nestable: true,
+    all_presets: [],
+    preset_id: null,
+    real_name: 'blocks',
+    component_group_uuid: null
+  },
+  {
+    name: 'hero',
+    display_name: null,
+    created_at: '2020-07-20T20:10:00.655Z',
+    updated_at: '2020-07-20T20:10:00.655Z',
+    id: 3,
+    schema: {
+      title: {
+        type: 'text'
+      },
+      subtitle: {
+        type: 'text'
+      }
+    },
+    image: null,
+    preview_field: null,
+    is_root: false,
+    preview_tmpl: null,
+    is_nestable: true,
+    all_presets: [
+      {
+        id: '01',
+        name: 'Hero Variant 1',
+        component_id: 3,
+        image: null
+      }
+    ],
+    preset_id: null,
+    real_name: 'hero',
+    component_group_uuid: null
   }
 ]
 
