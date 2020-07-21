@@ -135,20 +135,26 @@ $ storyblok generate-migration --space <SPACE_ID> --component <COMPONENT_NAME> -
 Execute a specific migration file. Check **Migrations** section to more details
 
 ```sh
-$ storyblok run-migration --space <SPACE_ID> --component <COMPONENT_NAME> --field <FIELD> --publish <PUBLISH_OPTION> --publish-languages <LANGUAGES> --dryrun
+$ storyblok run-migration --space <SPACE_ID> --component <COMPONENT_NAME> --field <FIELD> --dryrun
+```
+
+Optionally you can provide the publish parameter to publish content after saving. Example:
+
+```sh
+$ storyblok run-migration --publish publish --space 1234 --component article --field image
 ```
 
 #### Options
 
-* `space`: space where the component is
+* `space`: the space you get from the space settings area
 * `component`: component name. It needs to be a valid component
 * `field`: name of field
 * `dryrun`: when passed as an argument, does not perform the migration
-* `publish`: publish the content when update
+* `publish` (optional): publish the content when update
   * `all`: publish all stories, even if they have not yet been published
-  * `publish`: only publish stories that already publish and doesn't have unpublished changes
-  * `published-with-changes`: allow publish stories with unpublished changes
-* `publish-languages`: publish specific languages. You can publish more than one language at a time by separating the languages by `,`
+  * `publish`: only publish stories that already are published and don't have unpublished changes
+  * `published-with-changes`: publish stories that are published and have unpublished changes
+* `publish-languages` (optional): publish specific languages. You can publish more than one language at a time by separating the languages by `,`
 
 ### spaces
 
