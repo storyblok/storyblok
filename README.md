@@ -141,7 +141,7 @@ $ storyblok run-migration --space <SPACE_ID> --component <COMPONENT_NAME> --fiel
 Optionally you can provide the publish parameter to publish content after saving. Example:
 
 ```sh
-$ storyblok run-migration --publish publish --space 1234 --component article --field image
+$ storyblok run-migration --publish published --space 1234 --component article --field image
 ```
 
 #### Options
@@ -152,7 +152,7 @@ $ storyblok run-migration --publish publish --space 1234 --component article --f
 * `dryrun`: when passed as an argument, does not perform the migration
 * `publish` (optional): publish the content when update
   * `all`: publish all stories, even if they have not yet been published
-  * `publish`: only publish stories that already are published and don't have unpublished changes
+  * `published`: only publish stories that already are published and don't have unpublished changes
   * `published-with-changes`: publish stories that are published and have unpublished changes
 * `publish-languages` (optional): publish specific languages. You can publish more than one language at a time by separating the languages by `,`
 
