@@ -1,6 +1,5 @@
-const { importFiles } = require('../../src/tasks/index')
 const { FAKE_STORIES, EMAIL_TEST, PASSWORD_TEST } = require('../constants')
-const Storyblok = require('storyblok-js-client')
+const { Readable } = require('stream')
 
 const { 
   jsonParser,
@@ -9,6 +8,19 @@ const {
   csvParser,
   sendContent
 } = require('../../src/tasks/import/utils')
+
+const response = [{
+  slug: 'this-is-my-title',
+  name: 'This is my title',
+  parent_id: 0,
+  content: {
+    component: 'About',
+    category: 'press',
+    title: 'This is my title',
+    image: 'https://a.storyblok.com/f/51376/x/1502f01431/corporate-website.svg',
+    text: 'Lorem ipsum dolor sit amet'
+  }
+}]
 
 jest.mock('axios')
 
@@ -23,32 +35,6 @@ describe('Test utils functions to import command', () => {
     expect(discoverExtension(fileName)).toEqual('txt')
   })
 
-
-  it('Test sendContent function', () => {
-    const URL = 'https://api.storyblok.com/v1/'
-    const stories = FAKE_STORIES()[0]
-
-    const FAKE_API = {
-      getClient: jest.fn(() => Promise.resolve(new Storyblok({
-        oauthToken: process.env.STORYBLOK_TOKEN
-      }, URL))),
-
-      post: jest.fn(() => Promise.resolve(stories)),
-      spaceId: jest.fn(() => Promise.resolve(75070))
-    }
-
-    sendContent(FAKE_API, stories)
-      .then(() => {
-        expect(
-          FAKE_API.post
-        ).toEqual(stories.name)
-        expect(FAKE_API.getClient).toHaveBeenCalled()
-      })
-      .catch(err => {
-        console.error(err)
-      })
-  })
-
   it('Test xml parser', () => {
     const data = `
       <?xml version="1.0" encoding="UTF-8"?>
@@ -56,9 +42,7 @@ describe('Test utils functions to import command', () => {
           <row>
             <path>this-is-my-title</path>
             <title>This is my title</title>
-            <text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In erat mauris, faucibus quis pharetra sit amet, pretium ac libero. Etiam vehicula eleifend bibendum. Morbi gravida metus ut sapien condimentum sodales mollis augue sodales. Vestibulum quis quam at sem placerat aliquet. Curabitur a felis at sapien ullamcorper fermentum. Mauris molestie arcu et lectus iaculis sit amet eleifend eros posuere. Fusce nec porta orci.
-
-        Integer vitae neque odio, a sollicitudin lorem. Aenean orci mauris, tristique luctus fermentum eu, feugiat vel massa. Fusce sem sem, egestas nec vulputate vel, pretium sit amet mi. Fusce ut nisl id risus facilisis euismod. Curabitur et elementum purus. Duis tincidunt fringilla eleifend. Morbi id lorem eu ante adipiscing feugiat. Sed congue erat in enim eleifend dignissim at in nisl.</text>
+            <text>Lorem ipsum dolor sit amet</text>
             <image>https://a.storyblok.com/f/51376/x/1502f01431/corporate-website.svg</image>
             <category>press</category>
           </row>
@@ -67,8 +51,62 @@ describe('Test utils functions to import command', () => {
 
     xmlParser(data, 'About', 0)
       .then(res => {
-        console.log(res)
-        expect(res).toEqual('')
+        expect(res).toEqual(response)
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  })
+
+  it('Test json parser', () => {
+    const data = {
+      "this-is-my-title": {
+        "title": "This is my title",
+        "text": "Lorem ipsum dolor sit amet",
+        "image": "https://a.storyblok.com/f/51376/x/1502f01431/corporate-website.svg",
+        "category": "press"
+      }
+    }
+    
+    jsonParser(JSON.stringify(data), 'About', 0)
+      .then(res => {
+        expect(res).toEqual(response)
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  })
+
+  it('Test csv parser', () => {
+    let data = Readable.from(`
+      path;title;text;image;category
+      this-is-my-title;This is my title;"Lorem ipsum dolor sit amet.;https://a.storyblok.com/corporate-website.svg;press
+    `)
+
+    csvParser(data, 'About', 0)
+      .then(res => {
+        expect(res).toEqual(response)
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  })
+
+  it('Test sendContent function', async () => {
+    const URL = 'https://api.storyblok.com/v1/'
+    const stories = FAKE_STORIES()[0]
+
+    const FAKE_API = {
+      getClient: jest.fn(() => Promise.resolve({
+        oauthToken: process.env.STORYBLOK_TOKEN
+      }, URL)),
+      post: jest.fn(() => Promise.resolve(stories.name)),
+      spaceId: jest.fn(() => Promise.resolve(75070))
+    }
+
+    await sendContent(FAKE_API, [stories])
+      .then(() => {
+        expect(FAKE_API.post).toBe(stories.name)
       })
       .catch(err => {
         console.error(err)
