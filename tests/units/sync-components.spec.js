@@ -113,7 +113,6 @@ const FAKE_PRESETS = {
 const extractSpace = path => path.split('/')[1]
 
 const mockGetRequest = jest.fn((path) => {
-  console.log(path)
   if (
     path === 'spaces/001/component_groups' ||
     path === 'spaces/002/component_groups'
