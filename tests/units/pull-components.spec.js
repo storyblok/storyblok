@@ -1,27 +1,29 @@
 const fs = require('fs')
 const pullComponents = require('../../src/tasks/pull-components')
+const { FAKE_COMPONENTS } = require('../constants')
 
 jest.mock('fs')
 
 describe('testing pullComponents', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('api.getComponents() should be called once time', () => {
     const api = {
-      getComponents: jest.fn(() => Promise.resolve(true)),
+      getComponents: jest.fn(() => Promise.resolve(FAKE_COMPONENTS())),
       getComponentGroups () {
         return Promise.resolve([])
       }
     }
 
-    pullComponents(api, {})
+    return pullComponents(api, {})
       .then(() => {
         expect(api.getComponents.mock.calls.length).toBe(1)
       })
-      .catch(err => {
-        console.error(err)
-      })
   })
 
-  it('api.getComponents() should be call fs.writeFile correctly', () => {
+  it('api.getComponents() should be call fs.writeFile correctly', async () => {
     const SPACE = 12345
     const BODY = {
       components: [
@@ -63,16 +65,13 @@ describe('testing pullComponents', () => {
 
     const expectFileName = `components.${SPACE}.json`
 
-    pullComponents(api, options)
+    return pullComponents(api, options)
       .then(_ => {
         const [path, data] = fs.writeFile.mock.calls[0]
 
         expect(fs.writeFile.mock.calls.length).toBe(1)
         expect(path).toBe(`./${expectFileName}`)
         expect(JSON.parse(data)).toEqual(BODY)
-      })
-      .catch(err => {
-        console.error(err)
       })
   })
 
