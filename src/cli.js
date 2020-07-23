@@ -319,6 +319,38 @@ program
     }
   })
 
+// import data
+program
+  .command('import')
+  .description('Import data from other systems and relational databases.')
+  .requiredOption('-f, --file <FILE_NAME>', 'Name of the file')
+  .requiredOption('-t, --type <TYPE>', 'Type of the content')
+  .option('-fr, --folder <FOLDER_ID>', '(Optional) This is a Id of folder in storyblok')
+  .option('-d, --delimiter', 'If you are using a csv file, put the file delimiter, the default is ";"')
+  .action(async (options) => {
+    const space = program.space
+    try {
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
+
+      if (!space) {
+        console.log(chalk.red('X') + ' Please provide the space as argument --space <SPACE_ID>.')
+        return
+      }
+
+      api.setSpaceId(space)
+      await tasks.importFiles(api, options)
+
+      console.log(
+        `${chalk.green('✓')} The import process was executed with success!`
+      )
+    } catch (e) {
+      console.log(chalk.red('X') + ' An error ocurred to import data : ' + e.message)
+      process.exit(1)
+    }
+  })
+
 program.parse(process.argv)
 
 if (program.rawArgs.length <= 2) {
