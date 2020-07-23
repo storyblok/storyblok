@@ -156,6 +156,22 @@ $ storyblok run-migration --publish published --space 1234 --component article -
   * `published-with-changes`: publish stories that are published and have unpublished changes
 * `publish-languages` (optional): publish specific languages. You can publish more than one language at a time by separating the languages by `,`
 
+### rollback-migration
+
+The `rollback-migration` command gives the possibility to undo the changes made from the last `run-migrations` command.
+
+```sh
+$ storyblok rollback-migration --space 1234 --component Product --field title
+```
+
+**Importantly**, the `rollback-migrations` command will only work if you have already changed a component with `run-migrations`; Another restriction for this command is that if you run the `run-migrations` command with the `--dryrun` flag this command will not work, as the rollback file will not be created.
+
+#### options
+
+* `space`: the space you get from the space settings area
+* `component`: component name. It needs to be a valid component
+* `field`: name of field
+
 ### spaces
 
 List all spaces of the logged account
@@ -250,6 +266,12 @@ $ storyblok run-migration --space 00000 --component product --field price --publ
 # to update more than one language
 $ storyblok run-migration --space 00000 --component product --field price --publish all --publish-languages=de,pt
 ```
+
+### 4. Rollback migrations
+
+Whenever you run a `run-migrations` command a json file containing all the content before the change takes place will be generated. **Important**, this just doesn't apply if you add the `--dryrun` flag.
+
+Remembering that, the content that will be saved is always related to the last `run-migrations` command, that is, if you run the `run-migrations` command twice changing the same component, the content will only be saved before the last update.
 
 ### Examples
 
