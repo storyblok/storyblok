@@ -2,6 +2,7 @@ const csvReader = require('fast-csv')
 const xmlConverter = require('xml-js')
 const chalk = require('chalk')
 const path = require('path')
+const fs = require('fs')
 const { isArray } = require('lodash')
 
 /**
@@ -26,16 +27,24 @@ const discoverExtension = (fileName) => {
  * @param  {Object} contents - Object with the content to be sent
  * @return {Promise}
  */
-
 const sendContent = async (api, contents) => {
   for (const story of contents) {
-    await api.getClient()
-      .post(`spaces/${api.spaceId}/stories`, { story })
-      .then(res => {
-        console.log(`${chalk.green('✓')} ${res.data.story.name} was created `)
-        return res.data.story.name
-      })
-      .catch(err => Promise.reject(err))
+    try {
+      console.log(
+        `${chalk.blue('-')} Creating the story ${story.name}(${story.slug})`
+      )
+      await api.post('stories', { story })
+
+      console.log(
+        `${chalk.green('✓')} ${story.name}(${story.slug}) was created`
+      )
+    } catch (e) {
+      console.log(
+        `${chalk.red('X')} An error ocurred when create the story ${story.name}(${story.slug}): ${e.message}`
+      )
+    }
+
+    console.log('')
   }
 }
 
@@ -180,10 +189,45 @@ const jsonParser = async (data, typeOfContent, folderID = 0) => {
   return Promise.resolve(story)
 }
 
+/**
+ * @typedef {Object} ConvertFileOptions
+ * @property {string} type Type of content
+ * @property {string} folder Folder ID
+ * @property {string} delimiter Delimiter (For csv files)
+ *
+ * @method converFile
+ * @param  {string} file                path to file
+ * @param  {string} extension           file extension
+ * @param  {ConvertFileOptions} options options to parser functions
+ */
+const converFile = (file, extension, options) => {
+  const {
+    type,
+    folder,
+    delimiter
+  } = options
+
+  if (extension === 'csv') {
+    const dataFromFile = fs.readFileSync(file)
+    return csvParser(dataFromFile, type, folder, delimiter)
+  }
+  if (extension === 'xml') {
+    const dataFromFile = fs.readFileSync(file)
+    return xmlParser(dataFromFile, type, folder)
+  }
+  if (extension === 'json') {
+    const dataFromFile = fs.readFileSync(file, 'utf-8')
+    return jsonParser(dataFromFile, type, folder)
+  }
+
+  return Promise.reject(new Error('The file extension is not supported.'))
+}
+
 module.exports = {
   csvParser,
   xmlParser,
   jsonParser,
   sendContent,
+  converFile,
   discoverExtension
 }

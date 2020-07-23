@@ -1,71 +1,40 @@
 const chalk = require('chalk')
-const fs = require('fs')
 const {
-  csvParser,
-  xmlParser,
-  jsonParser,
+  converFile,
   sendContent,
   discoverExtension
 } = require('./utils')
 
 /**
+ * @typedef {Object} ImportDataOptions
+ * @property {string} type Type of content
+ * @property {string} folder Folder ID
+ * @property {string} delimiter Delimiter (For csv files)
+ * @property {string} file path to file
+ *
  * @method importData
- * @param options - Array with arguments, [Name of the file, Type of content, Folder ID, Delimiter (For csv files)]
- * @param api - Pass the api instance as a parameter
+ * @param {Object} api - Pass the api instance as a parameter
+ * @param {ImportDataOptions} options
  * @return {Promise}
  */
-
 const importFiles = async (api, options) => {
-  const {
-    file,
-    type,
-    folder,
-    delimiter
-  } = options
+  const { file } = options
 
   if (!api) {
     console.log(chalk.red('X') + 'Api instance is required to make the request')
     return []
   }
 
-  const extension = discoverExtension(file)
-  if (extension === 'csv') {
-    const dataFromFile = fs.readFileSync(file)
-    const convertData = await csvParser(dataFromFile, type, folder, delimiter)
-      .then(res => {
-        sendContent(api, res)
-      })
-      .catch(err => {
-        console.error(`${chalk.red('X')} An error occurred while converting the file`)
-        return Promise.reject(new Error(err))
-      })
-    return convertData
-  }
-  if (extension === 'xml') {
-    const dataFromFile = fs.readFileSync(file)
-    const convertData = await xmlParser(dataFromFile, type, folder)
-      .then(res => {
-        sendContent(api, res)
-      })
-      .catch(err => {
-        console.error(`${chalk.red('X')} An error occurred while converting the file`)
-        return Promise.reject(new Error(err))
-      })
-    return convertData
-  }
-  if (extension === 'json') {
-    const dataFromFile = fs.readFileSync(file, 'utf-8')
-    const convertData = await jsonParser(dataFromFile, type, folder)
-      .then(res => {
-        sendContent(api, res)
-      })
-      .catch(err => {
-        console.error(`${chalk.red('X')} An error occurred while converting the file`)
-        return Promise.reject(new Error(err))
-      })
-    return convertData
-  }
+  try {
+    const extension = discoverExtension(file)
+    const dataFromFile = await converFile(file, extension, options)
 
-  console.log(chalk.red('X') + ' The file extension is not supported. ')
+    await sendContent(api, dataFromFile)
+  } catch (e) {
+    console.log(
+      `${chalk.red('X')} An error ocurrend when process file and send it ${e.message}`
+    )
+    return Promise.reject(e)
+  }
 }
 module.exports = importFiles

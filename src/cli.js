@@ -341,6 +341,10 @@ program
 
       api.setSpaceId(space)
       await tasks.importFiles(api, options)
+
+      console.log(
+        `${chalk.green('✓')} The import process was executed with success!`
+      )
     } catch (e) {
       console.log(chalk.red('X') + ' An error ocurred to import data : ' + e.message)
       process.exit(1)
