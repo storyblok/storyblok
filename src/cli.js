@@ -302,6 +302,34 @@ program
     }
   })
 
+program
+  .command('rollback-migration')
+  .description('Rollback-migration a migration file')
+  .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
+  .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
+  .action(async (options) => {
+    const field = options.field || ''
+    const component = options.component || ''
+    const space = program.space
+    if (!space) {
+      console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
+      process.exit(1)
+    }
+
+    try {
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
+
+      api.setSpaceId(space)
+
+      await tasks.rollbackMigration(api, field, component)
+    } catch (e) {
+      console.log(chalk.red('X') + ' An error ocurred when run rollback-migration: ' + e.message)
+      process.exit(1)
+    }
+  })
+
 // list spaces
 program
   .command('spaces')
