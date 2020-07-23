@@ -1,6 +1,6 @@
-const { FAKE_STORIES, EMAIL_TEST, PASSWORD_TEST } = require('../constants')
+const { FAKE_STORIES } = require('../constants')
 
-const { 
+const {
   jsonParser,
   discoverExtension,
   xmlParser,
@@ -59,14 +59,14 @@ describe('Test utils functions to import command', () => {
 
   it('Test json parser', () => {
     const data = {
-      "this-is-my-title": {
-        "title": "This is my title",
-        "text": "Lorem ipsum dolor sit amet",
-        "image": "https://a.storyblok.com/f/51376/x/1502f01431/corporate-website.svg",
-        "category": "press"
+      'this-is-my-title': {
+        title: 'This is my title',
+        text: 'Lorem ipsum dolor sit amet',
+        image: 'https://a.storyblok.com/f/51376/x/1502f01431/corporate-website.svg',
+        category: 'press'
       }
     }
-    
+
     jsonParser(JSON.stringify(data), 'About', 0)
       .then(res => {
         expect(res).toEqual(response)
@@ -77,7 +77,7 @@ describe('Test utils functions to import command', () => {
   })
 
   it('Test csv parser', () => {
-    let data = `path;title;text;image;category
+    const data = `path;title;text;image;category
       this-is-my-title;This is my title;"Lorem ipsum dolor sit amet";https://a.storyblok.com/f/51376/x/1502f01431/corporate-website.svg;press`
 
     csvParser(data, 'About', 0)
