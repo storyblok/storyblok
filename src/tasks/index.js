@@ -7,5 +7,6 @@ module.exports = {
   generateMigration: require('./migrations/generate'),
   runMigration: require('./migrations/run'),
   rollbackMigration: require('./migrations/rollback'),
-  listSpaces: require('./list-spaces')
+  listSpaces: require('./list-spaces'),
+  importFiles: require('./import/import')
 }
