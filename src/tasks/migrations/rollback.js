@@ -2,7 +2,7 @@ const chalk = require('chalk')
 const fs = require('fs-extra')
 const MIGRATIONS_ROLLBACK_DIRECTORY = `${process.cwd()}/migrations/rollback`
 const {
-  getAllFilesInRollBackDirectory,
+  checkExistenceFilesInRollBackDirectory,
   urlTofRollbackMigrationFile
 } = require('./utils')
 
@@ -17,8 +17,7 @@ const {
 const rollbackMigration = async (api, field, component) => {
   if (!fs.existsSync(MIGRATIONS_ROLLBACK_DIRECTORY)) {
     console.log(`
-        ${chalk.red('X')} 
-        To execute the rollback-migration command you need to have changed some component with the migrations commands.`
+        ${chalk.red('X')} To execute the rollback-migration command you need to have changed some component with the migrations commands.`
     )
     return
   }
@@ -28,15 +27,12 @@ const rollbackMigration = async (api, field, component) => {
   )
 
   try {
-    const file = getAllFilesInRollBackDirectory(MIGRATIONS_ROLLBACK_DIRECTORY, component, field)
-
-    if (!file.length) {
-      console.log(`
-        ${chalk.red('X')} 
-        Rollback file for component ${chalk.blue(component)} and field ${chalk.blue(field)} was not found`
-      )
-      return
-    }
+    checkExistenceFilesInRollBackDirectory(MIGRATIONS_ROLLBACK_DIRECTORY, component, field)
+      .then(data => {
+        if (!data) {
+          return console.log(`${chalk.red('X')} Rollback file for component ${chalk.blue(component)} and field ${chalk.blue(field)} was not found`)
+        }
+      })
 
     console.log()
     console.log(
