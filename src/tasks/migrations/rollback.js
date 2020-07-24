@@ -61,8 +61,10 @@ const rollbackMigration = async (api, field, component) => {
     console.log(
       `${chalk.green('✓')} The roolback-migration was executed with success!`
     )
+    return Promise.resolve({ rollback: true })
   } catch (err) {
     console.log(`${chalk.red('X')} The rollback-migration command was not successfully executed: ${err}`)
+    return Promise.reject(err)
   }
 }
 

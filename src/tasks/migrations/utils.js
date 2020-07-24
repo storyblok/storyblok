@@ -286,7 +286,7 @@ const checkExistenceFilesInRollBackDirectory = (path, component, field) => {
     console.log(`
         ${chalk.red('X')} The path for which the rollback files should be contained does not exist`
     )
-    return Promise.reject({ error: 'Path not found' })
+    return Promise.reject(new Error({ error: 'Path not found' }))
   }
 
   const files = fs.readdirSync(path).map(file => file)
