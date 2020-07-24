@@ -144,7 +144,7 @@ const runMigration = async (api, component, field, options = {}) => {
 
     // send file of rollback to save in migrations/rollback directory
     if (!isEmpty(rollbackData)) {
-      await createRollbackFile(rollbackData, field)
+      await createRollbackFile(rollbackData, component, field)
     }
 
     console.log(`${chalk.green('✓')} The migration was executed with success!`)

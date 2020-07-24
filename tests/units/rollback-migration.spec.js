@@ -26,7 +26,7 @@ const FAKE_API = {
 
 describe('testing rollbackMigration', () => {
   it('test function to createRollbackFile', async () => {
-    return createRollbackFile([story])
+    return createRollbackFile([story], 'page', 'body')
       .then(data => {
         expect(data.component).toBe(complement.component)
 

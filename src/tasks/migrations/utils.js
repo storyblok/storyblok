@@ -248,24 +248,24 @@ const getNameOfRollbackMigrationFile = (component, field) => {
 
 /**
  * @method createRollbackFile
- * @param  {Array}   stories    array containing the object of each story to be rollback
+ * @param  {Array}   stories    array containing stories for rollback
  * @return {Promise}
  */
 
-const createRollbackFile = async (stories, field) => {
+const createRollbackFile = async (stories, component, field) => {
   try {
     if (!fs.existsSync(MIGRATIONS_ROLLBACK_DIRECTORY)) {
       fs.mkdir(MIGRATIONS_ROLLBACK_DIRECTORY)
     }
-    fs.writeFile(urlTofRollbackMigrationFile(stories[0].content.component, field), JSON.stringify(stories, null, 2), { flag: 'a' }, (error) => {
+    fs.writeFile(urlTofRollbackMigrationFile(component, field), JSON.stringify(stories, null, 2), { flag: 'w' }, (error) => {
       if (error) {
-        console.log(`${chalk.red('X')} The file to reverse this migration was not created: ${error}`)
+        console.log(`${chalk.red('X')} The rollback file could not be created: ${error}`)
         return error
       }
-      console.log(`${chalk.green('✓')} File to rollback this migration was created with success!`)
+      console.log(`${chalk.green('✓')} The rollback file has been created in migrations/rollback/!`)
     })
     return Promise.resolve({
-      component: stories[0].component,
+      component: component,
       created: true
     })
   } catch (error) {
