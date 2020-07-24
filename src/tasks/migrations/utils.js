@@ -257,7 +257,14 @@ const createRollbackFile = async (stories, component, field) => {
     if (!fs.existsSync(MIGRATIONS_ROLLBACK_DIRECTORY)) {
       fs.mkdir(MIGRATIONS_ROLLBACK_DIRECTORY)
     }
-    fs.writeFile(urlTofRollbackMigrationFile(component, field), JSON.stringify(stories, null, 2), { flag: 'w' }, (error) => {
+
+    let url = urlTofRollbackMigrationFile(component, field)
+
+    if (fs.existsSync(url)) {
+      fs.unlinkSync(url)
+    }
+
+    fs.writeFile(url, JSON.stringify(stories, null, 2), { flag: 'a' }, (error) => {
       if (error) {
         console.log(`${chalk.red('X')} The rollback file could not be created: ${error}`)
         return error

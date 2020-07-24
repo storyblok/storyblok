@@ -7,10 +7,8 @@ const {
 const FAKE_PATH = `${process.cwd()}/migrations/rollback`
 const { FAKE_STORIES } = require('../constants')
 
-const complement = { component: 'product', field: 'title' }
 const story = {
-  ...FAKE_STORIES()[0],
-  ...complement
+  ...FAKE_STORIES()[0]
 }
 
 const URL = 'https://api.storyblok.com/v1/'
@@ -28,21 +26,20 @@ describe('testing rollbackMigration', () => {
   it('test function to createRollbackFile', async () => {
     return createRollbackFile([story], 'page', 'body')
       .then(data => {
-        expect(data.component).toBe(complement.component)
-
+        expect(data.component).toBe('page')
         expect(data.created).toBe(true)
       })
   })
 
   it('teste function to checkExistenceFilesInRollBackDirectory', async () => {
-    checkExistenceFilesInRollBackDirectory(FAKE_PATH, complement.component, complement.field)
+    checkExistenceFilesInRollBackDirectory(FAKE_PATH, 'page', 'body')
       .then(data => {
-        expect(data).toStrictEqual(['rollback_product_title.json'])
+        expect(data).toStrictEqual(['rollback_page_body.json'])
       })
   })
 
   it('test function to rollbackMigration', () => {
-    rollbackMigration(FAKE_API, complement.field, complement.component)
+    rollbackMigration(FAKE_API, 'body', 'page')
       .then(data => {
         expect(data).toEqual({ rollback: true })
       })
