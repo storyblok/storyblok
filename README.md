@@ -164,7 +164,7 @@ The `rollback-migration` command gives the possibility to undo the changes made 
 $ storyblok rollback-migration --space 1234 --component Product --field title
 ```
 
-**Important**: the `rollback-migrations` command will only work if there where changes done with `run-migrations`. Therefore running `run-migrations` command with the `--dryrun` flag will NOT create a rollback file.
+**Important**: The `rollback-migrations` command will only work if there where changes done with `run-migrations`. Therefore running `run-migrations` command with the `--dryrun` flag will NOT create a rollback file.
 
 #### options
 
