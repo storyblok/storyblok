@@ -45,15 +45,14 @@ const rollbackMigration = async (api, field, component) => {
 
     for (const story of rollbackContent) {
       console.log(
-        `${chalk.blue('-')} Restoring data from "${chalk.blue(story.content.slug)}" ...`
+        `${chalk.blue('-')} Restoring data from "${chalk.blue(story.full_slug)}" ...`
       )
-      await api.getClient()
-      await api.put(story.urlToRollback, {
-        story: story.content,
+      await api.put(`stories/${story.id}`, {
+        story: { content: story.content },
         force_update: '1'
       })
       console.log(
-        `  ${chalk.blue('-')} ${story.content.name} data is restored!`
+        `  ${chalk.blue('-')} ${story.full_slug} data has been restored!`
       )
       console.log()
     }

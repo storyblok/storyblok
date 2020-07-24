@@ -103,13 +103,10 @@ const runMigration = async (api, component, field, options = {}) => {
           const url = `stories/${story.id}`
 
           // create a rollback object
-          const contentToRollback = { ...storyData }
-          contentToRollback.content = { ...oldContent }
           rollbackData.push({
-            component: component,
-            field: field,
-            urlToRollback: url,
-            content: contentToRollback
+            id: storyData.id,
+            full_slug: storyData.full_slug,
+            content: oldContent
           })
 
           const payload = {
@@ -146,7 +143,9 @@ const runMigration = async (api, component, field, options = {}) => {
     }
 
     // send file of rollback to save in migrations/rollback directory
-    await createRollbackFile(rollbackData)
+    if (!isEmpty(rollbackData)) {
+      await createRollbackFile(rollbackData, field)
+    }
 
     console.log(`${chalk.green('✓')} The migration was executed with success!`)
     return Promise.resolve({

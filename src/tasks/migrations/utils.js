@@ -252,12 +252,12 @@ const getNameOfRollbackMigrationFile = (component, field) => {
  * @return {Promise}
  */
 
-const createRollbackFile = async (stories) => {
+const createRollbackFile = async (stories, field) => {
   try {
     if (!fs.existsSync(MIGRATIONS_ROLLBACK_DIRECTORY)) {
       fs.mkdir(MIGRATIONS_ROLLBACK_DIRECTORY)
     }
-    fs.writeFile(urlTofRollbackMigrationFile(stories[0].component, stories[0].field), JSON.stringify(stories, null, 2), { flag: 'a' }, (error) => {
+    fs.writeFile(urlTofRollbackMigrationFile(stories[0].content.component, field), JSON.stringify(stories, null, 2), { flag: 'a' }, (error) => {
       if (error) {
         console.log(`${chalk.red('X')} The file to reverse this migration was not created: ${error}`)
         return error

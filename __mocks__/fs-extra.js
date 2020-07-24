@@ -19,28 +19,16 @@ const readFile = jest.fn((path) => {
   mockFiles = path
   return Promise.resolve(JSON.stringify([
     {
-      name: 'Product',
-      id: 0,
-      uuid: '5ebd1485-25c5-460f-b477-b41facc884f8',
-      component: 'product',
-      field: 'title',
-      content: {
-        name: 'Product',
-        slug: 'product',
-        _uid: '4bc98f32-6200-4176-86b0-b6f2ea14be6f',
-        body: [
-          {
-            _uid: '111781de-3174-4f61-8ae3-0b653085a582',
-            headline: 'My Product Page',
-            component: 'teaser'
-          }
-        ],
-        component: 'page'
-      },
-      slug: 'product',
-      full_slug: 'product',
-      published: true,
-      unpublished_changes: true,
+      "id": 0,
+      "full_slug": "another-post",
+      "content": {
+        "_uid": "5647c21f-8813-4f8a-ad38-b9f74e0e7c89",
+        "text": "Donec tortor mauris, mollis vel pretium vitae, lacinia nec sapien. Donec erat neque, ullamcorper tincidunt iaculis sit amet, pharetra bibendum ipsum. Nunc mattis risus ac ante consequat nec pulvinar neque molestie. Etiam interdum nunc at metus lacinia non varius erat dignissim. Integer elementum, felis id facilisis vulputate, ipsum tellus venenatis dui, at blandit nibh massa in dolor. Cras a ultricies sapien. Vivamus adipiscing feugiat pharetra.",
+        "image": "https://a.storyblok.com/f/51376/884x750/3bff01d851/international.svg",
+        "title": "test",
+        "category": "news",
+        "component": "Product"
+      }
     }
   ]))
 })
