@@ -6,7 +6,8 @@ const {
   checkFileExists,
   processMigration,
   getStoriesByComponent,
-  getNameOfMigrationFile
+  getNameOfMigrationFile,
+  createRollbackFile
 } = require('./utils')
 
 /**
@@ -54,6 +55,7 @@ const runMigration = async (api, component, field, options = {}) => {
     const fileName = getNameOfMigrationFile(component, field)
     const pathToFile = getPathToFile(fileName, migrationPath)
     const fileExists = await checkFileExists(pathToFile)
+    const rollbackData = []
 
     if (!fileExists) {
       throw new Error(`The migration to combination ${fileName} doesn't exists`)
@@ -99,6 +101,14 @@ const runMigration = async (api, component, field, options = {}) => {
             `${chalk.blue('-')} Updating story ${story.full_slug}`
           )
           const url = `stories/${story.id}`
+
+          // create a rollback object
+          rollbackData.push({
+            id: storyData.id,
+            full_slug: storyData.full_slug,
+            content: oldContent
+          })
+
           const payload = {
             story: storyData,
             force_update: '1'
@@ -130,6 +140,11 @@ const runMigration = async (api, component, field, options = {}) => {
       }
 
       console.log()
+    }
+
+    // send file of rollback to save in migrations/rollback directory
+    if (!isEmpty(rollbackData)) {
+      await createRollbackFile(rollbackData, component, field)
     }
 
     console.log(`${chalk.green('✓')} The migration was executed with success!`)

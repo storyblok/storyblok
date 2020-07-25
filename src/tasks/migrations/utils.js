@@ -6,6 +6,7 @@ const chalk = require('chalk')
 const { parseError } = require('../../utils')
 const migrationTemplate = require('../templates/migration-file')
 const MIGRATIONS_DIRECTORY = `${process.cwd()}/migrations`
+const MIGRATIONS_ROLLBACK_DIRECTORY = `${process.cwd()}/migrations/rollback`
 
 /**
  * @method getPathToFile
@@ -223,6 +224,89 @@ const processMigration = async (content = {}, component = '', migrationFn) => {
   return Promise.resolve(true)
 }
 
+/**
+ * @method urlTofRollbackMigrationFile
+ * @param  {String}   component name of the component to rollback
+ * @param  {String}   field     name of the field to rollback
+ * @return {String}
+ */
+
+const urlTofRollbackMigrationFile = (component, field) => {
+  return `${MIGRATIONS_ROLLBACK_DIRECTORY}/${getNameOfRollbackMigrationFile(component, field)}`
+}
+
+/**
+ * @method getNameOfRollbackMigrationFile
+ * @param  {String}   component name of the component to rollback
+ * @param  {String}   field     name of the field to rollback
+ * @return {String}
+ */
+
+const getNameOfRollbackMigrationFile = (component, field) => {
+  return `rollback_${component}_${field}.json`
+}
+
+/**
+ * @method createRollbackFile
+ * @param  {Array}   stories    array containing stories for rollback
+ * @return {Promise}
+ */
+
+const createRollbackFile = async (stories, component, field) => {
+  try {
+    if (!fs.existsSync(MIGRATIONS_ROLLBACK_DIRECTORY)) {
+      fs.mkdir(MIGRATIONS_ROLLBACK_DIRECTORY)
+    }
+
+    let url = urlTofRollbackMigrationFile(component, field)
+
+    if (fs.existsSync(url)) {
+      fs.unlinkSync(url)
+    }
+
+    fs.writeFile(url, JSON.stringify(stories, null, 2), { flag: 'a' }, (error) => {
+      if (error) {
+        console.log(`${chalk.red('X')} The rollback file could not be created: ${error}`)
+        return error
+      }
+      console.log(`${chalk.green('✓')} The rollback file has been created in migrations/rollback/!`)
+    })
+    return Promise.resolve({
+      component: component,
+      created: true
+    })
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}
+
+/**
+ * @method checkExistenceFilesInRollBackDirectory
+ * @param  {String}   path      path of the rollback folder directories
+ * @param  {String}   component name of the components to be searched for in the rollback folder
+ * @param  {String}   field     name of the field to be searched for in the rollback folder
+ * @return {Promisse<Array>}
+ */
+
+const checkExistenceFilesInRollBackDirectory = (path, component, field) => {
+  if (!fs.existsSync(path)) {
+    console.log(`
+        ${chalk.red('X')} The path for which the rollback files should be contained does not exist`
+    )
+    return Promise.reject(new Error({ error: 'Path not found' }))
+  }
+
+  const files = fs.readdirSync(path).map(file => file)
+
+  const file = files.filter((name) => {
+    const splitedName = name.split('_')
+    if (splitedName[1] === component && splitedName[2] === `${field}.json`) {
+      return name
+    }
+  })
+  return Promise.resolve(file)
+}
+
 module.exports = {
   getPathToFile,
   checkFileExists,
@@ -233,5 +317,9 @@ module.exports = {
   showMigrationChanges,
   getStoriesByComponent,
   getComponentsFromName,
-  getNameOfMigrationFile
+  getNameOfMigrationFile,
+  createRollbackFile,
+  checkExistenceFilesInRollBackDirectory,
+  urlTofRollbackMigrationFile,
+  getNameOfRollbackMigrationFile
 }
