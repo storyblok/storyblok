@@ -217,11 +217,11 @@ A json file need to have following format:
 
 ```json
 {
-  'this-is-my-title': {
-    title: 'This is my title',
-    text: 'Lorem ipsum dolor sit amet',
-    image: 'https://a.storyblok.com/f/51376/x/1502f01431/corporate-website.svg',
-    category: 'press'
+  "this-is-my-title": {
+    "title": "This is my title",
+    "text": "Lorem ipsum dolor sit amet",
+    "image": "https://a.storyblok.com/f/51376/x/1502f01431/corporate-website.svg",
+    "category": "press"
   }
 }
 ```
