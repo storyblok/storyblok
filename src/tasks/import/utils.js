@@ -175,14 +175,14 @@ const jsonParser = async (data, typeOfContent, folderID = 0) => {
   const copyData = JSON.parse(data)
   const story = []
 
-  for (const key in copyData) {
+  for (const key of copyData) {
     story.push({
-      slug: key || '',
-      name: copyData[key].title || '',
+      slug: key.path || '',
+      name: key.title || '',
       parent_id: folderID,
       content: {
         component: typeOfContent,
-        ...copyData[key]
+        ...key
       }
     })
   }
