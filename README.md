@@ -187,8 +187,7 @@ This command gives you the possibility to import flat content from `.csv`, `.xml
 The attributes `path` and `title` are required.
 
 ```sh
-$ storyblok import --file <FILE_NAME> --type <TYPE_OF_CONTENT> --folder
-<FOLDER_ID> --delimiter <DELIMITER_TO_CSV_FILES> --space <SPACE_ID>
+$ storyblok import --file <FILE_NAME> --type <TYPE_OF_CONTENT> --folder <FOLDER_ID> --delimiter <DELIMITER_TO_CSV_FILES> --space <SPACE_ID>
 ```
 
 A xml file needs to have following format:
