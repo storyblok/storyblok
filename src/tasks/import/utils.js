@@ -24,7 +24,7 @@ const discoverExtension = (fileName) => {
 /**
  * @method sendContent
  * @param  {Object} api - A api object
- * @param  {Object} contents - Object with the content to be sent
+ * @param  {Object} contents - Object with the content
  * @return {Promise}
  */
 const sendContent = async (api, contents) => {
@@ -36,11 +36,11 @@ const sendContent = async (api, contents) => {
       await api.post('stories', { story })
 
       console.log(
-        `${chalk.green('✓')} ${story.name}(${story.slug}) was created`
+        `${chalk.green('✓')} ${story.name}(${story.slug}) has been created`
       )
     } catch (e) {
       console.log(
-        `${chalk.red('X')} An error ocurred when create the story ${story.name}(${story.slug}): ${e.message}`
+        `${chalk.red('X')} An error ocurred when creating the story ${story.name}(${story.slug}): ${e.message}`
       )
     }
 
@@ -220,7 +220,7 @@ const converFile = (file, extension, options) => {
     return jsonParser(dataFromFile, type, folder)
   }
 
-  return Promise.reject(new Error('The file extension is not supported.'))
+  return Promise.reject(new Error('This file extension is not supported. Please use .xml, .json or .csv'))
 }
 
 module.exports = {
