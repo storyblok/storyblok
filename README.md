@@ -182,20 +182,57 @@ $ storyblok spaces
 
 ### import
 
-This command gives the possibility to import files directly to a specific space, thus being able to create stories with ease. The layer supports `.csv`, `.xml` and `.json` files.
+This command gives you the possibility to import flat content from `.csv`, `.xml` and `.json` files coming from other systems.
+
+The attributes `path` and `title` are required.
 
 ```sh
 $ storyblok import --file <FILE_NAME> --type <TYPE_OF_CONTENT> --folder
 <FOLDER_ID> --delimiter <DELIMITER_TO_CSV_FILES> --space <SPACE_ID>
 ```
 
+A xml file needs to have following format:
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <row>
+    <path>this-is-my-title</path>
+    <title>This is my title</title>
+    <text>Lorem ipsum dolor sit amet</text>
+    <image>https://a.storyblok.com/f/51376/x/1502f01431/corporate-website.svg</image>
+    <category>press</category>
+  </row>
+</root>
+```
+
+A csv file needs to have following format. The first row is used to identify the attribute names:
+
+```
+path;title;text;image;category
+this-is-my-title;This is my title;"Lorem ipsum dolor sit amet";https://a.storyblok.com/f/51376/x/1502f01431/corporate-website.svg;press
+```
+
+A json file need to have following format:
+
+```json
+{
+  'this-is-my-title': {
+    title: 'This is my title',
+    text: 'Lorem ipsum dolor sit amet',
+    image: 'https://a.storyblok.com/f/51376/x/1502f01431/corporate-website.svg',
+    category: 'press'
+  }
+}
+```
+
 #### Options
 
-* `file`: name of the file where the data is
-* `type`: this is the name of the content type you want to create
-* `folder`: id of the folder where you want to upload the stories (Default value is **0** )
-* `delimiter`: delimiter of the `.cvs` files, only necessary if you are uploading a csv file (Default value is **;** )
-* `space`: space where data will be loaded
+* `file`: name of the file
+* `type`: name of the content type you want to use for the import
+* `space`: id of your space
+* `delimiter` (optional): delimiter of the `.cvs` files, only necessary if you are uploading a csv file (Default value is **;** )
+* `folder` (optional): id of the folder where you want to store the content in Storyblok
 
 ### Help
 
