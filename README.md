@@ -379,61 +379,6 @@ module.exports = function (block) {
   }
 }
 ```
-## Import Data from file
-
-This command supports 3 file extensions, `xml`, `csv` and `json`.
-To create stories in the storyblok you will need to have two mandatory attributes `name` and `slug`.
-
-For more information on how to create stories, see the [documentation](https://www.storyblok.com/docs/api/management#core-resources/stories/create-story).
-
-### For JSON files
-
-For `.json` files, the keys must be the story slugs, an one of keys has been name.
-
-#### Example of file
-
-```js
-{
-  "this-is-my-title": { // The key of json will be the slug of the story
-    "title": "This is my title", // "title": is a name for story
-    "text": "Lorem ipsum dolor sit amet.",
-    "image": "https://test.com/corporate-website.svg",
-    "category": "press"
-  }
-}
-```
-
-### For XML files
-
-For `.xml` files, these must contain a <path> tag with the slug inside
-
-#### Example of file
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<root>
-  <row>
-    <path>this-is-my-title</path> <!-- The <path> tag will be the slug of the story -->
-    <title>This is my title</title> <!-- The <title> tag will be the  name of the story -->
-    <text>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</text>
-    <image>https://a.storyblok.com/corporate-website.svg</image>
-    <category>press</category>
-  </row>
-</root>
-```
-
-### For CSV files
-
-For `.csv` files, these must have a column named `path`.
-The default delimiter for `.csv`files is **;**, but if your file uses another delimiter, pass that delimiter using the `--delimiter` flag.
-
-#### Example of file
-The `path;` fields will be the slug of the story and `title;` will be the name field.
-
-```csv
-path;title;text;image;category
-this-is-my-title;This is my title;"Lorem ipsum dolor sit amet.;https://a.storyblok.com/corporate-website.svg;press
-```
 
 ## You're looking for a headstart?
 
