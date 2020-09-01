@@ -103,7 +103,7 @@ const csvParser = (data, typeOfContent, folderID = 0, delimiter = ';') => {
   })
 }
 
-const xmlFactoryOfStoryes = (line, typeOfContent, folderID) => {
+const xmlFactoryOfStories = (line, typeOfContent, folderID) => {
   const content = Object.keys(line).reduce((acc, key) => {
     acc[key] = line[key]
     return acc
@@ -148,10 +148,10 @@ const xmlParser = async (data, typeOfContent, folderID = 0) => {
       const contentParsed = xmlConverter.xml2js(data, options)
 
       if (isArray(contentParsed.root.row)) {
-        const story = contentParsed.root.row.map(line => xmlFactoryOfStoryes(line, typeOfContent, folderID))
+        const story = contentParsed.root.row.map(line => xmlFactoryOfStories(line, typeOfContent, folderID))
         return resolve(story)
       }
-      const story = xmlFactoryOfStoryes(contentParsed.root.row, typeOfContent, folderID)
+      const story = xmlFactoryOfStories(contentParsed.root.row, typeOfContent, folderID)
       return resolve([story])
     } catch (error) {
       return reject(error)
@@ -175,14 +175,14 @@ const jsonParser = async (data, typeOfContent, folderID = 0) => {
   const copyData = JSON.parse(data)
   const story = []
 
-  for (const key in copyData) {
+  for (const key of copyData) {
     story.push({
-      slug: key || '',
-      name: copyData[key].title || '',
+      slug: key.path || '',
+      name: key.title || '',
       parent_id: folderID,
       content: {
         component: typeOfContent,
-        ...copyData[key]
+        ...key
       }
     })
   }

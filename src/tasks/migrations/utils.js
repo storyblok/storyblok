@@ -258,7 +258,7 @@ const createRollbackFile = async (stories, component, field) => {
       fs.mkdir(MIGRATIONS_ROLLBACK_DIRECTORY)
     }
 
-    let url = urlTofRollbackMigrationFile(component, field)
+    const url = urlTofRollbackMigrationFile(component, field)
 
     if (fs.existsSync(url)) {
       fs.unlinkSync(url)
