@@ -78,7 +78,7 @@ $ storyblok sync --type <COMMAND> --source <SPACE_ID> --target <SPACE_ID>
 
 #### Options
 
-* `type`: describe the command type to execute. Can be: `folders`, `components`, `stories` or `roles`. It's possible pass multiple types separated by comma (`,`).
+* `type`: describe the command type to execute. Can be: `folders`, `components`, `stories`, `presets` or `roles`. It's possible pass multiple types separated by comma (`,`).
 * `source`: the source space to use to sync
 * `target`: the target space to use to sync
 
