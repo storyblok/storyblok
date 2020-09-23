@@ -293,7 +293,8 @@ class SyncComponents {
             name: presetData.name,
             component_id: componentId,
             space_id: this.targetSpaceId,
-            preset: presetData.preset
+            preset: presetData.preset,
+            image: presetData.image
           }
         })
       }
