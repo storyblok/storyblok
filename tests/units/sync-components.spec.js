@@ -97,13 +97,13 @@ const FAKE_PRESETS = {
             _uid: '5f8b150f-2931-4693-965e-077a53ec9132',
             title: 'A default hero title',
             subtitle: 'A default hero subtitle',
-            component: 'hero'
+            component: 'hero',
+            image: 'http://urlToImage/image'
           },
           component_id: 3, // from FAKE_COMPONENTS 'hero'
           space_id: '000000',
           created_at: '2020-04-24T18:13:35.056Z',
           updated_at: '2020-04-24T18:13:35.056Z',
-          image: null
         }
       ]
     }
@@ -264,7 +264,8 @@ describe('testing syncComponents', () => {
             _uid: '5f8b150f-2931-4693-965e-077a53ec9132',
             title: 'A default hero title',
             subtitle: 'A default hero subtitle',
-            component: 'hero'
+            component: 'hero',
+            image: 'http://urlToImage/image'
           }
         }
       }
