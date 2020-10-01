@@ -7,6 +7,7 @@ const chalk = require('chalk')
 const clear = require('clear')
 const figlet = require('figlet')
 const inquirer = require('inquirer')
+const leven = require('leven')
 
 const updateNotifier = require('update-notifier')
 const pkg = require('../package.json')
@@ -376,6 +377,18 @@ program
     } catch (e) {
       console.log(chalk.red('X') + ' An error ocurred to import data : ' + e.message)
       process.exit(1)
+    }
+  })
+
+program
+  .arguments('<command>')
+  .action((invalidCmd) => {
+    program.outputHelp()
+    console.log('  ' + chalk.red(`Unknown command ${chalk.yellow(invalidCmd)}.`))
+    const availableCommands = program.commands.map(cmd => cmd._name)
+    const suggestion = availableCommands.find(cmd => leven(cmd, invalidCmd) < 3)
+    if (suggestion) {
+      console.log('\n  ' + chalk.red(`Did you mean ${chalk.yellow(suggestion)}?`))
     }
   })
 
