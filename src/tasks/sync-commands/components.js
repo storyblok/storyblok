@@ -3,6 +3,8 @@ const StoryblokClient = require('storyblok-js-client')
 const { find } = require('lodash')
 const SyncComponentGroups = require('./component-groups')
 const { findByProperty } = require('../../utils')
+const FormData = require('form-data')
+const axios = require('axios')
 
 class SyncComponents {
   /**
@@ -288,13 +290,18 @@ class SyncComponents {
       for (let i = 0; i < presetsSize; i++) {
         const presetData = presets[i]
 
+        let imageUrl = null
+        if (presetData.image) {
+          imageUrl = await this.uploadImageForPreset(presetData.image)
+        }
+
         await this.client.post(`spaces/${this.targetSpaceId}/presets`, {
           preset: {
             name: presetData.name,
             component_id: componentId,
             space_id: this.targetSpaceId,
             preset: presetData.preset,
-            image: presetData.image
+            image: imageUrl
           }
         })
       }
@@ -306,6 +313,39 @@ class SyncComponents {
       return Promise.reject(e)
     }
   }
+
+  async uploadImageForPreset (image) {
+    let file = [...image.split('/')]
+    let imageName = file[file.length - 1]
+
+    return this.client.post(`spaces/${this.targetSpaceId}/assets`, {
+      filename: imageName,
+      asset_folder_id: null
+    }).then(res => {
+      return this.uploadFileToS3(res.data, image)
+    })
+      .catch(e => console.log(e))
+  }
+
+  async uploadFileToS3 (signed_request, imageUrl) {
+    const response = await axios.get(`https:${imageUrl}`, { responseType: 'arraybuffer' })
+    return new Promise((resolve, reject) => {
+      const form = new FormData()
+      for (const key in signed_request.fields) {
+        form.append(key, signed_request.fields[key])
+      }
+
+      form.append('file', response.data)
+
+      form.submit(signed_request.post_url, (err, res) => {
+        if (err) {
+          return reject(err)
+        }
+        console.log('https://a.storyblok.com/' + signed_request.fields.key + ' UPLOADED!')
+        return resolve(signed_request.pretty_url)
+      })
+    })
+}
 }
 
 module.exports = SyncComponents
