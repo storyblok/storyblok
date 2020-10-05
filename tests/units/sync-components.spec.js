@@ -98,12 +98,13 @@ const FAKE_PRESETS = {
             title: 'A default hero title',
             subtitle: 'A default hero subtitle',
             component: 'hero',
-            image: 'http://urlToImage/image'
+            image: 'https://a.storyblok.com/f/002/bd78c087d1/screen-shot.png',
           },
           component_id: 3, // from FAKE_COMPONENTS 'hero'
           space_id: '000000',
           created_at: '2020-04-24T18:13:35.056Z',
           updated_at: '2020-04-24T18:13:35.056Z',
+          image: null
         }
       ]
     }
@@ -260,12 +261,13 @@ describe('testing syncComponents', () => {
           name: 'Hero Variant 1',
           space_id: '002',
           component_id: '000000001',
+          image: null,
           preset: {
             _uid: '5f8b150f-2931-4693-965e-077a53ec9132',
             title: 'A default hero title',
             subtitle: 'A default hero subtitle',
             component: 'hero',
-            image: 'http://urlToImage/image'
+            image: 'https://a.storyblok.com/f/002/bd78c087d1/screen-shot.png'
           }
         }
       }

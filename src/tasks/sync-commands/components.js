@@ -292,6 +292,7 @@ class SyncComponents {
 
         let imageUrl = null
         if (presetData.image) {
+          console.log(`${chalk.blue('-')} Preparing image for upload...`)
           imageUrl = await this.uploadImageForPreset(presetData.image)
         }
 
@@ -324,28 +325,34 @@ class SyncComponents {
     }).then(res => {
       return this.uploadFileToS3(res.data, image)
     })
-      .catch(e => console.log(e))
+      .catch(e => Promise.reject(e))
   }
 
   async uploadFileToS3 (signed_request, imageUrl) {
-    const response = await axios.get(`https:${imageUrl}`, { responseType: 'arraybuffer' })
-    return new Promise((resolve, reject) => {
-      const form = new FormData()
-      for (const key in signed_request.fields) {
-        form.append(key, signed_request.fields[key])
-      }
+    try {
+      const response = await axios.get(`https:${imageUrl}`, { responseType: 'arraybuffer' })
 
-      form.append('file', response.data)
-
-      form.submit(signed_request.post_url, (err, res) => {
-        if (err) {
-          return reject(err)
+      return new Promise((resolve, reject) => {
+        const form = new FormData()
+        for (const key in signed_request.fields) {
+          form.append(key, signed_request.fields[key])
         }
-        console.log('https://a.storyblok.com/' + signed_request.fields.key + ' UPLOADED!')
-        return resolve(signed_request.pretty_url)
+
+        form.append('file', response.data)
+
+        form.submit(signed_request.post_url, (err, res) => {
+          if (err) {
+            console.log(`${chalk.red('X')} There was an error uploading the image`)
+            return reject(err)
+          }
+          console.log(`${chalk.green('✓')} Uploaded ${signed_request.fields.key} image successfully!`)
+          return resolve(signed_request.pretty_url)
+        })
       })
-    })
-}
+    } catch (e) {
+      console.error('An error occurred while uploading the image ' + e.message)
+    }
+  }
 }
 
 module.exports = SyncComponents
