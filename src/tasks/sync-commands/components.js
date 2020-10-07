@@ -323,12 +323,12 @@ class SyncComponents {
       filename: imageName,
       asset_folder_id: null
     }).then(res => {
-      return this.uploadFileToS3(res.data, image)
+      return this.uploadFileToS3(res.data, image, imageName)
     })
       .catch(e => Promise.reject(e))
   }
 
-  async uploadFileToS3 (signed_request, imageUrl) {
+  async uploadFileToS3 (signed_request, imageUrl, name) {
     try {
       const response = await axios.get(`https:${imageUrl}`, { responseType: 'arraybuffer' })
 
@@ -345,7 +345,7 @@ class SyncComponents {
             console.log(`${chalk.red('X')} There was an error uploading the image`)
             return reject(err)
           }
-          console.log(`${chalk.green('✓')} Uploaded ${signed_request.fields.key} image successfully!`)
+          console.log(`${chalk.green('✓')} Uploaded ${name} image successfully!`)
           return resolve(signed_request.pretty_url)
         })
       })
