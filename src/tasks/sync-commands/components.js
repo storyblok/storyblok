@@ -1,8 +1,10 @@
 const chalk = require('chalk')
 const StoryblokClient = require('storyblok-js-client')
-const { find } = require('lodash')
+const { find, last } = require('lodash')
 const SyncComponentGroups = require('./component-groups')
 const { findByProperty } = require('../../utils')
+const FormData = require('form-data')
+const axios = require('axios')
 
 class SyncComponents {
   /**
@@ -288,12 +290,24 @@ class SyncComponents {
       for (let i = 0; i < presetsSize; i++) {
         const presetData = presets[i]
 
+        let imageUrl = null
+        if (presetData.image) {
+          console.log(`${chalk.blue('-')} Preparing image for upload...`)
+          try {
+            imageUrl = await this.uploadImageForPreset(presetData.image)
+          } catch (e) {
+            imageUrl = null
+            console.error('Error on uploading the preset screenshoot', e.message)
+          }
+        }
+
         await this.client.post(`spaces/${this.targetSpaceId}/presets`, {
           preset: {
             name: presetData.name,
             component_id: componentId,
             space_id: this.targetSpaceId,
-            preset: presetData.preset
+            preset: presetData.preset,
+            image: imageUrl
           }
         })
       }
@@ -303,6 +317,46 @@ class SyncComponents {
       console.error('An error ocurred when save the presets' + e.message)
 
       return Promise.reject(e)
+    }
+  }
+
+  async uploadImageForPreset (image = '') {
+    const imageName = last(image.split('/'))
+
+    return this.client
+      .post(`spaces/${this.targetSpaceId}/assets`, {
+        filename: imageName,
+        asset_folder_id: null
+      })
+      .then(res => this.uploadFileToS3(res.data, image, imageName))
+      .catch(e => Promise.reject(e))
+  }
+
+  async uploadFileToS3 (signedRequest, imageUrl, name) {
+    try {
+      const response = await axios.get(`https:${imageUrl}`, {
+        responseType: 'arraybuffer'
+      })
+
+      return new Promise((resolve, reject) => {
+        const form = new FormData()
+        for (const key in signedRequest.fields) {
+          form.append(key, signedRequest.fields[key])
+        }
+
+        form.append('file', response.data)
+
+        form.submit(signedRequest.post_url, (err, res) => {
+          if (err) {
+            console.log(`${chalk.red('X')} There was an error uploading the image`)
+            return reject(err)
+          }
+          console.log(`${chalk.green('✓')} Uploaded ${name} image successfully!`)
+          return resolve(signedRequest.pretty_url)
+        })
+      })
+    } catch (e) {
+      console.error('An error occurred while uploading the image ' + e.message)
     }
   }
 }
