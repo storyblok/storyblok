@@ -125,12 +125,15 @@ class SyncComponents {
             componentTarget.all_presets || []
           )
 
-          if (presetsToSave.length) {
-            await this.createPresets(presetsToSave, componentTarget.id)
-            continue
+          if (presetsToSave.newPresets.length) {
+            await this.createPresets(presetsToSave.newPresets, componentTarget.id, 'post')
           }
 
-          console.log(chalk.green('✓') + ' Presets were already in sync')
+          if (presetsToSave.updatePresets.length) {
+            await this.createPresets(presetsToSave.updatePresets, componentTarget.id, 'put')
+          }
+
+          console.log(chalk.green('✓') + ' Presets in sync')
         } else {
           console.error(chalk.red('X') + ` Component ${component.name} sync failed: ${e.message}`)
         }
@@ -177,14 +180,18 @@ class SyncComponents {
 
   filterPresetsFromTargetComponent (presets, targetPresets) {
     console.log(chalk.blue('-') + ' Checking target presets to sync')
-
-    const targetPresetsNames = targetPresets.map(preset => {
-      return preset.name.toLowerCase()
+    const targetPresetsNames = targetPresets.map(preset => preset.name.toLowerCase())
+    const newPresets = presets.filter(preset => !targetPresetsNames.includes(preset.name.toLowerCase()))
+    const updatePresetsSource = presets.filter(preset => targetPresetsNames.includes(preset.name.toLowerCase()))
+    const updatePresets = updatePresetsSource.map(source => {
+      const target = targetPresets.find(target => target.name.toLowerCase() === source.name.toLowerCase())
+      return Object.assign({}, source, target)
     })
 
-    return presets.filter(preset => {
-      return !targetPresetsNames.includes(preset.name.toLowerCase())
-    })
+    return {
+      newPresets,
+      updatePresets
+    }
   }
 
   createComponent (spaceId, componentData) {
@@ -282,9 +289,9 @@ class SyncComponents {
     })
   }
 
-  async createPresets (presets = [], componentId) {
+  async createPresets (presets = [], componentId, method = 'post') {
     const presetsSize = presets.length
-    console.log(`${chalk.green('-')} Syncing ${presetsSize} presets to space #${this.targetSpaceId}`)
+    console.log(`${chalk.yellow('-')} Syncing ${presetsSize} ${method === 'post' ? 'new' : 'existing'} presets to space #${this.targetSpaceId}`)
 
     try {
       for (let i = 0; i < presetsSize; i++) {
@@ -301,7 +308,8 @@ class SyncComponents {
           }
         }
 
-        await this.client.post(`spaces/${this.targetSpaceId}/presets`, {
+        const presetId = method === 'put' ? `/${presetData.id}` : ''
+        await this.client[method](`spaces/${this.targetSpaceId}/presets${presetId}`, {
           preset: {
             name: presetData.name,
             component_id: componentId,
