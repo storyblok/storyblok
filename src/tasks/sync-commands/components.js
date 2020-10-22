@@ -180,11 +180,11 @@ class SyncComponents {
 
   filterPresetsFromTargetComponent (presets, targetPresets) {
     console.log(chalk.blue('-') + ' Checking target presets to sync')
-    const targetPresetsNames = targetPresets.map(preset => preset.name.toLowerCase())
-    const newPresets = presets.filter(preset => !targetPresetsNames.includes(preset.name.toLowerCase()))
-    const updatePresetsSource = presets.filter(preset => targetPresetsNames.includes(preset.name.toLowerCase()))
+    const targetPresetsNames = targetPresets.map(preset => preset.name)
+    const newPresets = presets.filter(preset => !targetPresetsNames.includes(preset.name))
+    const updatePresetsSource = presets.filter(preset => targetPresetsNames.includes(preset.name))
     const updatePresets = updatePresetsSource.map(source => {
-      const target = targetPresets.find(target => target.name.toLowerCase() === source.name.toLowerCase())
+      const target = targetPresets.find(target => target.name === source.name)
       return Object.assign({}, source, target, { image: source.image })
     })
 
@@ -296,26 +296,15 @@ class SyncComponents {
     try {
       for (let i = 0; i < presetsSize; i++) {
         const presetData = presets[i]
-
-        let imageUrl = null
-        if (presetData.image) {
-          console.log(`${chalk.blue('-')} Preparing image for upload...`)
-          try {
-            imageUrl = await this.uploadImageForPreset(presetData.image)
-          } catch (e) {
-            imageUrl = null
-            console.error('Error on uploading the preset screenshoot', e.message)
-          }
-        }
-
         const presetId = method === 'put' ? `/${presetData.id}` : ''
+
         await this.client[method](`spaces/${this.targetSpaceId}/presets${presetId}`, {
           preset: {
             name: presetData.name,
             component_id: componentId,
             space_id: this.targetSpaceId,
             preset: presetData.preset,
-            image: imageUrl
+            image: presetData.image
           }
         })
       }
