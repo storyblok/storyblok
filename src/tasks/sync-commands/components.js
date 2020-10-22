@@ -185,7 +185,7 @@ class SyncComponents {
     const updatePresetsSource = presets.filter(preset => targetPresetsNames.includes(preset.name.toLowerCase()))
     const updatePresets = updatePresetsSource.map(source => {
       const target = targetPresets.find(target => target.name.toLowerCase() === source.name.toLowerCase())
-      return Object.assign({}, source, target)
+      return Object.assign({}, source, target, { image: source.image })
     })
 
     return {
