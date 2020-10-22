@@ -125,12 +125,15 @@ class SyncComponents {
             componentTarget.all_presets || []
           )
 
-          if (presetsToSave.length) {
-            await this.createPresets(presetsToSave, componentTarget.id)
-            continue
+          if (presetsToSave.newPresets.length) {
+            await this.createPresets(presetsToSave.newPresets, componentTarget.id, 'post')
           }
 
-          console.log(chalk.green('✓') + ' Presets were already in sync')
+          if (presetsToSave.updatePresets.length) {
+            await this.createPresets(presetsToSave.updatePresets, componentTarget.id, 'put')
+          }
+
+          console.log(chalk.green('✓') + ' Presets in sync')
         } else {
           console.error(chalk.red('X') + ` Component ${component.name} sync failed: ${e.message}`)
         }
@@ -177,14 +180,18 @@ class SyncComponents {
 
   filterPresetsFromTargetComponent (presets, targetPresets) {
     console.log(chalk.blue('-') + ' Checking target presets to sync')
-
-    const targetPresetsNames = targetPresets.map(preset => {
-      return preset.name.toLowerCase()
+    const targetPresetsNames = targetPresets.map(preset => preset.name)
+    const newPresets = presets.filter(preset => !targetPresetsNames.includes(preset.name))
+    const updatePresetsSource = presets.filter(preset => targetPresetsNames.includes(preset.name))
+    const updatePresets = updatePresetsSource.map(source => {
+      const target = targetPresets.find(target => target.name === source.name)
+      return Object.assign({}, source, target, { image: source.image })
     })
 
-    return presets.filter(preset => {
-      return !targetPresetsNames.includes(preset.name.toLowerCase())
-    })
+    return {
+      newPresets,
+      updatePresets
+    }
   }
 
   createComponent (spaceId, componentData) {
@@ -282,32 +289,22 @@ class SyncComponents {
     })
   }
 
-  async createPresets (presets = [], componentId) {
+  async createPresets (presets = [], componentId, method = 'post') {
     const presetsSize = presets.length
-    console.log(`${chalk.green('-')} Syncing ${presetsSize} presets to space #${this.targetSpaceId}`)
+    console.log(`${chalk.yellow('-')} Syncing ${presetsSize} ${method === 'post' ? 'new' : 'existing'} presets to space #${this.targetSpaceId}`)
 
     try {
       for (let i = 0; i < presetsSize; i++) {
         const presetData = presets[i]
+        const presetId = method === 'put' ? `/${presetData.id}` : ''
 
-        let imageUrl = null
-        if (presetData.image) {
-          console.log(`${chalk.blue('-')} Preparing image for upload...`)
-          try {
-            imageUrl = await this.uploadImageForPreset(presetData.image)
-          } catch (e) {
-            imageUrl = null
-            console.error('Error on uploading the preset screenshoot', e.message)
-          }
-        }
-
-        await this.client.post(`spaces/${this.targetSpaceId}/presets`, {
+        await this.client[method](`spaces/${this.targetSpaceId}/presets${presetId}`, {
           preset: {
             name: presetData.name,
             component_id: componentId,
             space_id: this.targetSpaceId,
             preset: presetData.preset,
-            image: imageUrl
+            image: presetData.image
           }
         })
       }
