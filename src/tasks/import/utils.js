@@ -176,13 +176,14 @@ const jsonParser = async (data, typeOfContent, folderID = 0) => {
   const story = []
 
   for (const key of copyData) {
+    const { path, title, ...rest } = key
     story.push({
-      slug: key.path || '',
-      name: key.title || '',
+      slug: path || '',
+      name: title || '',
       parent_id: folderID,
       content: {
         component: typeOfContent,
-        ...key
+        ...rest
       }
     })
   }
@@ -195,12 +196,12 @@ const jsonParser = async (data, typeOfContent, folderID = 0) => {
  * @property {string} folder Folder ID
  * @property {string} delimiter Delimiter (For csv files)
  *
- * @method converFile
+ * @method convertFile
  * @param  {string} file                path to file
  * @param  {string} extension           file extension
  * @param  {ConvertFileOptions} options options to parser functions
  */
-const converFile = (file, extension, options) => {
+const convertFile = (file, extension, options) => {
   const {
     type,
     folder,
@@ -228,6 +229,6 @@ module.exports = {
   xmlParser,
   jsonParser,
   sendContent,
-  converFile,
+  convertFile,
   discoverExtension
 }
