@@ -1,6 +1,6 @@
 const chalk = require('chalk')
 const {
-  converFile,
+  convertFile,
   sendContent,
   discoverExtension
 } = require('./utils')
@@ -27,7 +27,7 @@ const importFiles = async (api, options) => {
 
   try {
     const extension = discoverExtension(file)
-    const dataFromFile = await converFile(file, extension, options)
+    const dataFromFile = await convertFile(file, extension, options)
 
     await sendContent(api, dataFromFile)
   } catch (e) {
