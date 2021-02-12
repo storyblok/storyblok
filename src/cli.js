@@ -354,9 +354,10 @@ program
   .requiredOption('-f, --file <FILE_NAME>', 'Name of the file')
   .requiredOption('-t, --type <TYPE>', 'Type of the content')
   .option('-fr, --folder <FOLDER_ID>', '(Optional) This is a Id of folder in storyblok')
-  .option('-d, --delimiter', 'If you are using a csv file, put the file delimiter, the default is ";"')
+  .option('-d, --delimiter <DELIMITER>', 'If you are using a csv file, put the file delimiter, the default is ";"')
   .action(async (options) => {
     const space = program.space
+
     try {
       if (!api.isAuthorized()) {
         await api.processLogin()
