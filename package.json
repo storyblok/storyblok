@@ -10,7 +10,7 @@
   ],
   "main": "src/cli.js",
   "bin": {
-    "storyblok-local": "src/cli.js"
+    "storyblok": "src/cli.js"
   },
   "scripts": {
     "lint": "eslint src/",
