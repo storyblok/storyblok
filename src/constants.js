@@ -6,7 +6,8 @@ const SYNC_TYPES = [
   'folders',
   'components',
   'roles',
-  'stories'
+  'stories',
+  'datasources'
 ]
 
 module.exports = {

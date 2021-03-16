@@ -165,7 +165,7 @@ program
 program
   .command('sync')
   .description('Sync schemas, roles, folders and stories between spaces')
-  .requiredOption('--type <TYPE>', 'Define what will be sync. Can be components, folders, stories or roles')
+  .requiredOption('--type <TYPE>', 'Define what will be sync. Can be components, folders, stories, datasources or roles')
   .requiredOption('--source <SPACE_ID>', 'Source space id')
   .requiredOption('--target <SPACE_ID>', 'Target space id')
   .action(async (options) => {
