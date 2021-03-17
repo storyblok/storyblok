@@ -15,7 +15,7 @@ const getGroupByName = (groups, name) => {
 }
 
 module.exports = (api, options) => {
-  const { source } = options
+  const { source, presetsSource } = options
 
   if (isUrl(source)) {
     return axios
@@ -32,8 +32,8 @@ module.exports = (api, options) => {
 
   const data = fs.readFileSync(source, 'utf8')
   let presetsData
-  if (fs.existsSync(source.replace('components.', 'presets.'))) {
-    presetsData = fs.readFileSync(source.replace('components.', 'presets.'), 'utf8')
+  if (presetsSource) {
+    presetsData = fs.readFileSync(presetsSource, 'utf8')
   }
   if (data) {
     const body = JSON.parse(data)
