@@ -192,11 +192,11 @@ const SyncSpaces = {
     }
   },
 
-  async getDatasourceEntries(spaceId, datasourceId) {
+  async getDatasourceEntries (spaceId, datasourceId) {
     const entriesFirstPage = await this.client.get(`spaces/${spaceId}/datasource_entries/?datasource_id=${datasourceId}`)
     const entriesRequets = []
     for (let i = 1; i < Math.ceil(entriesFirstPage.total / 25); i++) {
-      sourceEntriesRequets.push(this.client.get(`spaces/${spaceId}/datasource_entries/?datasource_id=${datasourceId}`, { page: i }))
+      entriesRequets.push(this.client.get(`spaces/${spaceId}/datasource_entries/?datasource_id=${datasourceId}`, { page: i }))
     }
     return entriesFirstPage.data.datasource_entries.concat((await Promise.all(entriesRequets)).map(r => r.data.datasource_entries))
   },
@@ -205,16 +205,16 @@ const SyncSpaces = {
     console.log(chalk.green('✓') + ' Syncing datasources...')
     const targetDatasources = await this.client.getAll(`spaces/${this.targetSpaceId}/datasources`)
     const sourceDatasources = await this.client.getAll(`spaces/${this.sourceSpaceId}/datasources`)
-  
+
     /* Add Datasources */
     const addDatasources = sourceDatasources.filter(d => !targetDatasources.map(td => td.slug).includes(d.slug))
     for (let i = 0; i < addDatasources.length; i++) {
       /* Create the datasource */
-      const new_datasource = await this.client.post(`spaces/${this.targetSpaceId}/datasources`, {
+      const newDatasource = await this.client.post(`spaces/${this.targetSpaceId}/datasources`, {
         name: addDatasources[i].name,
         slug: addDatasources[i].slug
       })
-  
+
       /* Add the entries */
       const sourceEntries = await this.getDatasourceEntries(this.sourceSpaceId, addDatasources[i].id)
       const entriesCreationRequests = []
@@ -223,14 +223,14 @@ const SyncSpaces = {
           datasource_entry: {
             name: sourceEntries[j].name,
             value: sourceEntries[j].value,
-            datasource_id: new_datasource.data.datasource.id
+            datasource_id: newDatasource.data.datasource.id
           }
         }))
       }
       await Promise.all(entriesCreationRequests)
       console.log(chalk.green('✓') + ' Created datasource ' + addDatasources[i].name)
     }
-  
+
     /* Update Datasources */
     const updateDatasources = targetDatasources.filter(d => sourceDatasources.map(sd => sd.slug).includes(d.slug))
     for (let i = 0; i < updateDatasources.length; i++) {
@@ -240,12 +240,12 @@ const SyncSpaces = {
         name: sourceDatasource.name,
         slug: sourceDatasource.slug
       })
-  
+
       const sourceEntries = await this.getDatasourceEntries(this.sourceSpaceId, sourceDatasource.id)
       const targetEntries = await this.getDatasourceEntries(this.targetSpaceId, updateDatasources[i].id)
       const updateEntries = targetEntries.filter(e => sourceEntries.map(se => se.name).includes(e.name))
       const addEntries = sourceEntries.filter(e => !targetEntries.map(te => te.name).includes(e.name))
-  
+
       /* Update entries */
       const entriesUpdateRequests = []
       for (let j = 0; j < updateEntries.length; j++) {
@@ -259,7 +259,7 @@ const SyncSpaces = {
         }))
       }
       await Promise.all(entriesUpdateRequests)
-  
+
       /* Add entries */
       const entriesCreationRequests = []
       for (let j = 0; j < addEntries.length; j++) {
@@ -276,7 +276,6 @@ const SyncSpaces = {
     }
   }
 }
-
 
 /**
  * @method sync
