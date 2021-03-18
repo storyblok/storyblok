@@ -2,6 +2,7 @@ const pSeries = require('p-series')
 const chalk = require('chalk')
 const StoryblokClient = require('storyblok-js-client')
 const SyncComponents = require('./sync-commands/components')
+const SyncDatasources = require('./sync-commands/datasources')
 const { capitalize } = require('../utils')
 
 const SyncSpaces = {
@@ -192,87 +193,22 @@ const SyncSpaces = {
     }
   },
 
-  async getDatasourceEntries (spaceId, datasourceId) {
-    const entriesFirstPage = await this.client.get(`spaces/${spaceId}/datasource_entries/?datasource_id=${datasourceId}`)
-    const entriesRequets = []
-    for (let i = 1; i < Math.ceil(entriesFirstPage.total / 25); i++) {
-      entriesRequets.push(this.client.get(`spaces/${spaceId}/datasource_entries/?datasource_id=${datasourceId}`, { page: i }))
-    }
-    return entriesFirstPage.data.datasource_entries.concat((await Promise.all(entriesRequets)).map(r => r.data.datasource_entries))
-  },
-
   async syncDatasources () {
-    console.log(chalk.green('✓') + ' Syncing datasources...')
-    const targetDatasources = await this.client.getAll(`spaces/${this.targetSpaceId}/datasources`)
-    const sourceDatasources = await this.client.getAll(`spaces/${this.sourceSpaceId}/datasources`)
+    const syncDatasourcesInstance = new SyncDatasources({
+      sourceSpaceId: this.sourceSpaceId,
+      targetSpaceId: this.targetSpaceId,
+      oauthToken: this.oauthToken
+    })
 
-    /* Add Datasources */
-    const addDatasources = sourceDatasources.filter(d => !targetDatasources.map(td => td.slug).includes(d.slug))
-    for (let i = 0; i < addDatasources.length; i++) {
-      /* Create the datasource */
-      const newDatasource = await this.client.post(`spaces/${this.targetSpaceId}/datasources`, {
-        name: addDatasources[i].name,
-        slug: addDatasources[i].slug
-      })
+    try {
+      await syncDatasourcesInstance.sync()
+    } catch (e) {
+      console.error(
+        chalk.red('X') + ` Datasources Sync failed: ${e.message}`
+      )
+      console.log(e)
 
-      /* Add the entries */
-      const sourceEntries = await this.getDatasourceEntries(this.sourceSpaceId, addDatasources[i].id)
-      const entriesCreationRequests = []
-      for (let j = 0; j < sourceEntries.length; j++) {
-        entriesCreationRequests.push(this.client.post(`spaces/${this.targetSpaceId}/datasource_entries/`, {
-          datasource_entry: {
-            name: sourceEntries[j].name,
-            value: sourceEntries[j].value,
-            datasource_id: newDatasource.data.datasource.id
-          }
-        }))
-      }
-      await Promise.all(entriesCreationRequests)
-      console.log(chalk.green('✓') + ' Created datasource ' + addDatasources[i].name)
-    }
-
-    /* Update Datasources */
-    const updateDatasources = targetDatasources.filter(d => sourceDatasources.map(sd => sd.slug).includes(d.slug))
-    for (let i = 0; i < updateDatasources.length; i++) {
-      /* Update the datasource */
-      const sourceDatasource = sourceDatasources.find(d => d.slug === updateDatasources[i].slug)
-      await this.client.put(`spaces/${this.targetSpaceId}/datasources/${updateDatasources[i].id}`, {
-        name: sourceDatasource.name,
-        slug: sourceDatasource.slug
-      })
-
-      const sourceEntries = await this.getDatasourceEntries(this.sourceSpaceId, sourceDatasource.id)
-      const targetEntries = await this.getDatasourceEntries(this.targetSpaceId, updateDatasources[i].id)
-      const updateEntries = targetEntries.filter(e => sourceEntries.map(se => se.name).includes(e.name))
-      const addEntries = sourceEntries.filter(e => !targetEntries.map(te => te.name).includes(e.name))
-
-      /* Update entries */
-      const entriesUpdateRequests = []
-      for (let j = 0; j < updateEntries.length; j++) {
-        const sourceEntry = sourceEntries.find(d => d.name === updateEntries[j].name)
-        entriesUpdateRequests.push(this.client.put(`spaces/${this.targetSpaceId}/datasource_entries/${updateEntries[j].id}`, {
-          datasource_entry: {
-            name: sourceEntry.name,
-            value: sourceEntry.value,
-            datasource_id: updateDatasources[i].id
-          }
-        }))
-      }
-      await Promise.all(entriesUpdateRequests)
-
-      /* Add entries */
-      const entriesCreationRequests = []
-      for (let j = 0; j < addEntries.length; j++) {
-        entriesCreationRequests.push(this.client.post(`spaces/${this.targetSpaceId}/datasource_entries/`, {
-          datasource_entry: {
-            name: addEntries[j].name,
-            value: addEntries[j].value,
-            datasource_id: updateDatasources[i].id
-          }
-        }))
-      }
-      await Promise.all(entriesCreationRequests)
-      console.log(chalk.green('✓') + ' Updated datasource ' + updateDatasources[i].name)
+      return Promise.reject(new Error(e))
     }
   }
 }
