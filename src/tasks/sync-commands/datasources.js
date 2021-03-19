@@ -22,12 +22,12 @@ class SyncDatasources {
       this.sourceDatasources = await this.client.getAll(`spaces/${this.sourceSpaceId}/datasources`)
 
       console.log(
-        `${chalk.blue('-')} In source space #${this.sourceSpaceId}, it were found: `
+        `${chalk.blue('-')} In source space #${this.sourceSpaceId}: `
       )
       console.log(`  - ${this.sourceDatasources.length} datasources`)
 
       console.log(
-        `${chalk.blue('-')} In target space #${this.targetSpaceId}, it were found: `
+        `${chalk.blue('-')} In target space #${this.targetSpaceId}: `
       )
       console.log(`  - ${this.targetDatasources.length} datasources`)
     } catch (err) {
@@ -36,7 +36,7 @@ class SyncDatasources {
       return Promise.reject(err)
     }
 
-    console.log(chalk.green('✓') + ' Syncing datasources...')
+    console.log(chalk.green('-') + ' Syncing datasources...')
     await this.addDatasources()
     await this.updateDatasources()
   }
@@ -88,6 +88,34 @@ class SyncDatasources {
     }
   }
 
+  async syncDatasourceEntries (sourceId, targetId) {
+    try {
+      const sourceEntries = await this.getDatasourceEntries(this.sourceSpaceId, sourceId)
+      const targetEntries = await this.getDatasourceEntries(this.targetSpaceId, targetId)
+      const updateEntries = targetEntries.filter(e => sourceEntries.map(se => se.name).includes(e.name))
+      const addEntries = sourceEntries.filter(e => !targetEntries.map(te => te.name).includes(e.name))
+
+      /* Update entries */
+      const entriesUpdateRequests = []
+      for (let j = 0; j < updateEntries.length; j++) {
+        const sourceEntry = sourceEntries.find(d => d.name === updateEntries[j].name)
+        await this.updateDatasourceEntry(updateEntries[j], sourceEntry, targetId)
+      }
+      await Promise.all(entriesUpdateRequests)
+
+      /* Add entries */
+      const entriesCreationRequests = []
+      for (let j = 0; j < addEntries.length; j++) {
+        await this.addDatasourceEntry(addEntries[j], targetId)
+      }
+      await Promise.all(entriesCreationRequests)
+    } catch (err) {
+      console.error(`An error ocurred when syncing the datasource entries: ${err.message}`)
+
+      return Promise.reject(err)
+    }
+  }
+
   async addDatasources () {
     const datasourcesToAdd = this.sourceDatasources.filter(d => !this.targetDatasources.map(td => td.slug).includes(d.slug))
     if (datasourcesToAdd.length) {
@@ -104,13 +132,7 @@ class SyncDatasources {
           slug: datasourcesToAdd[i].slug
         })
 
-        /* Add the entries */
-        const sourceEntries = await this.getDatasourceEntries(this.sourceSpaceId, datasourcesToAdd[i].id)
-        const entriesCreationRequests = []
-        for (let j = 0; j < sourceEntries.length; j++) {
-          entriesCreationRequests.push(this.addDatasourceEntry(sourceEntries[j], newDatasource.data.datasource.id))
-        }
-        await Promise.all(entriesCreationRequests)
+        await this.syncDatasourceEntries(datasourcesToAdd[i].id, newDatasource.data.datasource.id)
         console.log(chalk.green('✓') + ' Created datasource ' + datasourcesToAdd[i].name)
       } catch (err) {
         console.error(
@@ -137,25 +159,7 @@ class SyncDatasources {
           slug: sourceDatasource.slug
         })
 
-        const sourceEntries = await this.getDatasourceEntries(this.sourceSpaceId, sourceDatasource.id)
-        const targetEntries = await this.getDatasourceEntries(this.targetSpaceId, datasourcesToUpdate[i].id)
-        const updateEntries = targetEntries.filter(e => sourceEntries.map(se => se.name).includes(e.name))
-        const addEntries = sourceEntries.filter(e => !targetEntries.map(te => te.name).includes(e.name))
-
-        /* Update entries */
-        const entriesUpdateRequests = []
-        for (let j = 0; j < updateEntries.length; j++) {
-          const sourceEntry = sourceEntries.find(d => d.name === updateEntries[j].name)
-          await this.updateDatasourceEntry(updateEntries[j], sourceEntry, datasourcesToUpdate[i].id)
-        }
-        await Promise.all(entriesUpdateRequests)
-
-        /* Add entries */
-        const entriesCreationRequests = []
-        for (let j = 0; j < addEntries.length; j++) {
-          await this.addDatasourceEntry(addEntries[j], datasourcesToUpdate[i].id)
-        }
-        await Promise.all(entriesCreationRequests)
+        await this.syncDatasourceEntries(sourceDatasource.id, datasourcesToUpdate[i].id)
         console.log(chalk.green('✓') + ' Updated datasource ' + datasourcesToUpdate[i].name)
       } catch (err) {
         console.error(
