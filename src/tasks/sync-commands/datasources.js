@@ -99,14 +99,14 @@ class SyncDatasources {
       const entriesUpdateRequests = []
       for (let j = 0; j < updateEntries.length; j++) {
         const sourceEntry = sourceEntries.find(d => d.name === updateEntries[j].name)
-        await this.updateDatasourceEntry(updateEntries[j], sourceEntry, targetId)
+        entriesUpdateRequests.push(this.updateDatasourceEntry(updateEntries[j], sourceEntry, targetId))
       }
       await Promise.all(entriesUpdateRequests)
 
       /* Add entries */
       const entriesCreationRequests = []
       for (let j = 0; j < addEntries.length; j++) {
-        await this.addDatasourceEntry(addEntries[j], targetId)
+        entriesCreationRequests.push(this.addDatasourceEntry(addEntries[j], targetId))
       }
       await Promise.all(entriesCreationRequests)
     } catch (err) {
