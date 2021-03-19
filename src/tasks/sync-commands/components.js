@@ -42,14 +42,14 @@ class SyncComponents {
       this.sourcePresets = await this.presetsLib.getPresets(this.sourceSpaceId)
 
       console.log(
-        `${chalk.blue('-')} In source space #${this.targetSpaceId}, it were found: `
+        `${chalk.blue('-')} In source space #${this.sourceSpaceId}, it were found: `
       )
       console.log(`  - ${this.sourcePresets.length} presets`)
       console.log(`  - ${this.sourceComponentGroups.length} groups`)
       console.log(`  - ${this.sourceComponents.length} components`)
 
       console.log(
-        `${chalk.blue('-')} In target space #${this.sourceSpaceId}, it were found: `
+        `${chalk.blue('-')} In target space #${this.targetSpaceId}, it were found: `
       )
       console.log(`  - ${this.targetComponentGroups.length} groups`)
       console.log(`  - ${this.targetComponents.length} components`)
