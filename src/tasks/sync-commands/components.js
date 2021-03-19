@@ -1,10 +1,9 @@
 const chalk = require('chalk')
 const StoryblokClient = require('storyblok-js-client')
-const { find, last } = require('lodash')
+const { find } = require('lodash')
 const SyncComponentGroups = require('./component-groups')
 const { findByProperty } = require('../../utils')
-const FormData = require('form-data')
-const axios = require('axios')
+const PresetsLib = require('../../utils/presets-lib')
 
 class SyncComponents {
   /**
@@ -20,6 +19,7 @@ class SyncComponents {
     this.client = new StoryblokClient({
       oauthToken: options.oauthToken
     })
+    this.presetsLib = new PresetsLib({ oauthToken: options.oauthToken, targetSpaceId: this.targetSpaceId })
   }
 
   async sync () {
@@ -39,7 +39,7 @@ class SyncComponents {
       this.sourceComponents = await this.getComponents(this.sourceSpaceId)
       this.targetComponents = await this.getComponents(this.targetSpaceId)
 
-      this.sourcePresets = await this.getPresets(this.sourceSpaceId)
+      this.sourcePresets = await this.presetsLib.getPresets(this.sourceSpaceId)
 
       console.log(
         `${chalk.blue('-')} In source space #${this.targetSpaceId}, it were found: `
@@ -65,7 +65,7 @@ class SyncComponents {
       const component = this.sourceComponents[i]
       console.log(chalk.blue('-') + ` Processing component ${component.name}`)
 
-      const componentPresets = this.getComponentPresets(component)
+      const componentPresets = this.presetsLib.getComponentPresets(component)
 
       delete component.id
       delete component.created_at
@@ -102,7 +102,7 @@ class SyncComponents {
         console.log(chalk.green('✓') + ` Component ${component.name} created`)
 
         if (componentPresets.length) {
-          await this.createPresets(componentPresets, componentCreated.id)
+          await this.presetsLib.createPresets(componentPresets, componentCreated.id)
         }
       } catch (e) {
         if (e.response && e.response.status && e.response.status === 422) {
@@ -120,17 +120,17 @@ class SyncComponents {
           )
           console.log(chalk.green('✓') + ` Component ${component.name} synced`)
 
-          const presetsToSave = this.filterPresetsFromTargetComponent(
+          const presetsToSave = this.presetsLib.filterPresetsFromTargetComponent(
             componentPresets || [],
             componentTarget.all_presets || []
           )
 
           if (presetsToSave.newPresets.length) {
-            await this.createPresets(presetsToSave.newPresets, componentTarget.id, 'post')
+            await this.presetsLib.createPresets(presetsToSave.newPresets, componentTarget.id, 'post')
           }
 
           if (presetsToSave.updatePresets.length) {
-            await this.createPresets(presetsToSave.updatePresets, componentTarget.id, 'put')
+            await this.presetsLib.createPresets(presetsToSave.updatePresets, componentTarget.id, 'put')
           }
 
           console.log(chalk.green('✓') + ' Presets in sync')
@@ -139,30 +139,6 @@ class SyncComponents {
         }
       }
     }
-  }
-
-  async getPresets (spaceId) {
-    console.log(`${chalk.green('-')} Load presets from space #${spaceId}`)
-
-    try {
-      const response = await this.client.get(
-        `spaces/${spaceId}/presets`
-      )
-
-      return response.data.presets || []
-    } catch (e) {
-      console.error('An error ocurred when load presets ' + e.message)
-
-      return Promise.reject(e)
-    }
-  }
-
-  getComponentPresets (component = {}) {
-    console.log(`${chalk.green('-')} Get presets from component ${component.name}`)
-
-    return this.sourcePresets.filter(preset => {
-      return preset.component_id === component.id
-    })
   }
 
   getComponents (spaceId) {
@@ -176,22 +152,6 @@ class SyncComponents {
 
   getTargetComponent (name) {
     return find(this.targetComponents, ['name', name]) || {}
-  }
-
-  filterPresetsFromTargetComponent (presets, targetPresets) {
-    console.log(chalk.blue('-') + ' Checking target presets to sync')
-    const targetPresetsNames = targetPresets.map(preset => preset.name)
-    const newPresets = presets.filter(preset => !targetPresetsNames.includes(preset.name))
-    const updatePresetsSource = presets.filter(preset => targetPresetsNames.includes(preset.name))
-    const updatePresets = updatePresetsSource.map(source => {
-      const target = targetPresets.find(target => target.name === source.name)
-      return Object.assign({}, source, target, { image: source.image })
-    })
-
-    return {
-      newPresets,
-      updatePresets
-    }
   }
 
   createComponent (spaceId, componentData) {
@@ -287,74 +247,6 @@ class SyncComponents {
 
       return targetGroupData.uuid
     })
-  }
-
-  async createPresets (presets = [], componentId, method = 'post') {
-    const presetsSize = presets.length
-    console.log(`${chalk.yellow('-')} Syncing ${presetsSize} ${method === 'post' ? 'new' : 'existing'} presets to space #${this.targetSpaceId}`)
-
-    try {
-      for (let i = 0; i < presetsSize; i++) {
-        const presetData = presets[i]
-        const presetId = method === 'put' ? `/${presetData.id}` : ''
-
-        await this.client[method](`spaces/${this.targetSpaceId}/presets${presetId}`, {
-          preset: {
-            name: presetData.name,
-            component_id: componentId,
-            space_id: this.targetSpaceId,
-            preset: presetData.preset,
-            image: presetData.image
-          }
-        })
-      }
-
-      console.log(`${chalk.green('✓')} ${presetsSize} presets sync in space (#${this.targetSpaceId})`)
-    } catch (e) {
-      console.error('An error ocurred when save the presets' + e.message)
-
-      return Promise.reject(e)
-    }
-  }
-
-  async uploadImageForPreset (image = '') {
-    const imageName = last(image.split('/'))
-
-    return this.client
-      .post(`spaces/${this.targetSpaceId}/assets`, {
-        filename: imageName,
-        asset_folder_id: null
-      })
-      .then(res => this.uploadFileToS3(res.data, image, imageName))
-      .catch(e => Promise.reject(e))
-  }
-
-  async uploadFileToS3 (signedRequest, imageUrl, name) {
-    try {
-      const response = await axios.get(`https:${imageUrl}`, {
-        responseType: 'arraybuffer'
-      })
-
-      return new Promise((resolve, reject) => {
-        const form = new FormData()
-        for (const key in signedRequest.fields) {
-          form.append(key, signedRequest.fields[key])
-        }
-
-        form.append('file', response.data)
-
-        form.submit(signedRequest.post_url, (err, res) => {
-          if (err) {
-            console.log(`${chalk.red('X')} There was an error uploading the image`)
-            return reject(err)
-          }
-          console.log(`${chalk.green('✓')} Uploaded ${name} image successfully!`)
-          return resolve(signedRequest.pretty_url)
-        })
-      })
-    } catch (e) {
-      console.error('An error occurred while uploading the image ' + e.message)
-    }
   }
 }
 
