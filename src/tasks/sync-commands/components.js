@@ -65,7 +65,7 @@ class SyncComponents {
       const component = this.sourceComponents[i]
       console.log(chalk.blue('-') + ` Processing component ${component.name}`)
 
-      const componentPresets = this.presetsLib.getComponentPresets(component)
+      const componentPresets = this.presetsLib.getComponentPresets(component, this.sourcePresets)
 
       delete component.id
       delete component.created_at
