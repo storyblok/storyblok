@@ -54,7 +54,7 @@ module.exports = (api, options) => {
   return Promise.reject(new Error('Can not push invalid json - please provide a valid json file'))
 }
 
-const push = async (api, components, presets) => {
+const push = async (api, components, presets = []) => {
   const presetsLib = new PresetsLib({ oauthToken: api.accessToken, targetSpaceId: api.spaceId })
   try {
     const componentGroups = await api.getComponentGroups()

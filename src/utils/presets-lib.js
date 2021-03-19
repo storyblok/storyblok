@@ -43,7 +43,7 @@ class PresetsLib {
     }
   }
 
-  getComponentPresets (component = {}, presets) {
+  getComponentPresets (component = {}, presets = []) {
     console.log(`${chalk.green('-')} Get presets from component ${component.name}`)
 
     return presets.filter(preset => {
