@@ -139,6 +139,15 @@ module.exports = {
     this.spaceId = spaceId
   },
 
+  getPresets () {
+    const client = this.getClient()
+
+    return client
+      .get(this.getPath('presets'))
+      .then(data => data.data.presets || [])
+      .catch(err => Promise.reject(err))
+  },
+
   getComponents () {
     const client = this.getClient()
 

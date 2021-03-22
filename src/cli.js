@@ -97,10 +97,12 @@ program
 // push-components
 program
   .command('push-components <source>')
+  .option('-p, --presets-source <presetsSource>', 'Path to presets file')
   .description("Download your space's components schema as json. The source parameter can be a URL to your JSON file or a path to it")
-  .action(async (source) => {
+  .action(async (source, options) => {
     console.log(`${chalk.blue('-')} Executing push-components task`)
     const space = program.space
+    const presetsSource = options.presetsSource
 
     if (!space) {
       console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
@@ -111,9 +113,8 @@ program
       if (!api.isAuthorized()) {
         await api.processLogin()
       }
-
       api.setSpaceId(space)
-      await tasks.pushComponents(api, { source })
+      await tasks.pushComponents(api, { source, presetsSource })
     } catch (e) {
       console.log(chalk.red('X') + ' An error occurred when executing the push-components task: ' + e.message)
       process.exit(1)

@@ -31,6 +31,8 @@ const pullComponents = async (api, options) => {
 
     const components = await api.getComponents()
 
+    const presets = await api.getPresets()
+
     components.forEach(component => {
       const groupUuid = component.component_group_uuid
       if (groupUuid) {
@@ -51,6 +53,20 @@ const pullComponents = async (api, options) => {
       }
 
       Promise.resolve(file)
+    })
+
+    const presetsFile = `presets.${space}.json`
+    const presetsData = JSON.stringify({ presets }, null, 2)
+
+    console.log(`${chalk.green('✓')} We've saved your presets in the file: ${presetsFile}`)
+
+    fs.writeFile(`./${presetsFile}`, presetsData, err => {
+      if (err) {
+        Promise.reject(err)
+        return
+      }
+
+      Promise.resolve(presetsFile)
     })
   } catch (e) {
     console.error(`${chalk.red('X')} An error ocurred in pull-components task when load components data`)
