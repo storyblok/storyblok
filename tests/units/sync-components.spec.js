@@ -1,4 +1,5 @@
 const sync = require('../../src/tasks/sync')
+const PresetsLib = jest.requireActual('../../src/utils/presets-lib')
 const { TOKEN_TEST, FAKE_COMPONENTS } = require('../constants')
 
 const FAKE_COMPONENTS_TO_TEST = {
@@ -184,6 +185,33 @@ jest.mock('storyblok-js-client', () => {
   })
 })
 
+const mockGetPresets = jest.fn((spaceId) => {
+  return Promise.resolve(FAKE_PRESETS[spaceId].data.presets)
+})
+
+const mockGetComponentPresets = jest.fn((component, presets) => {
+  return PresetsLib.prototype.getComponentPresets(component, presets)
+})
+
+const mockFilterPresetsFromTargetComponent = jest.fn((presets, targetPresets) => {
+  return PresetsLib.prototype.filterPresetsFromTargetComponent(presets, targetPresets)
+})
+
+const mockCreatePresets = jest.fn((presets = [], componentId, method = 'post') => {
+  return Promise.resolve(true)
+})
+
+jest.mock('../../src/utils/presets-lib', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      getPresets: mockGetPresets,
+      getComponentPresets: mockGetComponentPresets,
+      createPresets: mockCreatePresets,
+      filterPresetsFromTargetComponent: mockFilterPresetsFromTargetComponent
+    }
+  })
+})
+
 const SOURCE_SPACE_TEST = '001'
 const TARGET_SPACE_TEST = '002'
 
@@ -209,7 +237,7 @@ describe('testing syncComponents', () => {
     expect(mockGetRequest).toHaveBeenCalledWith('spaces/002/components')
 
     // it must be get presets
-    expect(mockGetRequest).toHaveBeenCalledWith('spaces/001/presets')
+    expect(mockGetPresets).toHaveBeenCalledWith('001')
   })
 
   it('shoud be create the General component_groups correctly', () => {
@@ -252,27 +280,6 @@ describe('testing syncComponents', () => {
     )
   })
 
-  it('shoud be create the presets for specific components correctly', () => {
-    // it must be get each component group
-    expect(mockPostRequest).toHaveBeenCalledWith(
-      'spaces/002/presets',
-      {
-        preset: {
-          name: 'Hero Variant 1',
-          space_id: '002',
-          component_id: '000000001',
-          image: null,
-          preset: {
-            _uid: '5f8b150f-2931-4693-965e-077a53ec9132',
-            title: 'A default hero title',
-            subtitle: 'A default hero subtitle',
-            component: 'hero',
-            image: 'https://a.storyblok.com/f/002/bd78c087d1/screen-shot.png'
-          }
-        }
-      }
-    )
-  })
 
   it('shoud be create components related to group correctly', () => {
     expect(mockPostRequest).toHaveBeenCalledWith(
