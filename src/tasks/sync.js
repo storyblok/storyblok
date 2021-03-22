@@ -2,6 +2,7 @@ const pSeries = require('p-series')
 const chalk = require('chalk')
 const StoryblokClient = require('storyblok-js-client')
 const SyncComponents = require('./sync-commands/components')
+const SyncDatasources = require('./sync-commands/datasources')
 const { capitalize } = require('../utils')
 
 const SyncSpaces = {
@@ -185,6 +186,25 @@ const SyncSpaces = {
     } catch (e) {
       console.error(
         chalk.red('X') + ` Sync failed: ${e.message}`
+      )
+      console.log(e)
+
+      return Promise.reject(new Error(e))
+    }
+  },
+
+  async syncDatasources () {
+    const syncDatasourcesInstance = new SyncDatasources({
+      sourceSpaceId: this.sourceSpaceId,
+      targetSpaceId: this.targetSpaceId,
+      oauthToken: this.oauthToken
+    })
+
+    try {
+      await syncDatasourcesInstance.sync()
+    } catch (e) {
+      console.error(
+        chalk.red('X') + ` Datasources Sync failed: ${e.message}`
       )
       console.log(e)
 

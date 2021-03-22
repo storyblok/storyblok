@@ -70,7 +70,7 @@ $ storyblok push-components ./components.json --space 67819
 
 ### sync
 
-Sync components, folder, roles or stories between spaces
+Sync components, folder, roles, datasources or stories between spaces
 
 ```sh
 $ storyblok sync --type <COMMAND> --source <SPACE_ID> --target <SPACE_ID>
@@ -78,7 +78,7 @@ $ storyblok sync --type <COMMAND> --source <SPACE_ID> --target <SPACE_ID>
 
 #### Options
 
-* `type`: describe the command type to execute. Can be: `folders`, `components`, `stories` or `roles`. It's possible pass multiple types separated by comma (`,`).
+* `type`: describe the command type to execute. Can be: `folders`, `components`, `stories`, `datasources` or `roles`. It's possible pass multiple types separated by comma (`,`).
 * `source`: the source space to use to sync
 * `target`: the target space to use to sync
 
