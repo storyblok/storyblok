@@ -15,57 +15,37 @@ const getGroupByName = (groups, name) => {
   return groups.filter(group => group.name === name)[0] || {}
 }
 
-module.exports = async (api, options) => {
-  const { source, presetsSource } = options
-  let presetsData = []
-
-  if (isUrl(presetsSource)) {
-    try {
-      presetsData = (await axios.get(presetsSource)).data.presets
-    } catch (err) {
-      console.error(`${chalk.red('X')} Can not load json file from ${presetsSource}`)
-      return Promise.reject(err)
-    }
+/**
+ * Get the data from a local or remote JSON file
+ * @param {string} source the local path or remote url of the file
+ * @returns {Promise<Object>} return the data from the source or an error
+ */
+const getDataFromSource = async (source) => {
+  if (!source) {
+    return {}
   }
 
-  if (isUrl(source)) {
-    return axios
-      .get(source)
-      .then(data => {
-        const body = data.data || {}
-        return push(api, body.components || [], presetsData)
-      })
-      .catch(err => {
-        console.error(`${chalk.red('X')} Can not load json file from ${source}`)
-        return Promise.reject(err)
-      })
-  }
-
-  const data = fs.readFileSync(source, 'utf8')
-  if (data) {
-    const body = JSON.parse(data)
-    let presetsFile
-    if (!isUrl(presetsSource)) {
-      presetsFile = fs.readFileSync(presetsSource, 'utf8')
+  try {
+    if (isUrl(source)) {
+      return (await axios.get(source)).data
+    } else {
+      return JSON.parse(fs.readFileSync(source, 'utf8'))
     }
-    if (presetsFile) {
-      try {
-        presetsData = JSON.parse(presetsFile).presets
-      } catch (err) {
-        console.error(`${chalk.red('X')} Can not load json file from ${presetsSource}`)
-        return Promise.reject(err)
-      }
-    }
-    if (body.components) {
-      return push(api, body.components, presetsData)
-    }
-
+  } catch (err) {
     console.error(`${chalk.red('X')} Can not load json file from ${source}`)
-    return Promise.reject(new Error(`Can not load json file from ${source}`))
+    return Promise.reject(err)
   }
+}
 
-  console.error(`${chalk.red('X')} Can not push invalid json - please provide a valid json file`)
-  return Promise.reject(new Error('Can not push invalid json - please provide a valid json file'))
+module.exports = async (api, { source, presetsSource }) => {
+  try {
+    const components = (await getDataFromSource(source)).components || []
+    const presets = (await getDataFromSource(presetsSource)).presets || []
+    return push(api, components, presets)
+  } catch (err) {
+    console.error(`${chalk.red('X')} Can not push invalid json - please provide a valid json file`)
+    return Promise.reject(new Error('Can not push invalid json - please provide a valid json file'))
+  }
 }
 
 const push = async (api, components, presets = []) => {
