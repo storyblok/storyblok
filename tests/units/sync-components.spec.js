@@ -280,6 +280,28 @@ describe('testing syncComponents', () => {
     )
   })
 
+  it('shoud be create the presets for specific components correctly', () => {
+    // it must be get each component group
+    expect(mockCreatePresets).toHaveBeenCalledWith(
+      [{
+        id: '01',
+        name: 'Hero Variant 1',
+        preset: {
+          _uid: '5f8b150f-2931-4693-965e-077a53ec9132',
+          title: 'A default hero title',
+          subtitle: 'A default hero subtitle',
+          component: 'hero',
+          image: 'https://a.storyblok.com/f/002/bd78c087d1/screen-shot.png',
+        },
+        component_id: 3, // from FAKE_COMPONENTS 'hero'
+        space_id: '000000',
+        created_at: '2020-04-24T18:13:35.056Z',
+        updated_at: '2020-04-24T18:13:35.056Z',
+        image: null
+      }],
+      '000000001'
+    )
+  })
 
   it('shoud be create components related to group correctly', () => {
     expect(mockPostRequest).toHaveBeenCalledWith(
