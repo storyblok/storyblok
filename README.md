@@ -42,7 +42,7 @@ $ storyblok pull-components --space <SPACE_ID>
 
 ### push-components
 
-Push your components file to your/another space. `--presets-source` is optional.
+Push your components file to your/another space
 
 ```sh
 $ storyblok push-components <SOURCE> --space <SPACE_ID> --presets-source <PRESETS_SOURCE>
@@ -67,6 +67,21 @@ $ storyblok push-components ./components.json --space 67819
 #### Options
 
 * `space`: your space id
+* `presets-source`: it can be a URL or path to JSON file with the presets
+
+#### Examples
+
+Using an **URL** for `presets-source`
+
+```sh
+$ storyblok push-components https://raw.githubusercontent.com/storyblok/nuxtdoc/master/seed.components.json --presets-source https://url-to-your-presets-file.json --space 67819
+```
+
+Using a **path** to file
+
+```sh
+$ storyblok push-components ./components.json --presets-source ./presets.json --space 67819
+```
 
 ### sync
 
