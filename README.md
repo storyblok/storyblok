@@ -67,7 +67,7 @@ $ storyblok push-components ./components.json --space 67819
 #### Options
 
 * `space`: your space id
-* `presets-source`: it can be a URL or path to JSON file with the presets
+* `presets-source` (optional): it can be a URL or path to JSON file with the presets
 
 #### Examples
 
