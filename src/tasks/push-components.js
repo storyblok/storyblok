@@ -15,15 +15,25 @@ const getGroupByName = (groups, name) => {
   return groups.filter(group => group.name === name)[0] || {}
 }
 
-module.exports = (api, options) => {
+module.exports = async (api, options) => {
   const { source, presetsSource } = options
+  let presetsData = []
+
+  if (isUrl(presetsSource)) {
+    try {
+      presetsData = (await axios.get(presetsSource)).data.presets
+    } catch (err) {
+      console.error(`${chalk.red('X')} Can not load json file from ${presetsSource}`)
+      return Promise.reject(err)
+    }
+  }
 
   if (isUrl(source)) {
     return axios
       .get(source)
       .then(data => {
         const body = data.data || {}
-        return push(api, body.components || [])
+        return push(api, body.components || [], presetsData)
       })
       .catch(err => {
         console.error(`${chalk.red('X')} Can not load json file from ${source}`)
@@ -32,18 +42,22 @@ module.exports = (api, options) => {
   }
 
   const data = fs.readFileSync(source, 'utf8')
-  let presetsData
-  if (presetsSource) {
-    presetsData = fs.readFileSync(presetsSource, 'utf8')
-  }
   if (data) {
     const body = JSON.parse(data)
-    let presetsBody
-    if (presetsData) {
-      presetsBody = JSON.parse(presetsData)
+    let presetsFile
+    if (!isUrl(presetsSource)) {
+      presetsFile = fs.readFileSync(presetsSource, 'utf8')
+    }
+    if (presetsFile) {
+      try {
+        presetsData = JSON.parse(presetsFile).presets
+      } catch (err) {
+        console.error(`${chalk.red('X')} Can not load json file from ${presetsSource}`)
+        return Promise.reject(err)
+      }
     }
     if (body.components) {
-      return push(api, body.components, presetsBody ? presetsBody.presets : [])
+      return push(api, body.components, presetsData)
     }
 
     console.error(`${chalk.red('X')} Can not load json file from ${source}`)
