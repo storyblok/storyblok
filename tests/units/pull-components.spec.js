@@ -12,6 +12,7 @@ describe('testing pullComponents', () => {
   it('api.getComponents() should be called once time', () => {
     const api = {
       getComponents: jest.fn(() => Promise.resolve(FAKE_COMPONENTS())),
+      getPresets: jest.fn(() => Promise.resolve([])),
       getComponentGroups () {
         return Promise.resolve([])
       }
@@ -56,6 +57,9 @@ describe('testing pullComponents', () => {
       },
       getComponentGroups () {
         return Promise.resolve([])
+      },
+      getPresets () {
+        return Promise.resolve([])
       }
     }
 
@@ -69,7 +73,7 @@ describe('testing pullComponents', () => {
       .then(_ => {
         const [path, data] = fs.writeFile.mock.calls[0]
 
-        expect(fs.writeFile.mock.calls.length).toBe(1)
+        expect(fs.writeFile.mock.calls.length).toBe(2)
         expect(path).toBe(`./${expectFileName}`)
         expect(JSON.parse(data)).toEqual(BODY)
       })
@@ -81,6 +85,9 @@ describe('testing pullComponents', () => {
         return Promise.reject(new Error('Failed'))
       },
       getComponentGroups () {
+        return Promise.resolve([])
+      },
+      getPresets () {
         return Promise.resolve([])
       }
     }
