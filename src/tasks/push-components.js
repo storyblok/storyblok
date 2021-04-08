@@ -12,7 +12,11 @@ const isUrl = source => source.indexOf('http') === 0
  * @return {Object}
  */
 const getGroupByName = (groups, name) => {
-  return groups.filter(group => group.name === name)[0] || {}
+  return groups.find(group => group.name === name) || {}
+}
+
+const getGroupByUuid = (groups, uuid) => {
+  return groups.find(group => group.source_uuid === uuid)
 }
 
 /**
@@ -51,37 +55,58 @@ module.exports = async (api, { source, presetsSource }) => {
 const push = async (api, components, presets = []) => {
   const presetsLib = new PresetsLib({ oauthToken: api.accessToken, targetSpaceId: api.spaceId })
   try {
-    const componentGroups = await api.getComponentGroups()
+    const componentsGroups = await api.getComponentGroups()
+    for (let i = 0; i < components.length; i++) {
+      const groupName = components[i].component_group_name
+      if (components[i].component_group_name) {
+        const currentGroup = getGroupByName(componentsGroups, groupName)
+        if (!currentGroup.name) {
+          try {
+            console.log(`${chalk.blue('-')} Creating the ${groupName} component group...`)
+            const newGroup = await api.post('component_groups', {
+              component_group: {
+                name: groupName
+              }
+            })
+            componentsGroups.push({
+              ...newGroup.data.component_group,
+              source_uuid: components[i].component_group_uuid
+            })
+          } catch (err) {
+            console.log(
+              `${chalk.yellow('-')} Components group ${groupName} already exists...`
+            )
+          }
+        } else {
+          currentGroup.source_uuid = components[i].component_group_uuid
+        }
+      }
+    }
 
     const apiComponents = await api.getComponents()
 
-    for (var i = 0; i < components.length; i++) {
+    for (let i = 0; i < components.length; i++) {
       const componentPresets = presetsLib.getComponentPresets(components[i], presets)
       delete components[i].id
       delete components[i].created_at
 
       const groupName = components[i].component_group_name
-      const groupData = getGroupByName(componentGroups, groupName)
+      const groupData = getGroupByName(componentsGroups, groupName)
 
       if (groupName) {
-        if (groupData.name) {
-          components[i].component_group_uuid = groupData.uuid
-        } else {
-          console.log(`${chalk.blue('-')} Creating the ${groupName} component group...`)
-          const data = await api.post('component_groups', {
-            component_group: {
-              name: groupName
-            }
-          })
-
-          const groupCreated = data.data.component_group
-
-          components[i].component_group_uuid = groupCreated.uuid
-
-          componentGroups.push(groupCreated)
-        }
-
+        components[i].component_group_uuid = groupData.uuid
         delete components[i].component_group_name
+      }
+
+      const schema = components[i].schema
+      if (schema) {
+        Object.keys(schema).forEach(field => {
+          if (schema[field].component_group_whitelist) {
+            schema[field].component_group_whitelist = schema[field].component_group_whitelist.map(uuid => 
+              getGroupByUuid(componentsGroups, uuid) ? getGroupByUuid(componentsGroups, uuid).uuid : uuid
+            )
+          }
+        })
       }
 
       const exists = apiComponents.filter(function (comp) {
