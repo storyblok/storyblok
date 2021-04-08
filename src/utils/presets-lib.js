@@ -90,7 +90,7 @@ class PresetsLib {
       const defaultPresetInTarget = componentPresets.find(preset => preset.name === sourcePreset.name)
       return defaultPresetInTarget
     } catch (err) {
-      console.error(`An error occurred while trying to get the "${sourcePreset.name}" preset from target: ${err.message}`)
+      console.error(`An error occurred while trying to get the "${sourcePreset.name}" preset from target space: ${err.message}`)
       return null
     }
   }
