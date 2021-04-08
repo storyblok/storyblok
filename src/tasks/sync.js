@@ -78,8 +78,8 @@ const SyncSpaces = {
           console.log(chalk.green('✓') + ' Created ' + sourceStory.full_slug)
         }
 
-        if (createdStory.data.story.uuid != sourceStory.uuid) {
-          await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + createdStory.data.story.id + '/update_uuid', {uuid: sourceStory.uuid})
+        if (createdStory.data.story.uuid !== sourceStory.uuid) {
+          await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + createdStory.data.story.id + '/update_uuid', { uuid: sourceStory.uuid })
         }
       } catch (e) {
         console.log(e)
@@ -128,8 +128,8 @@ const SyncSpaces = {
           story: folder
         })
 
-        if (newFolder.data.story.uuid != folder.uuid) {
-          await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + newFolder.data.story.id + '/update_uuid', {uuid: folder.uuid})
+        if (newFolder.data.story.uuid !== folder.uuid) {
+          await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + newFolder.data.story.id + '/update_uuid', { uuid: folder.uuid })
         }
 
         syncedFolders[folderId] = newFolder.data.story.id
