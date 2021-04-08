@@ -35,12 +35,11 @@ module.exports = {
       const { data } = response
 
       if (data.otp_required) {
-        // code sending to phone is currently not triggered in the CLI
         const questions = [
           {
             type: 'input',
             name: 'otp_attempt',
-            message: 'We sent a code to your email, please insert the authentication code:',
+            message: 'We sent a code to your email / phone, please insert the authentication code:',
             validate (value) {
               if (value.length > 0) {
                 return true
