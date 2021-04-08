@@ -61,6 +61,7 @@ const SyncSpaces = {
 
       try {
         var existingStory = await this.client.get('spaces/' + this.targetSpaceId + '/stories', { with_slug: all[i].full_slug })
+        var createdStory = null
         var payload = {
           story: sourceStory,
           force_update: '1'
@@ -70,11 +71,15 @@ const SyncSpaces = {
         }
 
         if (existingStory.data.stories.length === 1) {
-          await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + existingStory.data.stories[0].id, payload)
+          createdStory = await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + existingStory.data.stories[0].id, payload)
           console.log(chalk.green('✓') + ' Updated ' + existingStory.data.stories[0].full_slug)
         } else {
-          await this.client.post('spaces/' + this.targetSpaceId + '/stories', payload)
+          createdStory = await this.client.post('spaces/' + this.targetSpaceId + '/stories', payload)
           console.log(chalk.green('✓') + ' Created ' + sourceStory.full_slug)
+        }
+
+        if (createdStory.data.story.uuid !== sourceStory.uuid) {
+          await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + createdStory.data.story.id + '/update_uuid', { uuid: sourceStory.uuid })
         }
       } catch (e) {
         console.log(e)
@@ -122,6 +127,10 @@ const SyncSpaces = {
         const newFolder = await this.client.post(`spaces/${this.targetSpaceId}/stories`, {
           story: folder
         })
+
+        if (newFolder.data.story.uuid !== folder.uuid) {
+          await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + newFolder.data.story.id + '/update_uuid', { uuid: folder.uuid })
+        }
 
         syncedFolders[folderId] = newFolder.data.story.id
         console.log(`Folder ${newFolder.data.story.name} created`)
