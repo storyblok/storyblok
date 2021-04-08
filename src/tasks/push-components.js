@@ -87,6 +87,7 @@ const push = async (api, components, presets = []) => {
 
     for (let i = 0; i < components.length; i++) {
       const componentPresets = presetsLib.getComponentPresets(components[i], presets)
+      const defaultPreset = componentPresets.find(preset => preset.id === components[i].preset_id)
       delete components[i].id
       delete components[i].created_at
 
@@ -117,7 +118,25 @@ const push = async (api, components, presets = []) => {
         const { id, name } = exists[0]
         console.log(`${chalk.blue('-')} Updating component ${name}...`)
         const componentTarget = await api.get(`components/${id}`)
+
         try {
+          const presetsToSave = presetsLib.filterPresetsFromTargetComponent(
+            componentPresets || [],
+            componentTarget.data.component.all_presets || []
+          )
+          if (presetsToSave.newPresets.length) {
+            await presetsLib.createPresets(presetsToSave.newPresets, componentTarget.data.component.id, 'post')
+          }
+          if (presetsToSave.updatePresets.length) {
+            await presetsLib.createPresets(presetsToSave.updatePresets, componentTarget.data.component.id, 'put')
+          }
+          if (defaultPreset) {
+            const defaultPresetInTarget = await presetsLib.getSamePresetFromTarget(api.spaceId, componentTarget.data.component, defaultPreset)
+            if (defaultPresetInTarget) {
+              components[i].preset_id = defaultPresetInTarget.id
+            }
+          }
+
           await api.put(`components/${id}`, {
             component: components[i]
           })
@@ -127,16 +146,6 @@ const push = async (api, components, presets = []) => {
           console.error(`${chalk.red('X')} An error occurred when update component ${name}`)
           console.error(e.message)
         }
-        const presetsToSave = presetsLib.filterPresetsFromTargetComponent(
-          componentPresets || [],
-          componentTarget.data.component.all_presets || []
-        )
-        if (presetsToSave.newPresets.length) {
-          await presetsLib.createPresets(presetsToSave.newPresets, componentTarget.data.component.id, 'post')
-        }
-        if (presetsToSave.updatePresets.length) {
-          await presetsLib.createPresets(presetsToSave.updatePresets, componentTarget.data.component.id, 'put')
-        }
       } else {
         const { name } = components[i]
         console.log(`${chalk.blue('-')} Creating component ${name}...`)
@@ -145,7 +154,18 @@ const push = async (api, components, presets = []) => {
             component: components[i]
           })
           if (componentPresets) {
-            presetsLib.createPresets(componentPresets, componentRes.data.component.id)
+            await presetsLib.createPresets(componentPresets, componentRes.data.component.id)
+
+            if (defaultPreset) {
+              const defaultPresetInTarget = await presetsLib.getSamePresetFromTarget(api.spaceId, componentRes.data.component, defaultPreset)
+              if (defaultPresetInTarget) {
+                components[i].preset_id = defaultPresetInTarget.id
+
+                await api.put(`components/${componentRes.data.component.id}`, {
+                  component: components[i]
+                })
+              }
+            }
           }
           console.log(`${chalk.green('✓')} Component ${name} has been updated in Storyblok!`)
         } catch (e) {

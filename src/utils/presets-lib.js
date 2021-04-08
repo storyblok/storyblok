@@ -83,6 +83,18 @@ class PresetsLib {
     }
   }
 
+  async getSamePresetFromTarget (spaceId, component, sourcePreset) {
+    try {
+      const presetsInTarget = await this.getPresets(spaceId)
+      const componentPresets = this.getComponentPresets(component, presetsInTarget)
+      const defaultPresetInTarget = componentPresets.find(preset => preset.name === sourcePreset.name)
+      return defaultPresetInTarget
+    } catch (err) {
+      console.error(`An error occurred while trying to get the "${sourcePreset.name}" preset from target space: ${err.message}`)
+      return null
+    }
+  }
+
   async uploadImageForPreset (image = '') {
     const imageName = last(image.split('/'))
 
