@@ -66,6 +66,25 @@ const SyncSpaces = {
           story: sourceStory,
           force_update: '1'
         }
+        if (sourceStory.translated_slugs) {
+          const sourceTranslatedSlugs = sourceStory.translated_slugs.map(s => {
+            delete s.id
+            return s
+          })
+          if (existingStory.data.stories.length === 1) {
+            const storyData = await this.client.get('spaces/' + this.targetSpaceId + '/stories/' + existingStory.data.stories[0].id)
+            if (storyData.data.story && storyData.data.story.translated_slugs) {
+              const targetTranslatedSlugs = storyData.data.story.translated_slugs
+              sourceTranslatedSlugs.forEach(translation => {
+                if (targetTranslatedSlugs.find(t => t.lang === translation.lang)) {
+                  translation.id = targetTranslatedSlugs.find(t => t.lang === translation.lang).id
+                }
+              })
+            }
+          }
+          payload.story.translated_slugs_attributes = sourceTranslatedSlugs
+          delete payload.story.translated_slugs
+        }
         if (sourceStory.published) {
           payload.publish = '1'
         }
