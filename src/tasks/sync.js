@@ -19,6 +19,30 @@ const SyncSpaces = {
     }, options.api)
   },
 
+  async getStoryWithTranslatedSlugs (sourceStory, targetStory) {
+    const storyForPayload = { ...sourceStory }
+    if (sourceStory.translated_slugs) {
+      const sourceTranslatedSlugs = sourceStory.translated_slugs.map(s => {
+        delete s.id
+        return s
+      })
+      if (targetStory) {
+        const storyData = await this.client.get('spaces/' + this.targetSpaceId + '/stories/' + targetStory.id)
+        if (storyData.data.story && storyData.data.story.translated_slugs) {
+          const targetTranslatedSlugs = storyData.data.story.translated_slugs
+          sourceTranslatedSlugs.forEach(translation => {
+            if (targetTranslatedSlugs.find(t => t.lang === translation.lang)) {
+              translation.id = targetTranslatedSlugs.find(t => t.lang === translation.lang).id
+            }
+          })
+        }
+      }
+      storyForPayload.translated_slugs_attributes = sourceTranslatedSlugs
+      delete storyForPayload.translated_slugs
+    }
+    return storyForPayload
+  },
+
   async syncStories () {
     console.log(chalk.green('✓') + ' Syncing stories...')
     var targetFolders = await this.client.getAll(`spaces/${this.targetSpaceId}/stories`, {
@@ -60,31 +84,14 @@ const SyncSpaces = {
       sourceStory.parent_id = folderId
 
       try {
-        var existingStory = await this.client.get('spaces/' + this.targetSpaceId + '/stories', { with_slug: all[i].full_slug })
-        var createdStory = null
-        var payload = {
-          story: sourceStory,
+        const existingStory = await this.client.get('spaces/' + this.targetSpaceId + '/stories', { with_slug: all[i].full_slug })
+        let createdStory = null
+        const storyData = await this.getStoryWithTranslatedSlugs(sourceStory, existingStory.data.stories ? existingStory.data.stories[0] : null)
+        const payload = {
+          story: storyData,
           force_update: '1'
         }
-        if (sourceStory.translated_slugs) {
-          const sourceTranslatedSlugs = sourceStory.translated_slugs.map(s => {
-            delete s.id
-            return s
-          })
-          if (existingStory.data.stories.length === 1) {
-            const storyData = await this.client.get('spaces/' + this.targetSpaceId + '/stories/' + existingStory.data.stories[0].id)
-            if (storyData.data.story && storyData.data.story.translated_slugs) {
-              const targetTranslatedSlugs = storyData.data.story.translated_slugs
-              sourceTranslatedSlugs.forEach(translation => {
-                if (targetTranslatedSlugs.find(t => t.lang === translation.lang)) {
-                  translation.id = targetTranslatedSlugs.find(t => t.lang === translation.lang).id
-                }
-              })
-            }
-          }
-          payload.story.translated_slugs_attributes = sourceTranslatedSlugs
-          delete payload.story.translated_slugs
-        }
+
         if (sourceStory.published) {
           payload.publish = '1'
         }
@@ -151,29 +158,10 @@ const SyncSpaces = {
         const sourceFolder = folderResult.data.story
 
         let createdFolder = null
+        const folderData = await this.getStoryWithTranslatedSlugs(sourceFolder, existingFolder.data.stories ? existingFolder.data.stories[0] : null)
         const payload = {
-          story: folder,
+          story: folderData,
           force_update: '1'
-        }
-        if (sourceFolder.translated_slugs) {
-          console.log(sourceFolder.uuid)
-          const sourceTranslatedSlugs = sourceFolder.translated_slugs.map(s => {
-            delete s.id
-            return s
-          })
-          if (existingFolder.data.stories.length === 1) {
-            const folderData = await this.client.get('spaces/' + this.targetSpaceId + '/stories/' + existingFolder.data.stories[0].id)
-            if (folderData.data.story && folderData.data.story.translated_slugs) {
-              const targetTranslatedSlugs = folderData.data.story.translated_slugs
-              sourceTranslatedSlugs.forEach(translation => {
-                if (targetTranslatedSlugs.find(t => t.lang === translation.lang)) {
-                  translation.id = targetTranslatedSlugs.find(t => t.lang === translation.lang).id
-                }
-              })
-            }
-          }
-          payload.story.translated_slugs_attributes = sourceTranslatedSlugs
-          delete payload.story.translated_slugs
         }
 
         if (existingFolder.data.stories.length === 1) {
