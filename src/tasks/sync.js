@@ -147,8 +147,8 @@ const SyncSpaces = {
 
       try {
         const existingFolder = await this.client.get('spaces/' + this.targetSpaceId + '/stories', { with_slug: folder.full_slug })
-        const storyResult = await this.client.get('spaces/' + this.sourceSpaceId + '/stories/' + folderId)
-        const sourceFolder = storyResult.data.story
+        const folderResult = await this.client.get('spaces/' + this.sourceSpaceId + '/stories/' + folderId)
+        const sourceFolder = folderResult.data.story
 
         let createdFolder = null
         const payload = {
