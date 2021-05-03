@@ -101,6 +101,9 @@ const SyncSpaces = {
           await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + createdStory.data.story.id + '/update_uuid', { uuid: sourceStory.uuid })
         }
       } catch (e) {
+        console.error(
+          chalk.red('X') + ` Story ${all[i].name} Sync failed: ${e.message}`
+        )
         console.log(e)
       }
     }
@@ -143,18 +146,55 @@ const SyncSpaces = {
       }
 
       try {
-        const newFolder = await this.client.post(`spaces/${this.targetSpaceId}/stories`, {
-          story: folder
-        })
+        const existingFolder = await this.client.get('spaces/' + this.targetSpaceId + '/stories', { with_slug: folder.full_slug })
+        const storyResult = await this.client.get('spaces/' + this.sourceSpaceId + '/stories/' + folderId)
+        const sourceFolder = storyResult.data.story
 
-        if (newFolder.data.story.uuid !== folder.uuid) {
-          await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + newFolder.data.story.id + '/update_uuid', { uuid: folder.uuid })
+        let createdFolder = null
+        const payload = {
+          story: folder,
+          force_update: '1'
+        }
+        if (sourceFolder.translated_slugs) {
+          console.log(sourceFolder.uuid)
+          const sourceTranslatedSlugs = sourceFolder.translated_slugs.map(s => {
+            delete s.id
+            return s
+          })
+          if (existingFolder.data.stories.length === 1) {
+            const folderData = await this.client.get('spaces/' + this.targetSpaceId + '/stories/' + existingFolder.data.stories[0].id)
+            if (folderData.data.story && folderData.data.story.translated_slugs) {
+              const targetTranslatedSlugs = folderData.data.story.translated_slugs
+              sourceTranslatedSlugs.forEach(translation => {
+                if (targetTranslatedSlugs.find(t => t.lang === translation.lang)) {
+                  translation.id = targetTranslatedSlugs.find(t => t.lang === translation.lang).id
+                }
+              })
+            }
+          }
+          payload.story.translated_slugs_attributes = sourceTranslatedSlugs
+          delete payload.story.translated_slugs
         }
 
-        syncedFolders[folderId] = newFolder.data.story.id
-        console.log(`Folder ${newFolder.data.story.name} created`)
+        if (existingFolder.data.stories.length === 1) {
+          console.log(`Folder ${folder.name} already exists`)
+          createdFolder = await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + existingFolder.data.stories[0].id, payload)
+          console.log(chalk.green('✓') + `Folder ${folder.name} updated`)
+        } else {
+          createdFolder = await this.client.post('spaces/' + this.targetSpaceId + '/stories', payload)
+          console.log(chalk.green('✓') + `Folder ${folder.name} created`)
+        }
+
+        if (createdFolder.data.story.uuid !== folder.uuid) {
+          await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + createdFolder.data.story.id + '/update_uuid', { uuid: folder.uuid })
+        }
+
+        syncedFolders[folderId] = createdFolder.data.story.id
       } catch (e) {
-        console.log(`Folder ${folder.name} already exists`)
+        console.error(
+          chalk.red('X') + ` Folder ${folder.name} Sync failed: ${e.message}`
+        )
+        console.log(e)
       }
     }
   },
