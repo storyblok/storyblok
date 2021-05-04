@@ -19,6 +19,30 @@ const SyncSpaces = {
     }, options.api)
   },
 
+  async getStoryWithTranslatedSlugs (sourceStory, targetStory) {
+    const storyForPayload = { ...sourceStory }
+    if (sourceStory.translated_slugs) {
+      const sourceTranslatedSlugs = sourceStory.translated_slugs.map(s => {
+        delete s.id
+        return s
+      })
+      if (targetStory) {
+        const storyData = await this.client.get('spaces/' + this.targetSpaceId + '/stories/' + targetStory.id)
+        if (storyData.data.story && storyData.data.story.translated_slugs) {
+          const targetTranslatedSlugs = storyData.data.story.translated_slugs
+          sourceTranslatedSlugs.forEach(translation => {
+            if (targetTranslatedSlugs.find(t => t.lang === translation.lang)) {
+              translation.id = targetTranslatedSlugs.find(t => t.lang === translation.lang).id
+            }
+          })
+        }
+      }
+      storyForPayload.translated_slugs_attributes = sourceTranslatedSlugs
+      delete storyForPayload.translated_slugs
+    }
+    return storyForPayload
+  },
+
   async syncStories () {
     console.log(chalk.green('✓') + ' Syncing stories...')
     var targetFolders = await this.client.getAll(`spaces/${this.targetSpaceId}/stories`, {
@@ -60,35 +84,15 @@ const SyncSpaces = {
       sourceStory.parent_id = folderId
 
       try {
-        var existingStory = await this.client.get('spaces/' + this.targetSpaceId + '/stories', { with_slug: all[i].full_slug })
-        var createdStory = null
-        var payload = {
-          story: sourceStory,
-          force_update: '1'
-        }
-        if (sourceStory.translated_slugs) {
-          const sourceTranslatedSlugs = sourceStory.translated_slugs.map(s => {
-            delete s.id
-            return s
-          })
-          if (existingStory.data.stories.length === 1) {
-            const storyData = await this.client.get('spaces/' + this.targetSpaceId + '/stories/' + existingStory.data.stories[0].id)
-            if (storyData.data.story && storyData.data.story.translated_slugs) {
-              const targetTranslatedSlugs = storyData.data.story.translated_slugs
-              sourceTranslatedSlugs.forEach(translation => {
-                if (targetTranslatedSlugs.find(t => t.lang === translation.lang)) {
-                  translation.id = targetTranslatedSlugs.find(t => t.lang === translation.lang).id
-                }
-              })
-            }
-          }
-          payload.story.translated_slugs_attributes = sourceTranslatedSlugs
-          delete payload.story.translated_slugs
-        }
-        if (sourceStory.published) {
-          payload.publish = '1'
+        const existingStory = await this.client.get('spaces/' + this.targetSpaceId + '/stories', { with_slug: all[i].full_slug })
+        const storyData = await this.getStoryWithTranslatedSlugs(sourceStory, existingStory.data.stories ? existingStory.data.stories[0] : null)
+        const payload = {
+          story: storyData,
+          force_update: '1',
+          ...(sourceStory.published ? { published: 1 } : {})
         }
 
+        let createdStory = null
         if (existingStory.data.stories.length === 1) {
           createdStory = await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + existingStory.data.stories[0].id, payload)
           console.log(chalk.green('✓') + ' Updated ' + existingStory.data.stories[0].full_slug)
@@ -96,11 +100,13 @@ const SyncSpaces = {
           createdStory = await this.client.post('spaces/' + this.targetSpaceId + '/stories', payload)
           console.log(chalk.green('✓') + ' Created ' + sourceStory.full_slug)
         }
-
         if (createdStory.data.story.uuid !== sourceStory.uuid) {
           await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + createdStory.data.story.id + '/update_uuid', { uuid: sourceStory.uuid })
         }
       } catch (e) {
+        console.error(
+          chalk.red('X') + ` Story ${all[i].name} Sync failed: ${e.message}`
+        )
         console.log(e)
       }
     }
@@ -143,18 +149,34 @@ const SyncSpaces = {
       }
 
       try {
-        const newFolder = await this.client.post(`spaces/${this.targetSpaceId}/stories`, {
-          story: folder
-        })
-
-        if (newFolder.data.story.uuid !== folder.uuid) {
-          await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + newFolder.data.story.id + '/update_uuid', { uuid: folder.uuid })
+        const folderResult = await this.client.get('spaces/' + this.sourceSpaceId + '/stories/' + folderId)
+        const sourceFolder = folderResult.data.story
+        const existingFolder = await this.client.get('spaces/' + this.targetSpaceId + '/stories', { with_slug: folder.full_slug })
+        const folderData = await this.getStoryWithTranslatedSlugs(sourceFolder, existingFolder.data.stories ? existingFolder.data.stories[0] : null)
+        const payload = {
+          story: folderData,
+          force_update: '1'
         }
 
-        syncedFolders[folderId] = newFolder.data.story.id
-        console.log(`Folder ${newFolder.data.story.name} created`)
+        let createdFolder = null
+        if (existingFolder.data.stories.length === 1) {
+          console.log(`Folder ${folder.name} already exists`)
+          createdFolder = await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + existingFolder.data.stories[0].id, payload)
+          console.log(chalk.green('✓') + `Folder ${folder.name} updated`)
+        } else {
+          createdFolder = await this.client.post('spaces/' + this.targetSpaceId + '/stories', payload)
+          console.log(chalk.green('✓') + `Folder ${folder.name} created`)
+        }
+        if (createdFolder.data.story.uuid !== folder.uuid) {
+          await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + createdFolder.data.story.id + '/update_uuid', { uuid: folder.uuid })
+        }
+
+        syncedFolders[folderId] = createdFolder.data.story.id
       } catch (e) {
-        console.log(`Folder ${folder.name} already exists`)
+        console.error(
+          chalk.red('X') + ` Folder ${folder.name} Sync failed: ${e.message}`
+        )
+        console.log(e)
       }
     }
   },
