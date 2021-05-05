@@ -124,35 +124,35 @@ const SyncSpaces = {
 
     for (var i = 0; i < sourceFolders.length; i++) {
       const folder = sourceFolders[i]
-      const folderId = folder.id
-      delete folder.id
-      delete folder.created_at
-
-      if (folder.parent_id) {
-        // Parent child resolving
-        if (!syncedFolders[folderId]) {
-          const folderSlug = folder.full_slug.split('/')
-          const parentFolderSlug = folderSlug.splice(0, folderSlug.length - 1).join('/')
-
-          const existingFolders = await this.client.get(`spaces/${this.targetSpaceId}/stories`, {
-            with_slug: parentFolderSlug
-          })
-
-          if (existingFolders.data.stories.length) {
-            folder.parent_id = existingFolders.data.stories[0].id
-          } else {
-            folder.parent_id = 0
-          }
-        } else {
-          folder.parent_id = syncedFolders[folderId]
-        }
-      }
 
       try {
-        const folderResult = await this.client.get('spaces/' + this.sourceSpaceId + '/stories/' + folderId)
+        const folderResult = await this.client.get('spaces/' + this.sourceSpaceId + '/stories/' + folder.id)
         const sourceFolder = folderResult.data.story
         const existingFolder = await this.client.get('spaces/' + this.targetSpaceId + '/stories', { with_slug: folder.full_slug })
         const folderData = await this.getStoryWithTranslatedSlugs(sourceFolder, existingFolder.data.stories ? existingFolder.data.stories[0] : null)
+        delete folderData.id
+        delete folderData.created_at
+
+        if (folder.parent_id) {
+          // Parent child resolving
+          if (!syncedFolders[folder.id]) {
+            const folderSlug = folder.full_slug.split('/')
+            const parentFolderSlug = folderSlug.splice(0, folderSlug.length - 1).join('/')
+
+            const parentFolders = await this.client.get(`spaces/${this.targetSpaceId}/stories`, {
+              with_slug: parentFolderSlug
+            })
+
+            if (parentFolders.data.stories.length) {
+              folderData.parent_id = parentFolders.data.stories[0].id
+            } else {
+              folderData.parent_id = 0
+            }
+          } else {
+            folderData.parent_id = syncedFolders[folder.id]
+          }
+        }
+
         const payload = {
           story: folderData,
           force_update: '1'
@@ -162,16 +162,16 @@ const SyncSpaces = {
         if (existingFolder.data.stories.length === 1) {
           console.log(`Folder ${folder.name} already exists`)
           createdFolder = await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + existingFolder.data.stories[0].id, payload)
-          console.log(chalk.green('✓') + `Folder ${folder.name} updated`)
+          console.log(chalk.green('✓') + ` Folder ${folder.name} updated`)
         } else {
           createdFolder = await this.client.post('spaces/' + this.targetSpaceId + '/stories', payload)
-          console.log(chalk.green('✓') + `Folder ${folder.name} created`)
+          console.log(chalk.green('✓') + ` Folder ${folder.name} created`)
         }
         if (createdFolder.data.story.uuid !== folder.uuid) {
           await this.client.put('spaces/' + this.targetSpaceId + '/stories/' + createdFolder.data.story.id + '/update_uuid', { uuid: folder.uuid })
         }
 
-        syncedFolders[folderId] = createdFolder.data.story.id
+        syncedFolders[folder.id] = createdFolder.data.story.id
       } catch (e) {
         console.error(
           chalk.red('X') + ` Folder ${folder.name} Sync failed: ${e.message}`
