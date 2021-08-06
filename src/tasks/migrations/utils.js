@@ -219,6 +219,16 @@ const processMigration = async (content = {}, component = '', migrationFn) => {
         console.error(e)
       }
     }
+
+    if (isPlainObject(value) && value.type === 'doc' && value.content) {
+      value.content.filter(item => item.type === 'blok').forEach(async (item) => {
+        try {
+          await processMigration(item.attrs.body, component, migrationFn)
+        } catch (e) {
+          console.error(e)
+        }
+      })
+    }
   }
 
   return Promise.resolve(true)
