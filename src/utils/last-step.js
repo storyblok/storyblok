@@ -2,7 +2,7 @@
 
 const fs = require('fs')
 const chalk = require('chalk')
-const ghdownload = require('github-download')
+const ghdownload = require('git-clone')
 const replace = require('./replace')
 
 const getFinalStep = type => {
@@ -48,8 +48,8 @@ const lastStep = answers => {
 
     console.log(chalk.green('✓') + ' - The github repository ' + gitRepo + ' will be cloned now...')
 
-    ghdownload(gitRepo, outputDir)
-      .on('error', function (err) {
+    ghdownload(gitRepo, outputDir, async (err) => {
+      if(err) {
         if (err.code === 'ENOTEMPTY') {
           console.log(chalk.red('  Oh Snap! It seems that you already have a project with the name: ' + name))
           reject(new Error('This repository already has been cloned'))
@@ -62,8 +62,7 @@ const lastStep = answers => {
         console.log(chalk.red('X Don\'t forget to mark it with the tag `storyblok` so will can find it.'))
 
         return reject(err)
-      })
-      .on('end', async function () {
+      } else {
         const finalStep = getFinalStep(type)
 
         console.log(chalk.green('✓') + ' - ' + chalk.white('Your Storyblok project is ready for you!'))
@@ -101,7 +100,8 @@ const lastStep = answers => {
         } catch (e) {
           return reject(new Error('An error occurred when finish the download repository task ' + e.message))
         }
-      })
+      }
+    })
   })
 }
 
