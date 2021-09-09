@@ -34,7 +34,7 @@
     "lodash": "^4.17.21",
     "netrc": "0.1.4",
     "on-change": "^2.0.1",
-    "opn": "^6.0.0",
+    "open": "^6.0.0",
     "p-series": "^2.1.0",
     "path": "^0.12.7",
     "storyblok-js-client": "^3.3.1",
