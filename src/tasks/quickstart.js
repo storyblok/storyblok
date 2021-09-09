@@ -1,4 +1,4 @@
-const opn = require('opn')
+const open = require('open')
 const chalk = require('chalk')
 const lastStep = require('../utils/last-step')
 
@@ -79,7 +79,7 @@ const quickstart = async (api, answers, spaceId) => {
     console.log(`${chalk.green('✓')} - Starting Storyblok in your browser`)
 
     setTimeout(() => {
-      opn('http://' + answers.spaceDomain + '/_quickstart?quickstart=' + answers.loginToken)
+      open('http://' + answers.spaceDomain + '/_quickstart?quickstart=' + answers.loginToken)
       process.exit(0)
     }, 2000)
   } catch (e) {
