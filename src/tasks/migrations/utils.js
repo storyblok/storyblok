@@ -186,9 +186,10 @@ const showMigrationChanges = (path, value, oldValue) => {
  * @param  {Object}   content component structure from Storyblok
  * @param  {String}   component    name of the component that is processing
  * @param  {Function} migrationFn  the migration function defined by user
+ * @param  {String} storyFullSlug  the full slug of the containing story
  * @return {Promise<Boolean>}
  */
-const processMigration = async (content = {}, component = '', migrationFn) => {
+const processMigration = async (content = {}, component = '', migrationFn, storyFullSlug) => {
   // I'm processing the component that I want
   if (content.component === component) {
     const watchedContent = onChange(
@@ -196,7 +197,7 @@ const processMigration = async (content = {}, component = '', migrationFn) => {
       showMigrationChanges
     )
 
-    await migrationFn(watchedContent)
+    await migrationFn(watchedContent, storyFullSlug)
   }
 
   for (const key in content) {
@@ -205,7 +206,7 @@ const processMigration = async (content = {}, component = '', migrationFn) => {
     if (isArray(value)) {
       try {
         await Promise.all(
-          value.map(_item => processMigration(_item, component, migrationFn))
+          value.map(_item => processMigration(_item, component, migrationFn, storyFullSlug))
         )
       } catch (e) {
         console.error(e)
@@ -214,7 +215,7 @@ const processMigration = async (content = {}, component = '', migrationFn) => {
 
     if (isPlainObject(value) && has(value, 'component')) {
       try {
-        await processMigration(value, component, migrationFn)
+        await processMigration(value, component, migrationFn, storyFullSlug)
       } catch (e) {
         console.error(e)
       }
@@ -223,7 +224,7 @@ const processMigration = async (content = {}, component = '', migrationFn) => {
     if (isPlainObject(value) && value.type === 'doc' && value.content) {
       value.content.filter(item => item.type === 'blok').forEach(async (item) => {
         try {
-          await processMigration(item.attrs.body, component, migrationFn)
+          await processMigration(item.attrs.body, component, migrationFn, storyFullSlug)
         } catch (e) {
           console.error(e)
         }
