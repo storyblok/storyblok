@@ -169,15 +169,13 @@ program
   .requiredOption('--type <TYPE>', 'Define what will be sync. Can be components, folders, stories, datasources or roles')
   .requiredOption('--source <SPACE_ID>', 'Source space id')
   .requiredOption('--target <SPACE_ID>', 'Target space id')
-  .option('--exclude-folders', 'Define which folders (slugs) should be excluded from sync. Separate with comma')
   .action(async (options) => {
     console.log(`${chalk.blue('-')} Sync data between spaces\n`)
 
     const {
       type,
       source,
-      target,
-      excludeFolders,
+      target
     } = options
 
     try {
@@ -189,8 +187,6 @@ program
         }
       })
 
-      const _excludeFolders = excludeFolders.split(',') || []
-
       if (!api.isAuthorized()) {
         await api.processLogin()
       }
@@ -200,8 +196,7 @@ program
       await tasks.sync(_types, {
         token,
         source,
-        target,
-        excludeFolders: _excludeFolders,
+        target
       })
 
       console.log('\n' + chalk.green('✓') + ' Sync data between spaces successfully completed')

@@ -14,25 +14,9 @@ const SyncSpaces = {
     this.sourceSpaceId = options.source
     this.targetSpaceId = options.target
     this.oauthToken = options.token
-    this.excludeFolders = options.excludeFolders
     this.client = new StoryblokClient({
       oauthToken: options.token
     }, options.api)
-  },
-
-  filterFolders (sourceFolders) {
-    return sourceFolders
-    .map(fld => {
-      return {
-        ...fld,
-        real_slug: fld.default_full_slug || fld.full_slug
-      }
-    })
-    .filter(fld => !this.excludeFolders.some(slug => fld.real_slug === slug || fld.real_slug.startsWith(slug + '/')))
-    .map(fld => {
-      delete fld.real_slug
-      return fld
-    })
   },
 
   async getStoryWithTranslatedSlugs (sourceStory, targetStory) {
@@ -61,12 +45,10 @@ const SyncSpaces = {
 
   async syncStories () {
     console.log(chalk.green('✓') + ' Syncing stories...')
-    var _targetFolders = await this.client.getAll(`spaces/${this.targetSpaceId}/stories`, {
+    var targetFolders = await this.client.getAll(`spaces/${this.targetSpaceId}/stories`, {
       folder_only: 1,
       sort_by: 'slug:asc'
     })
-
-    const targetFolders = this.filterFolders(_targetFolders)
 
     var folderMapping = {}
 
@@ -134,13 +116,10 @@ const SyncSpaces = {
 
   async syncFolders () {
     console.log(chalk.green('✓') + ' Syncing folders...')
-    const _sourceFolders = await this.client.getAll(`spaces/${this.sourceSpaceId}/stories`, {
+    const sourceFolders = await this.client.getAll(`spaces/${this.sourceSpaceId}/stories`, {
       folder_only: 1,
       sort_by: 'slug:asc'
     })
-
-    const sourceFolders = this.filterFolders(_sourceFolders)
-
     const syncedFolders = {}
 
     for (var i = 0; i < sourceFolders.length; i++) {
