@@ -272,7 +272,12 @@ const SyncSpaces = {
 const sync = (types, options) => {
   SyncSpaces.init(options)
 
-  const tasks = types.map(_type => {
+  const tasks = types.sort((a, b) => {
+    if (a === 'folders') return -1
+    if (b === 'folders') return 1
+    return 0
+  }).map(_type => {
+    console.log(_type)
     const command = `sync${capitalize(_type)}`
 
     return () => SyncSpaces[command]()
