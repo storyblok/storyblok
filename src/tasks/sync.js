@@ -277,7 +277,6 @@ const sync = (types, options) => {
     if (b === 'folders') return 1
     return 0
   }).map(_type => {
-    console.log(_type)
     const command = `sync${capitalize(_type)}`
 
     return () => SyncSpaces[command]()
