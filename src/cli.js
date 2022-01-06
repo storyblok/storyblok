@@ -169,13 +169,15 @@ program
   .requiredOption('--type <TYPE>', 'Define what will be sync. Can be components, folders, stories, datasources or roles')
   .requiredOption('--source <SPACE_ID>', 'Source space id')
   .requiredOption('--target <SPACE_ID>', 'Target space id')
+  .option('--token <OAUTH_TOKEN>', 'OAUTH token to use for authorization')
   .action(async (options) => {
     console.log(`${chalk.blue('-')} Sync data between spaces\n`)
 
     const {
       type,
       source,
-      target
+      target,
+      token
     } = options
 
     try {
@@ -187,11 +189,12 @@ program
         }
       })
 
-      if (!api.isAuthorized()) {
-        await api.processLogin()
+      if (!token) {
+        if (!api.isAuthorized()) {
+          await api.processLogin()
+        }
+        token = creds.get().token || null
       }
-
-      const token = creds.get().token || null
 
       await tasks.sync(_types, {
         token,
