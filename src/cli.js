@@ -73,7 +73,12 @@ program
 program
   .command('pull-components')
   .description("Download your space's components schema as json")
-  .action(async () => {
+  .option('--token <OAUTH_TOKEN>', 'OAUTH token to use for authorization')
+  .action(async (options) => {
+    const {
+      token
+    } = options
+  
     console.log(`${chalk.blue('-')} Executing pull-components task`)
     const space = program.space
     if (!space) {
@@ -82,10 +87,15 @@ program
     }
 
     try {
-      if (!api.isAuthorized()) {
-        await api.processLogin()
+      if (!token) {
+        if (!api.isAuthorized()) {
+          await api.processLogin()
+        }
+      } else {
+        api.persistCredentials("", { access_token: token});
       }
 
+      
       api.setSpaceId(space)
       await tasks.pullComponents(api, { space })
     } catch (e) {
