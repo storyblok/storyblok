@@ -64,7 +64,7 @@ describe('testing pullComponents', () => {
     }
 
     const options = {
-      space: SPACE
+      fileName: SPACE
     }
 
     const expectFileName = `components.${SPACE}.json`

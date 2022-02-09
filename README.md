@@ -33,12 +33,13 @@ $ storyblok select
 Download your space's components schema as json. This command will download 2 files: 1 for the components and 1 for the presets.
 
 ```sh
-$ storyblok pull-components --space <SPACE_ID>
+$ storyblok pull-components --space <SPACE_ID> --file-name <FILE_NAME>
 ```
 
 #### Options
 
 * `space`: your space id
+* `file-name`(optional): a custom filename used to generate the component and present files, default is the space id
 
 ### push-components
 

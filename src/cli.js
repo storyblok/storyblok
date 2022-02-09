@@ -72,8 +72,9 @@ program
 // pull-components
 program
   .command('pull-components')
+  .option('-f, --file-name <fileName>', 'file-name to use instead of space id')
   .description("Download your space's components schema as json")
-  .action(async () => {
+  .action(async (options) => {
     console.log(`${chalk.blue('-')} Executing pull-components task`)
     const space = program.space
     if (!space) {
@@ -81,13 +82,15 @@ program
       process.exit(0)
     }
 
+    const fileName = options.fileName ? options.fileName : space
+
     try {
       if (!api.isAuthorized()) {
         await api.processLogin()
       }
 
       api.setSpaceId(space)
-      await tasks.pullComponents(api, { space })
+      await tasks.pullComponents(api, { fileName })
     } catch (e) {
       console.log(chalk.red('X') + ' An error occurred when executing the pull-components task: ' + e.message)
       process.exit(1)

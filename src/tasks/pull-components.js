@@ -20,11 +20,11 @@ const getNameFromComponentGroups = (groups, uuid) => {
 /**
  * @method pullComponents
  * @param  {Object} api
- * @param  {Object} options { space: Number }
+ * @param  {Object} options { fileName: string }
  * @return {Promise<Object>}
  */
 const pullComponents = async (api, options) => {
-  const { space } = options
+  const { fileName } = options
 
   try {
     const componentGroups = await api.getComponentGroups()
@@ -41,7 +41,7 @@ const pullComponents = async (api, options) => {
       }
     })
 
-    const file = `components.${space}.json`
+    const file = `components.${fileName}.json`
     const data = JSON.stringify({ components }, null, 2)
 
     console.log(`${chalk.green('✓')} We've saved your components in the file: ${file}`)
@@ -55,7 +55,7 @@ const pullComponents = async (api, options) => {
       Promise.resolve(file)
     })
 
-    const presetsFile = `presets.${space}.json`
+    const presetsFile = `presets.${fileName}.json`
     const presetsData = JSON.stringify({ presets }, null, 2)
 
     console.log(`${chalk.green('✓')} We've saved your presets in the file: ${presetsFile}`)
