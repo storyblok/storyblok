@@ -19,8 +19,8 @@ module.exports = {
     sb.client.interceptors.response.use((res) => {
       return res
     }, (error) => {
-      if(error.response.status === 401){
-        this.logout()
+      if (error.response.status === 401) {
+        this.logout(true)
       }
       return Promise.reject(error)
     })
@@ -128,8 +128,8 @@ module.exports = {
     return data.access_token
   },
 
-  logout () {
-    if (creds.get().email) {
+  logout (unauthorized) {
+    if (creds.get().email && unauthorized) {
       console.log(chalk.red('X') + ' Your login seems to be expired, we logged you out. Please log back in again.')
     }
     creds.set(null)
