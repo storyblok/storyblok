@@ -5,16 +5,26 @@ const inquirer = require('inquirer')
 
 const creds = require('./creds')
 const getQuestions = require('./get-questions')
-const { LOGIN_URL, SIGNUP_URL, API_URL } = require('../constants')
+const { LOGIN_URL, USER_INFO, SIGNUP_URL, API_URL } = require('../constants')
 
 module.exports = {
   accessToken: '',
   spaceId: null,
 
   getClient () {
-    return new Storyblok({
+    const sb = new Storyblok({
       oauthToken: this.accessToken
     }, API_URL)
+    // In the current storyblok-js-client the response interceptor is not returning error codes. #workaround
+    sb.client.interceptors.response.use((res) => {
+      return res
+    }, (error) => {
+      if(error.response.status === 401){
+        this.logout()
+      }
+      return Promise.reject(error)
+    })
+    return sb
   },
 
   getPath (path) {
@@ -67,6 +77,20 @@ module.exports = {
     }
   },
 
+  async getUser () {
+    try {
+      const { data } = await axios.get(USER_INFO, {
+        headers: {
+          Authorization: this.accessToken
+        }
+      })
+      return data.user
+    } catch (e) {
+      this.logoutIfUnauthorized(e)
+      return undefined
+    }
+  },
+
   persistCredentials (email, data) {
     const token = this.extractToken(data)
     if (token) {
@@ -105,6 +129,9 @@ module.exports = {
   },
 
   logout () {
+    if (creds.get().email) {
+      console.log(chalk.red('X') + ' Your login seems to be expired, we logged you out. Please log back in again.')
+    }
     creds.set(null)
   },
 
