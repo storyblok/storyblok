@@ -9,5 +9,6 @@ module.exports = {
   rollbackMigration: require('./migrations/rollback'),
   listSpaces: require('./list-spaces'),
   importFiles: require('./import/import'),
-  deleteComponent: require('./delete-component')
+  deleteComponent: require('./delete-component'),
+  deleteComponents: require('./delete-components')
 }
