@@ -123,9 +123,9 @@ program
 
 // delete-component
 program
-  .command('delete-component <componentId>')
+  .command('delete-component <component>')
   .description('Delete a single component on your space.')
-  .action(async (componentId, options) => {
+  .action(async (component, options) => {
     console.log(`${chalk.blue('-')} Executing delete-component task`)
     const space = program.space
     if (!space) {
@@ -137,7 +137,7 @@ program
         await api.processLogin()
       }
       api.setSpaceId(space)
-      await tasks.deleteComponent(api, { componentId })
+      await tasks.deleteComponent(api, { comp: component })
     } catch (e) {
       console.log(chalk.red('X') + ' An error occurred when executing the delete-component task: ' + e.message)
       process.exit(1)

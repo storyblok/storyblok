@@ -88,11 +88,11 @@ $ storyblok push-components ./components.json --presets-source ./presets.json --
 Delete a single component on your space.
 
 ```sh
-storyblok delete-component <COMPONENT_ID> --space <SPACE_ID>
+storyblok delete-component <component> --space <SPACE_ID>
 ```
 
 #### Parameters
-* `component_id`: The component to delete on your/another space.
+* `component`: The name or id of the component
 
 #### Options
 * `space_id`: the space where the command should be executed.
@@ -102,6 +102,10 @@ storyblok delete-component <COMPONENT_ID> --space <SPACE_ID>
 Delete a component on your space.
 ```sh
 storyblok delete-component 111111 --space 67819
+```
+
+```sh
+storyblok delete-component teaser --space 67819
 ```
 
 ### sync
