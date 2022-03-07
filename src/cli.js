@@ -121,6 +121,29 @@ program
     }
   })
 
+// delete-component
+program
+  .command('delete-component <componentId>')
+  .description('Delete a single component on your space.')
+  .action(async (componentId, options) => {
+    console.log(`${chalk.blue('-')} Executing delete-component task`)
+    const space = program.space
+    if (!space) {
+      console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
+      process.exit(0)
+    }
+    try {
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
+      api.setSpaceId(space)
+      await tasks.deleteComponent(api, { componentId })
+    } catch (e) {
+      console.log(chalk.red('X') + ' An error occurred when executing the delete-component task: ' + e.message)
+      process.exit(1)
+    }
+  })
+
 // scaffold
 program
   .command('scaffold <name>')

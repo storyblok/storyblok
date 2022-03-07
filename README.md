@@ -83,6 +83,27 @@ Using a **path** to file
 $ storyblok push-components ./components.json --presets-source ./presets.json --space 67819
 ```
 
+### delete-component
+
+Delete a single component on your space.
+
+```sh
+storyblok delete-component <COMPONENT_ID> --space <SPACE_ID>
+```
+
+#### Parameters
+* `component_id`: The component to delete on your/another space.
+
+#### Options
+* `space_id`: the space where the command should be executed.
+
+#### Examples
+
+Delete a component on your space.
+```sh
+storyblok delete-component 111111 --space 67819
+```
+
 ### sync
 
 Sync components, folder, roles, datasources or stories between spaces

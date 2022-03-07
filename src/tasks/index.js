@@ -8,5 +8,6 @@ module.exports = {
   runMigration: require('./migrations/run'),
   rollbackMigration: require('./migrations/rollback'),
   listSpaces: require('./list-spaces'),
-  importFiles: require('./import/import')
+  importFiles: require('./import/import'),
+  deleteComponent: require('./delete-component')
 }
