@@ -45,10 +45,10 @@ class SyncDatasources {
     try {
       const entriesFirstPage = await this.client.get(`spaces/${spaceId}/datasource_entries/?datasource_id=${datasourceId}`)
       const entriesRequets = []
-      for (let i = 1; i < Math.ceil(entriesFirstPage.total / 25); i++) {
+      for (let i = 2; i <= Math.ceil(entriesFirstPage.total / 25); i++) {
         entriesRequets.push(this.client.get(`spaces/${spaceId}/datasource_entries/?datasource_id=${datasourceId}`, { page: i }))
       }
-      return entriesFirstPage.data.datasource_entries.concat((await Promise.all(entriesRequets)).map(r => r.data.datasource_entries))
+      return entriesFirstPage.data.datasource_entries.concat(...(await Promise.all(entriesRequets)).map(r => r.data.datasource_entries))
     } catch (err) {
       console.error(`An error ocurred when loading the entries of the datasource #${datasourceId}: ${err.message}`)
 
