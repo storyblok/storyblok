@@ -147,6 +147,15 @@ module.exports = {
       .catch(err => Promise.reject(err))
   },
 
+  getSpaceOptions () {
+    const client = this.getClient()
+
+    return client
+      .get(this.getPath(''))
+      .then((data) => data.data.space.options || {})
+      .catch((err) => Promise.reject(err))
+  },
+
   getComponents () {
     const client = this.getClient()
 
