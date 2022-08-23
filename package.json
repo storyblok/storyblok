@@ -37,7 +37,7 @@
     "open": "^6.0.0",
     "p-series": "^2.1.0",
     "path": "^0.12.7",
-    "storyblok-js-client": "^3.3.1",
+    "storyblok-js-client": "^4.5.6",
     "update-notifier": "^5.1.0",
     "xml-js": "^1.6.11"
   },

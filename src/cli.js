@@ -72,8 +72,10 @@ program
 // pull-components
 program
   .command('pull-components')
+  .option('-t, --token [value]', 'the space\'s access token')
+  .option('-r, --region [value]', 'region', 'eu')
   .description("Download your space's components schema as json")
-  .action(async () => {
+  .action(async (source) => {
     console.log(`${chalk.blue('-')} Executing pull-components task`)
     const space = program.space
     if (!space) {
@@ -86,10 +88,21 @@ program
         await api.processLogin()
       }
 
+      if (program.args.length > 0) {
+        const region = source.region || ''
+        api.setRegion(region)
+        const accessToken = source.token || ''
+        api.setAccessToken(accessToken)
+      }
+
       api.setSpaceId(space)
       await tasks.pullComponents(api, { space })
     } catch (e) {
-      console.log(chalk.red('X') + ' An error occurred when executing the pull-components task: ' + e.message)
+      if (/404/.test(e.message)) {
+        console.log(chalk.red('X') + ' If your space was created under US region, you must provide the region as argument --region us.')
+      } else {
+        console.log(chalk.red('X') + ' An error occurred when executing the pull-components task: ' + e.message)
+      }
       process.exit(1)
     }
   })
