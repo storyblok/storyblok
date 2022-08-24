@@ -5,16 +5,16 @@ const inquirer = require('inquirer')
 
 const creds = require('./creds')
 const getQuestions = require('./get-questions')
-const { LOGIN_URL, SIGNUP_URL, API_URL } = require('../constants')
+const { LOGIN_URL, SIGNUP_URL, API_URL, US_API_URL } = require('../constants')
 
 module.exports = {
   accessToken: '',
   oauthToken: '',
   spaceId: null,
-  region: '',
+  region: 'eu',
 
   getClient () {
-    const apiURL = this.region === 'us' ? null : API_URL
+    const apiURL = this.region === 'us' ? US_API_URL : API_URL
     return new Storyblok({
       accessToken: this.accessToken,
       oauthToken: this.oauthToken,

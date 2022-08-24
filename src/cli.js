@@ -72,7 +72,6 @@ program
 // pull-components
 program
   .command('pull-components')
-  .option('-t, --token [value]', 'the space\'s access token')
   .option('-r, --region [value]', 'region', 'eu')
   .description("Download your space's components schema as json")
   .action(async (source) => {
@@ -89,17 +88,15 @@ program
       }
 
       if (program.args.length > 0) {
-        const region = source.region || ''
+        const region = source.region || 'eu'
         api.setRegion(region)
-        const accessToken = source.token || ''
-        api.setAccessToken(accessToken)
       }
 
       api.setSpaceId(space)
       await tasks.pullComponents(api, { space })
     } catch (e) {
       if (/404/.test(e.message)) {
-        console.log(chalk.red('X') + ' If your space was created under US region, you must provide the region as argument --region us.')
+        console.log(chalk.yellow('/!\\') + ' If your space was created under US region, you must provide the region as argument --region us. Otherwise, you can use the default --region eu or omit this flag.')
       } else {
         console.log(chalk.red('X') + ' An error occurred when executing the pull-components task: ' + e.message)
       }
@@ -111,6 +108,7 @@ program
 program
   .command('push-components <source>')
   .option('-p, --presets-source <presetsSource>', 'Path to presets file')
+  .option('-r, --region [value]', 'region', 'eu')
   .description("Download your space's components schema as json. The source parameter can be a URL to your JSON file or a path to it")
   .action(async (source, options) => {
     console.log(`${chalk.blue('-')} Executing push-components task`)
@@ -121,6 +119,10 @@ program
       console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
       process.exit(0)
     }
+    if (program.args.length > 0) {
+      const region = options.region || 'eu'
+      api.setRegion(region)
+    }
 
     try {
       if (!api.isAuthorized()) {
@@ -129,7 +131,11 @@ program
       api.setSpaceId(space)
       await tasks.pushComponents(api, { source, presetsSource })
     } catch (e) {
-      console.log(chalk.red('X') + ' An error occurred when executing the push-components task: ' + e.message)
+      if (/404/.test(e.message)) {
+        console.log(chalk.yellow('/!\\') + ' If your space was created under US region, you must provide the region as argument --region us. Otherwise, you can use the default --region eu or omit this flag.')
+      } else {
+        console.log(chalk.red('X') + ' An error occurred when executing the pull-components task: ' + e.message)
+      }
       process.exit(1)
     }
   })

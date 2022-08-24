@@ -33,24 +33,26 @@ $ storyblok select
 Download your space's components schema as json. This command will download 2 files: 1 for the components and 1 for the presets.
 
 ```sh
-$ storyblok pull-components --space <SPACE_ID>
+$ storyblok pull-components --space <SPACE_ID> --region <REGION>
 ```
 
 #### Options
 
 * `space`: your space id
+* `region`: your space region (default: `eu`). If your space was created under US region, you should use `us` instead.
 
 ### push-components
 
 Push your components file to your/another space
 
 ```sh
-$ storyblok push-components <SOURCE> --space <SPACE_ID> --presets-source <PRESETS_SOURCE>
+$ storyblok push-components <SOURCE> --space <SPACE_ID> --region <REGION> --presets-source <PRESETS_SOURCE>
 ```
 
-#### Parameters
+#### Options
 
 * `source`: can be a URL or path to JSON file.
+* `region`: your space region (default: `eu`). If your space was created under US region, you should use `us` instead.
 
 Using an **URL**
 
