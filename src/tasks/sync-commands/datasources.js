@@ -136,7 +136,7 @@ class SyncDatasources {
         console.log(chalk.green('✓') + ' Created datasource ' + datasourcesToAdd[i].name)
       } catch (err) {
         console.error(
-          `${chalk.red('X')} Datasource ${datasourcesToAdd[i].name} creation failed: ${err.message}`
+          `${chalk.red('X')} Datasource ${datasourcesToAdd[i].name} creation failed: ${err.response.data.error || err.message}`
         )
       }
     }
