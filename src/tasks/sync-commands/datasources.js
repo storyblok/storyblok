@@ -1,5 +1,6 @@
 const chalk = require('chalk')
 const StoryblokClient = require('storyblok-js-client')
+const UUID = require('simple-uuid')
 
 class SyncDatasources {
   /**
@@ -41,9 +42,10 @@ class SyncDatasources {
     await this.updateDatasources()
   }
 
-  async getDatasourceEntries (spaceId, datasourceId) {
+  async getDatasourceEntries (spaceId, datasourceId, dimensionId = null) {
+    const dimensionQuery = dimensionId ? `&dimension=${dimensionId}` : ''
     try {
-      const entriesFirstPage = await this.client.get(`spaces/${spaceId}/datasource_entries/?datasource_id=${datasourceId}`)
+      const entriesFirstPage = await this.client.get(`spaces/${spaceId}/datasource_entries/?datasource_id=${datasourceId}${dimensionQuery}`)
       const entriesRequets = []
       for (let i = 2; i <= Math.ceil(entriesFirstPage.total / 25); i++) {
         entriesRequets.push(this.client.get(`spaces/${spaceId}/datasource_entries/?datasource_id=${datasourceId}`, { page: i }))
@@ -88,9 +90,9 @@ class SyncDatasources {
     }
   }
 
-  async syncDatasourceEntries (sourceId, targetId) {
+  async syncDatasourceEntries (datasourceId, targetId) {
     try {
-      const sourceEntries = await this.getDatasourceEntries(this.sourceSpaceId, sourceId)
+      const sourceEntries = await this.getDatasourceEntries(this.sourceSpaceId, datasourceId)
       const targetEntries = await this.getDatasourceEntries(this.targetSpaceId, targetId)
       const updateEntries = targetEntries.filter(e => sourceEntries.map(se => se.name).includes(e.name))
       const addEntries = sourceEntries.filter(e => !targetEntries.map(te => te.name).includes(e.name))
@@ -132,6 +134,10 @@ class SyncDatasources {
           slug: datasourcesToAdd[i].slug
         })
 
+        if (datasourcesToAdd[i].dimensions) {
+          await this.createDatasourcesDimensions(datasourcesToAdd[i], newDatasource.data.datasource.id)
+        }
+
         await this.syncDatasourceEntries(datasourcesToAdd[i].id, newDatasource.data.datasource.id)
         console.log(chalk.green('✓') + ' Created datasource ' + datasourcesToAdd[i].name)
       } catch (err) {
@@ -159,13 +165,34 @@ class SyncDatasources {
           slug: sourceDatasource.slug
         })
 
-        await this.syncDatasourceEntries(sourceDatasource.id, datasourcesToUpdate[i].id)
+        await this.syncDatasourceEntries(sourceDatasource, datasourcesToUpdate[i].id)
         console.log(chalk.green('✓') + ' Updated datasource ' + datasourcesToUpdate[i].name)
       } catch (err) {
         console.error(
           `${chalk.red('X')} Datasource ${datasourcesToUpdate[i].name} update failed: ${err.message}`
         )
       }
+    }
+  }
+
+  async createDatasourcesDimensions (datasource, datasourceId) {
+    const newDimensions = datasource.dimensions.map((dimension) => {
+      return {
+        name: dimension.name,
+        entry_value: dimension.entry_value,
+        datasource_id: datasourceId,
+        _uid: UUID()
+      }
+    })
+
+    try {
+      return await this.client.put(`spaces/${this.targetSpaceId}/datasources/${datasourceId}`, {
+        ...datasource,
+        dimensions: newDimensions,
+        dimensions_attributes: newDimensions
+      })
+    } catch (error) {
+      console.log(error)
     }
   }
 }
