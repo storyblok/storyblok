@@ -6,12 +6,13 @@ const { last } = require('lodash')
 
 class PresetsLib {
   /**
-   * @param {{ oauthToken: string, targetSpaceId: int }} options
+   * @param {{ oauthToken: string, targetSpaceId: int, region: string }} options
    */
   constructor (options) {
     this.oauthToken = options.oauthToken
     this.client = new StoryblokClient({
-      oauthToken: options.oauthToken
+      oauthToken: options.oauthToken,
+      region: options.region
     })
     this.targetSpaceId = options.targetSpaceId
   }

@@ -7,7 +7,7 @@ const PresetsLib = require('../../utils/presets-lib')
 
 class SyncComponents {
   /**
-   * @param {{ sourceSpaceId: string, targetSpaceId: string, oauthToken: string }} options
+   * @param {{ sourceSpaceId: string, targetSpaceId: string, oauthToken: string, region: string }} options
    */
   constructor (options) {
     this.sourcePresets = []
@@ -15,18 +15,25 @@ class SyncComponents {
     this.sourceComponents = []
     this.sourceSpaceId = options.sourceSpaceId
     this.targetSpaceId = options.targetSpaceId
+    this.region = options.region
     this.oauthToken = options.oauthToken
     this.client = new StoryblokClient({
-      oauthToken: options.oauthToken
+      oauthToken: options.oauthToken,
+      region: options.region
     })
-    this.presetsLib = new PresetsLib({ oauthToken: options.oauthToken, targetSpaceId: this.targetSpaceId })
+    this.presetsLib = new PresetsLib({
+      oauthToken: options.oauthToken,
+      targetSpaceId: this.targetSpaceId,
+      region: this.region
+    })
   }
 
   async sync () {
     const syncComponentGroupsInstance = new SyncComponentGroups({
       oauthToken: this.oauthToken,
       sourceSpaceId: this.sourceSpaceId,
-      targetSpaceId: this.targetSpaceId
+      targetSpaceId: this.targetSpaceId,
+      region: this.region
     })
 
     try {

@@ -14,8 +14,10 @@ const SyncSpaces = {
     this.sourceSpaceId = options.source
     this.targetSpaceId = options.target
     this.oauthToken = options.token
+    this.region = options.region
     this.client = new StoryblokClient({
-      oauthToken: options.token
+      oauthToken: options.token,
+      region: options.region
     }, options.api)
   },
 
@@ -228,7 +230,8 @@ const SyncSpaces = {
     const syncComponentsInstance = new SyncComponents({
       sourceSpaceId: this.sourceSpaceId,
       targetSpaceId: this.targetSpaceId,
-      oauthToken: this.oauthToken
+      oauthToken: this.oauthToken,
+      region: this.region
     })
 
     try {
@@ -247,7 +250,8 @@ const SyncSpaces = {
     const syncDatasourcesInstance = new SyncDatasources({
       sourceSpaceId: this.sourceSpaceId,
       targetSpaceId: this.targetSpaceId,
-      oauthToken: this.oauthToken
+      oauthToken: this.oauthToken,
+      region: this.region
     })
 
     try {
@@ -266,7 +270,7 @@ const SyncSpaces = {
 /**
  * @method sync
  * @param  {Array} types
- * @param  {*} options      { token: String, source: Number, target: Number, api: String }
+ * @param  {*} options      { token: String, source: Number, target: Number, api: String, region: string }
  * @return {Promise}
  */
 const sync = (types, options) => {

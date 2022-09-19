@@ -3,7 +3,7 @@ const StoryblokClient = require('storyblok-js-client')
 
 class SyncDatasources {
   /**
-   * @param {{ sourceSpaceId: string, targetSpaceId: string, oauthToken: string }} options
+   * @param {{ sourceSpaceId: string, targetSpaceId: string, oauthToken: string, region: string }} options
    */
   constructor (options) {
     this.targetDatasources = []
@@ -12,7 +12,8 @@ class SyncDatasources {
     this.targetSpaceId = options.targetSpaceId
     this.oauthToken = options.oauthToken
     this.client = new StoryblokClient({
-      oauthToken: options.oauthToken
+      oauthToken: options.oauthToken,
+      region: options.region
     })
   }
 

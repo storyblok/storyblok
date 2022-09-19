@@ -34,12 +34,14 @@ program.version(pkg.version)
 
 program
   .option('-s, --space [value]', 'space ID')
+  .option('-r, --region [value]', 'Region')
 
 // login
 program
   .command('login')
   .description('Login to the Storyblok cli')
   .action(async () => {
+    api.setRegion(program.region)
     if (api.isAuthorized()) {
       console.log(chalk.green('✓') + ' The user has been already logged. If you want to change the logged user, you must logout and login again')
       return
@@ -59,6 +61,7 @@ program
   .command('logout')
   .description('Logout from the Storyblok cli')
   .action(async () => {
+    api.setRegion(program.region)
     try {
       await api.logout()
       console.log('Logged out successfully! Token has been removed from .netrc file.')
@@ -74,6 +77,7 @@ program
   .command('pull-components')
   .description("Download your space's components schema as json")
   .action(async () => {
+    api.setRegion(program.region)
     console.log(`${chalk.blue('-')} Executing pull-components task`)
     const space = program.space
     if (!space) {
@@ -87,7 +91,7 @@ program
       }
 
       api.setSpaceId(space)
-      await tasks.pullComponents(api, { space })
+      await tasks.pullComponents(api, { space, region: program.region })
     } catch (e) {
       console.log(chalk.red('X') + ' An error occurred when executing the pull-components task: ' + e.message)
       process.exit(1)
@@ -100,6 +104,7 @@ program
   .option('-p, --presets-source <presetsSource>', 'Path to presets file')
   .description("Download your space's components schema as json. The source parameter can be a URL to your JSON file or a path to it")
   .action(async (source, options) => {
+    api.setRegion(program.region)
     console.log(`${chalk.blue('-')} Executing push-components task`)
     const space = program.space
     const presetsSource = options.presetsSource
@@ -114,7 +119,7 @@ program
         await api.processLogin()
       }
       api.setSpaceId(space)
-      await tasks.pushComponents(api, { source, presetsSource })
+      await tasks.pushComponents(api, { source, presetsSource, region: program.region })
     } catch (e) {
       console.log(chalk.red('X') + ' An error occurred when executing the push-components task: ' + e.message)
       process.exit(1)
@@ -126,6 +131,7 @@ program
   .command('scaffold <name>')
   .description('Scaffold <name> component')
   .action(async (name) => {
+    api.setRegion(program.region)
     console.log(`${chalk.blue('-')} Scaffolding a component\n`)
 
     if (api.isAuthorized()) {
@@ -149,6 +155,7 @@ program
   .command('select')
   .description('Usage to kickstart a boilerplate, fieldtype or theme')
   .action(async () => {
+    api.setRegion(program.region)
     console.log(`${chalk.blue('-')} Select a boilerplate, fieldtype or theme to initialize\n`)
 
     try {
@@ -157,7 +164,7 @@ program
 
       await lastStep(answers)
     } catch (e) {
-      console.error(chalk.red('X') + ' An error ocurred when execute the select command: ' + e.message)
+      console.error(chalk.red('X') + ' An error occurred when execute the select command: ' + e.message)
       process.exit(1)
     }
   })
@@ -170,6 +177,7 @@ program
   .requiredOption('--source <SPACE_ID>', 'Source space id')
   .requiredOption('--target <SPACE_ID>', 'Target space id')
   .action(async (options) => {
+    api.setRegion(program.region)
     console.log(`${chalk.blue('-')} Sync data between spaces\n`)
 
     const {
@@ -196,12 +204,13 @@ program
       await tasks.sync(_types, {
         token,
         source,
-        target
+        target,
+        region: program.region
       })
 
       console.log('\n' + chalk.green('✓') + ' Sync data between spaces successfully completed')
     } catch (e) {
-      console.error(chalk.red('X') + ' An error ocurred when syncing spaces: ' + e.message)
+      console.error(chalk.red('X') + ' An error occurred when syncing spaces: ' + e.message)
       process.exit(1)
     }
   })
@@ -211,13 +220,14 @@ program
   .command('quickstart')
   .description('Start a project quickly')
   .action(async () => {
+    api.setRegion(program.region)
     try {
       const space = program.space
       const questions = getQuestions('quickstart', { space }, api)
       const answers = await inquirer.prompt(questions)
       await tasks.quickstart(api, answers, space)
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred when execute quickstart operations: ' + e.message)
+      console.log(chalk.red('X') + ' An error occurred when execute quickstart operations: ' + e.message)
       process.exit(1)
     }
   })
@@ -228,6 +238,7 @@ program
   .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
   .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
   .action(async (options) => {
+    api.setRegion(program.region)
     const field = options.field || ''
     const component = options.component || ''
 
@@ -247,7 +258,7 @@ program
       api.setSpaceId(space)
       await tasks.generateMigration(api, component, field)
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred when generate the migration file: ' + e.message)
+      console.log(chalk.red('X') + ' An error occurred when generate the migration file: ' + e.message)
       process.exit(1)
     }
   })
@@ -261,6 +272,7 @@ program
   .option('--publish <PUBLISH_OPTION>', 'Publish the content. It can be: all, published or published-with-changes')
   .option('--publish-languages <LANGUAGES>', 'Publish specific languages')
   .action(async (options) => {
+    api.setRegion(program.region)
     const field = options.field || ''
     const component = options.component || ''
     const isDryrun = !!options.dryrun
@@ -298,7 +310,7 @@ program
         { isDryrun, publish, publishLanguages }
       )
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred when run the migration file: ' + e.message)
+      console.log(chalk.red('X') + ' An error occurred when run the migration file: ' + e.message)
       process.exit(1)
     }
   })
@@ -309,6 +321,7 @@ program
   .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
   .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
   .action(async (options) => {
+    api.setRegion(program.region)
     const field = options.field || ''
     const component = options.component || ''
     const space = program.space
@@ -326,7 +339,7 @@ program
 
       await tasks.rollbackMigration(api, field, component)
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred when run rollback-migration: ' + e.message)
+      console.log(chalk.red('X') + ' An error occurred when run rollback-migration: ' + e.message)
       process.exit(1)
     }
   })
@@ -336,6 +349,7 @@ program
   .command('spaces')
   .description('List all spaces of the logged account')
   .action(async () => {
+    api.setRegion(program.region)
     try {
       if (!api.isAuthorized()) {
         await api.processLogin()
@@ -343,7 +357,7 @@ program
 
       await tasks.listSpaces(api)
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred to listing sapces : ' + e.message)
+      console.log(chalk.red('X') + ' An error occurred to listing spaces : ' + e.message)
       process.exit(1)
     }
   })
@@ -357,6 +371,7 @@ program
   .option('-fr, --folder <FOLDER_ID>', '(Optional) This is a Id of folder in storyblok')
   .option('-d, --delimiter <DELIMITER>', 'If you are using a csv file, put the file delimiter, the default is ";"')
   .action(async (options) => {
+    api.setRegion(program.region)
     const space = program.space
 
     try {
@@ -376,7 +391,7 @@ program
         `${chalk.green('✓')} The import process was executed with success!`
       )
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred to import data : ' + e.message)
+      console.log(chalk.red('X') + ' An error occurred to import data : ' + e.message)
       process.exit(1)
     }
   })

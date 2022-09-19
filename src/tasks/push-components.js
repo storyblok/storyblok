@@ -53,7 +53,7 @@ module.exports = async (api, { source, presetsSource }) => {
 }
 
 const push = async (api, components, presets = []) => {
-  const presetsLib = new PresetsLib({ oauthToken: api.accessToken, targetSpaceId: api.spaceId })
+  const presetsLib = new PresetsLib({ oauthToken: api.accessToken, targetSpaceId: api.spaceId, region: api.region })
   try {
     const componentsGroups = await api.getComponentGroups()
     for (let i = 0; i < components.length; i++) {
@@ -103,7 +103,7 @@ const push = async (api, components, presets = []) => {
       if (schema) {
         Object.keys(schema).forEach(field => {
           if (schema[field].component_group_whitelist) {
-            schema[field].component_group_whitelist = schema[field].component_group_whitelist.map(uuid => 
+            schema[field].component_group_whitelist = schema[field].component_group_whitelist.map(uuid =>
               getGroupByUuid(componentsGroups, uuid) ? getGroupByUuid(componentsGroups, uuid).uuid : uuid
             )
           }

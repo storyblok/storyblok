@@ -5,16 +5,30 @@ const inquirer = require('inquirer')
 
 const creds = require('./creds')
 const getQuestions = require('./get-questions')
-const { LOGIN_URL, SIGNUP_URL, API_URL } = require('../constants')
+const {
+  EU_API_URL, EU_LOGIN_URL, EU_SIGNUP_URL, US_API_URL, US_LOGIN_URL, US_SIGNUP_URL
+} = require('../constants')
 
 module.exports = {
   accessToken: '',
   spaceId: null,
+  region: 'EU',
+
+  setRegion (region) {
+    this.region = region && region.toLowerCase()
+    if (this.region) {
+      console.log(chalk.green('✓') + ' Setting region to: ', this.region.toUpperCase() || 'EU')
+    }
+
+    this.API_URL = this.region === 'us' ? US_API_URL : EU_API_URL
+    this.LOGIN_URL = this.region === 'us' ? US_LOGIN_URL : EU_LOGIN_URL
+    this.SIGNUP_URL = this.region === 'us' ? US_SIGNUP_URL : EU_SIGNUP_URL
+  },
 
   getClient () {
     return new Storyblok({
       oauthToken: this.accessToken
-    }, API_URL)
+    }, this.API_URL)
   },
 
   getPath (path) {
@@ -27,7 +41,7 @@ module.exports = {
 
   async login (email, password) {
     try {
-      const response = await axios.post(LOGIN_URL, {
+      const response = await axios.post(this.LOGIN_URL, {
         email: email,
         password: password
       })
@@ -52,7 +66,7 @@ module.exports = {
 
         const { otp_attempt: code } = await inquirer.prompt(questions)
 
-        const newResponse = await axios.post(LOGIN_URL, {
+        const newResponse = await axios.post(this.LOGIN_URL, {
           email: email,
           password: password,
           otp_attempt: code
@@ -109,7 +123,7 @@ module.exports = {
   },
 
   signup (email, password) {
-    return axios.post(SIGNUP_URL, {
+    return axios.post(this.SIGNUP_URL, {
       email: email,
       password: password
     })

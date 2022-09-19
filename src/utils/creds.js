@@ -3,7 +3,7 @@ var fs = require('fs')
 var netrc = require('netrc')
 var os = require('os')
 
-var host = 'api.storyblok.com'
+var host = 'api-us.storyblok.com'
 
 const getFile = () => {
   const home = process.env[(/^win/.test(process.platform)) ? 'USERPROFILE' : 'HOME']
