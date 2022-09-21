@@ -128,20 +128,27 @@ class SyncDatasources {
 
     for (let i = 0; i < datasourcesToAdd.length; i++) {
       try {
+        console.log(`  ${chalk.green('-')} Creating datasource ${datasourcesToAdd[i].name} (${datasourcesToAdd[i].slug})`)
         /* Create the datasource */
         const newDatasource = await this.client.post(`spaces/${this.targetSpaceId}/datasources`, {
           name: datasourcesToAdd[i].name,
           slug: datasourcesToAdd[i].slug
         })
 
-        if (datasourcesToAdd[i].dimensions) {
+        if (datasourcesToAdd[i].dimensions.length) {
+          console.log(
+            `    ${chalk.blue('-')} Creating dimensions...`
+          )
           const response = await this.createDatasourcesDimensions(datasourcesToAdd[i], newDatasource.data.datasource.id)
           await this.syncDatasourceEntries(datasourcesToAdd[i].id, newDatasource.data.datasource.id)
-          console.log(chalk.green('✓') + ' Created datasource ' + datasourcesToAdd[i].name)
+          console.log(
+            `    ${chalk.blue('-')} Sync dimensions values...`
+          )
           await this.syncDatasourceDimensionsValues(datasourcesToAdd[i], response.data.datasource)
+          console.log(`  ${chalk.green('✓')} Created datasource ${datasourcesToAdd[i].name}`)
         } else {
           await this.syncDatasourceEntries(datasourcesToAdd[i].id, newDatasource.data.datasource.id)
-          console.log(chalk.green('✓') + ' Created datasource ' + datasourcesToAdd[i].name)
+          console.log(`  ${chalk.green('✓')} Created datasource ${datasourcesToAdd[i].name}`)
         }
       } catch (err) {
         console.error(
@@ -202,43 +209,55 @@ class SyncDatasources {
   async syncDatasourceDimensionsValues (sourceDatasource, targetDatasource) {
     const sourceEntriesPromisses = []
     const targetEmptyEntriesPromisses = []
-
-    for (let index = 0; index < sourceDatasource.dimensions.length; index++) {
-      sourceEntriesPromisses.push(await this.getDatasourceEntries(this.sourceSpaceId, sourceDatasource.id, sourceDatasource.dimensions[index].id))
-      targetEmptyEntriesPromisses.push(await this.getDatasourceEntries(this.targetSpaceId, targetDatasource.id, targetDatasource.dimensions[index].id))
-    }
-    await Promise.all(sourceEntriesPromisses)
-    await Promise.all(targetEmptyEntriesPromisses)
-
-    const targetEntriesPromisses = []
-
-    for (let targetEntriesIndex = 0; targetEntriesIndex < sourceEntriesPromisses.length; targetEntriesIndex++) {
-      for (let entriesIndex = 0; entriesIndex < sourceEntriesPromisses[targetEntriesIndex].length; entriesIndex++) {
-        const entryTargetId = targetEmptyEntriesPromisses[targetEntriesIndex][entriesIndex].id
-        const currentSourceEntry = sourceEntriesPromisses[targetEntriesIndex][entriesIndex]
-        const targetDatasourceId = targetDatasource.dimensions[targetEntriesIndex].id
-
-        const payload = {
-          name: currentSourceEntry.name,
-          value: currentSourceEntry.value,
-          dimension_value: currentSourceEntry.dimension_value,
-          datasource_id: `${targetDatasource.id}`,
-          id: entryTargetId
-        }
-        targetEntriesPromisses.push(await this.syncDimensionEntryValues(targetDatasourceId, payload, entryTargetId))
+    try {
+      for (let index = 0; index < sourceDatasource.dimensions.length; index++) {
+        const targetDimensionId = targetDatasource.dimensions[index].id
+        sourceEntriesPromisses.push(...await this.getDatasourceEntries(this.sourceSpaceId, sourceDatasource.id, sourceDatasource.dimensions[index].id))
+        targetEmptyEntriesPromisses.push(
+          ...await this.getDatasourceEntries(this.targetSpaceId, targetDatasource.id, targetDimensionId).then((res) => {
+            return res.map((entry) => {
+              return {
+                ...entry,
+                target_dimension_id: targetDimensionId
+              }
+            })
+          })
+        )
       }
+
+      await Promise.all(sourceEntriesPromisses)
+      await Promise.all(targetEmptyEntriesPromisses)
+
+      const targetEntriesPromisses = []
+
+      while (sourceEntriesPromisses.length !== 0) {
+        const currentSourceEntry = sourceEntriesPromisses[0]
+        const targetEntryIndex = targetEmptyEntriesPromisses.findIndex((tEntry) => tEntry.name === currentSourceEntry.name)
+        const currentTargetEntry = targetEmptyEntriesPromisses[targetEntryIndex]
+        const payload = {
+          ...currentTargetEntry,
+          dimension_value: currentSourceEntry.dimension_value
+        }
+
+        targetEntriesPromisses.push(await this.syncDimensionEntryValues(currentTargetEntry.target_dimension_id, currentTargetEntry.id, payload))
+        sourceEntriesPromisses.shift()
+        targetEmptyEntriesPromisses.splice(targetEntryIndex, 1)
+      }
+
+      await Promise.all(targetEntriesPromisses)
+    } catch (error) {
+      console.error(`    ${chalk.red('X')} Sync dimensions values failed: ${error.response.data.error || error.message || error}`)
     }
-    await Promise.all(targetEntriesPromisses)
   }
 
-  async syncDimensionEntryValues (dimensionId, payload, datasourceEntryId) {
+  async syncDimensionEntryValues (dimensionId = null, datasourceEntryId = null, payload = null) {
     try {
       await this.client.put(`spaces/${this.targetSpaceId}/datasource_entries/${datasourceEntryId}`, {
         datasource_entry: payload,
         dimension_id: dimensionId
       })
     } catch (error) {
-      console.log(error)
+      console.error(`    ${chalk.red('X')} Sync entry error ${payload.name} sync failed: ${error.response.data.error || error.message}`)
     }
   }
 }

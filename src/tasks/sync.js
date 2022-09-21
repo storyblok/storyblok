@@ -45,29 +45,29 @@ const SyncSpaces = {
 
   async syncStories () {
     console.log(chalk.green('✓') + ' Syncing stories...')
-    var targetFolders = await this.client.getAll(`spaces/${this.targetSpaceId}/stories`, {
+    const targetFolders = await this.client.getAll(`spaces/${this.targetSpaceId}/stories`, {
       folder_only: 1,
       sort_by: 'slug:asc'
     })
 
-    var folderMapping = {}
+    const folderMapping = {}
 
     for (let i = 0; i < targetFolders.length; i++) {
       var folder = targetFolders[i]
       folderMapping[folder.full_slug] = folder.id
     }
 
-    var all = await this.client.getAll(`spaces/${this.sourceSpaceId}/stories`, {
+    const all = await this.client.getAll(`spaces/${this.sourceSpaceId}/stories`, {
       story_only: 1
     })
 
     for (let i = 0; i < all.length; i++) {
       console.log(chalk.green('✓') + ' Starting update ' + all[i].full_slug)
 
-      var storyResult = await this.client.get('spaces/' + this.sourceSpaceId + '/stories/' + all[i].id)
-      var sourceStory = storyResult.data.story
-      var slugs = sourceStory.full_slug.split('/')
-      var folderId = 0
+      const { data } = await this.client.get('spaces/' + this.sourceSpaceId + '/stories/' + all[i].id)
+      const sourceStory = data.story
+      const slugs = sourceStory.full_slug.split('/')
+      let folderId = 0
 
       if (slugs.length > 1) {
         slugs.pop()
