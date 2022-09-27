@@ -139,12 +139,12 @@ class SyncDatasources {
           console.log(
             `    ${chalk.blue('-')} Creating dimensions...`
           )
-          const response = await this.createDatasourcesDimensions(datasourcesToAdd[i], newDatasource.data.datasource.id)
+          const { data } = await this.createDatasourcesDimensions(datasourcesToAdd[i].dimensions, newDatasource.data.datasource)
           await this.syncDatasourceEntries(datasourcesToAdd[i].id, newDatasource.data.datasource.id)
           console.log(
             `    ${chalk.blue('-')} Sync dimensions values...`
           )
-          await this.syncDatasourceDimensionsValues(datasourcesToAdd[i], response.data.datasource)
+          await this.syncDatasourceDimensionsValues(datasourcesToAdd[i], data.datasource)
           console.log(`  ${chalk.green('✓')} Created datasource ${datasourcesToAdd[i].name}`)
         } else {
           await this.syncDatasourceEntries(datasourcesToAdd[i].id, newDatasource.data.datasource.id)
@@ -170,13 +170,35 @@ class SyncDatasources {
       try {
         /* Update the datasource */
         const sourceDatasource = this.sourceDatasources.find(d => d.slug === datasourcesToUpdate[i].slug)
+
         await this.client.put(`spaces/${this.targetSpaceId}/datasources/${datasourcesToUpdate[i].id}`, {
           name: sourceDatasource.name,
           slug: sourceDatasource.slug
         })
 
-        await this.syncDatasourceEntries(sourceDatasource, datasourcesToUpdate[i].id)
-        console.log(chalk.green('✓') + ' Updated datasource ' + datasourcesToUpdate[i].name)
+        if (datasourcesToUpdate[i].dimensions.length) {
+          console.log(`  ${chalk.blue('-')} Updating datasources dimensions ${datasourcesToUpdate[i].name}...`)
+          const sourceDimensionsNames = sourceDatasource.dimensions.map((dimension) => dimension.name)
+          const targetDimensionsNames = datasourcesToUpdate[i].dimensions.map((dimension) => dimension.name)
+          const intersection = sourceDimensionsNames.filter(item => !targetDimensionsNames.includes(item))
+          let datasourceToSyncDimensionsValues = datasourcesToUpdate[i]
+
+          if (intersection) {
+            const dimensionsToCreate = sourceDatasource.dimensions.filter((dimension) => {
+              if (intersection.includes(dimension.name)) return dimension
+            })
+            const { data } = await this.createDatasourcesDimensions(dimensionsToCreate, datasourcesToUpdate[i], true)
+            datasourceToSyncDimensionsValues = data.datasource
+          }
+
+          await this.syncDatasourceEntries(sourceDatasource.id, datasourcesToUpdate[i].id)
+
+          await this.syncDatasourceDimensionsValues(sourceDatasource, datasourceToSyncDimensionsValues)
+          console.log(`${chalk.green('✓')} Updated datasource ${datasourcesToUpdate[i].name}`)
+        } else {
+          await this.syncDatasourceEntries(sourceDatasource.id, datasourcesToUpdate[i].id)
+          console.log(`${chalk.green('✓')} Updated datasource ${datasourcesToUpdate[i].name}`)
+        }
       } catch (err) {
         console.error(
           `${chalk.red('X')} Datasource ${datasourcesToUpdate[i].name} update failed: ${err.message}`
@@ -185,24 +207,37 @@ class SyncDatasources {
     }
   }
 
-  async createDatasourcesDimensions (datasource, datasourceId) {
-    const newDimensions = datasource.dimensions.map((dimension) => {
+  async createDatasourcesDimensions (dimensions, datasource, isToUpdate = false) {
+    const newDimensions = dimensions.map((dimension) => {
       return {
         name: dimension.name,
         entry_value: dimension.entry_value,
-        datasource_id: datasourceId,
+        datasource_id: datasource.id,
         _uid: UUID()
       }
     })
 
-    try {
-      return await this.client.put(`spaces/${this.targetSpaceId}/datasources/${datasourceId}`, {
-        ...datasource,
+    let payload = null
+
+    if (isToUpdate) {
+      payload = {
+        dimensions: [...datasource.dimensions, ...newDimensions],
+        dimensions_attributes: [...datasource.dimensions, ...newDimensions]
+      }
+    } else {
+      payload = {
         dimensions: newDimensions,
         dimensions_attributes: newDimensions
+      }
+    }
+
+    try {
+      return await this.client.put(`spaces/${this.targetSpaceId}/datasources/${datasource.id}`, {
+        ...datasource,
+        ...payload
       })
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 
@@ -234,14 +269,21 @@ class SyncDatasources {
         const currentSourceEntry = sourceEntriesPromisses[0]
         const targetEntryIndex = targetEmptyEntriesPromisses.findIndex((tEntry) => tEntry.name === currentSourceEntry.name)
         const currentTargetEntry = targetEmptyEntriesPromisses[targetEntryIndex]
-        const payload = {
-          ...currentTargetEntry,
-          dimension_value: currentSourceEntry.dimension_value
-        }
+        const valuesAreEqual = currentTargetEntry.dimension_value === currentSourceEntry.dimension_value
 
-        targetEntriesPromisses.push(await this.syncDimensionEntryValues(currentTargetEntry.target_dimension_id, currentTargetEntry.id, payload))
-        sourceEntriesPromisses.shift()
-        targetEmptyEntriesPromisses.splice(targetEntryIndex, 1)
+        if (valuesAreEqual) {
+          sourceEntriesPromisses.shift()
+          targetEmptyEntriesPromisses.splice(targetEntryIndex, 1)
+        } else {
+          const payload = {
+            ...currentTargetEntry,
+            dimension_value: currentSourceEntry.dimension_value
+          }
+
+          targetEntriesPromisses.push(await this.syncDimensionEntryValues(currentTargetEntry.target_dimension_id, currentTargetEntry.id, payload))
+          sourceEntriesPromisses.shift()
+          targetEmptyEntriesPromisses.splice(targetEntryIndex, 1)
+        }
       }
 
       await Promise.all(targetEntriesPromisses)
