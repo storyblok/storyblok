@@ -87,20 +87,15 @@ program
         await api.processLogin()
       }
 
+      const { region } = source
       if (program.args.length > 0) {
-        const region = source.region || 'eu'
         api.setRegion(region)
       }
 
       api.setSpaceId(space)
       await tasks.pullComponents(api, { space })
     } catch (e) {
-      if (/404/.test(e.message)) {
-        console.log(chalk.yellow('/!\\') + ' If your space was created under US region, you must provide the region as argument --region us. Otherwise, you can use the default --region eu or omit this flag.')
-      } else {
-        console.log(chalk.red('X') + ' An error occurred when executing the pull-components task: ' + e.message)
-      }
-      process.exit(1)
+      errorHandler(e)
     }
   })
 
@@ -119,24 +114,21 @@ program
       console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
       process.exit(0)
     }
-    if (program.args.length > 0) {
-      const region = options.region || 'eu'
-      api.setRegion(region)
-    }
 
     try {
       if (!api.isAuthorized()) {
         await api.processLogin()
       }
+
+      const { region } = options
+      if (program.args.length > 0) {
+        api.setRegion(region)
+      }
+
       api.setSpaceId(space)
       await tasks.pushComponents(api, { source, presetsSource })
     } catch (e) {
-      if (/404/.test(e.message)) {
-        console.log(chalk.yellow('/!\\') + ' If your space was created under US region, you must provide the region as argument --region us. Otherwise, you can use the default --region eu or omit this flag.')
-      } else {
-        console.log(chalk.red('X') + ' An error occurred when executing the pull-components task: ' + e.message)
-      }
-      process.exit(1)
+      errorHandler(e)
     }
   })
 
@@ -188,31 +180,35 @@ program
   .requiredOption('--type <TYPE>', 'Define what will be sync. Can be components, folders, stories, datasources or roles')
   .requiredOption('--source <SPACE_ID>', 'Source space id')
   .requiredOption('--target <SPACE_ID>', 'Target space id')
+  .option('-r, --region [value]', 'region', 'eu')
   .action(async (options) => {
     console.log(`${chalk.blue('-')} Sync data between spaces\n`)
 
-    const {
-      type,
-      source,
-      target
-    } = options
-
     try {
-      const _types = type.split(',') || []
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
 
+      const {
+        type,
+        source,
+        target,
+        region
+      } = options
+
+      api.setRegion(region)
+
+      const _types = type.split(',') || []
       _types.forEach(_type => {
         if (!SYNC_TYPES.includes(_type)) {
           throw new Error(`The type ${_type} is not valid`)
         }
       })
 
-      if (!api.isAuthorized()) {
-        await api.processLogin()
-      }
-
       const token = creds.get().token || null
 
       await tasks.sync(_types, {
+        api,
         token,
         source,
         target
@@ -220,8 +216,7 @@ program
 
       console.log('\n' + chalk.green('✓') + ' Sync data between spaces successfully completed')
     } catch (e) {
-      console.error(chalk.red('X') + ' An error ocurred when syncing spaces: ' + e.message)
-      process.exit(1)
+      errorHandler(e)
     }
   })
 
@@ -244,11 +239,12 @@ program
 program
   .command('generate-migration')
   .description('Generate a content migration file')
+  .option('-r, --region [value]', 'region', 'eu')
   .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
   .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
   .action(async (options) => {
-    const field = options.field || ''
-    const component = options.component || ''
+    const { field } = options || ''
+    const { component } = options || ''
 
     const space = program.space
     if (!space) {
@@ -262,6 +258,9 @@ program
       if (!api.isAuthorized()) {
         await api.processLogin()
       }
+
+      const { region } = options
+      api.setRegion(region)
 
       api.setSpaceId(space)
       await tasks.generateMigration(api, component, field)
@@ -404,4 +403,13 @@ program.parse(process.argv)
 
 if (program.rawArgs.length <= 2) {
   program.help()
+}
+
+function errorHandler (e) {
+  if (/404/.test(e.message)) {
+    console.log(chalk.yellow('/!\\') + ' If your space was created under US region, you must provide the region as argument --region us. Otherwise, you can use the default --region eu or omit this flag.')
+  } else {
+    console.log(chalk.red('X') + ' An error occurred when executing the pull-components task: ' + e.message)
+  }
+  process.exit(1)
 }

@@ -49,7 +49,7 @@ Push your components file to your/another space
 $ storyblok push-components <SOURCE> --space <SPACE_ID> --region <REGION> --presets-source <PRESETS_SOURCE>
 ```
 
-#### Options
+#### Parameters
 
 * `source`: can be a URL or path to JSON file.
 * `region`: your space region (default: `eu`). If your space was created under US region, you should use `us` instead.
@@ -69,6 +69,7 @@ $ storyblok push-components ./components.json --space 67819
 #### Options
 
 * `space`: your space id
+* `region`: your space region (default: `eu`). If your space was created under US region, you should use `us` instead.
 * `presets-source` (optional): it can be a URL or path to JSON file with the presets
 
 #### Examples
@@ -98,6 +99,7 @@ $ storyblok sync --type <COMMAND> --source <SPACE_ID> --target <SPACE_ID>
 * `type`: describe the command type to execute. Can be: `folders`, `components`, `stories`, `datasources` or `roles`. It's possible pass multiple types separated by comma (`,`).
 * `source`: the source space to use to sync
 * `target`: the target space to use to sync
+* `region`: your space region (default: `eu`). If your space was created under US region, you should use `us` instead.
 
 #### Examples
 
@@ -140,12 +142,14 @@ Create a migration file (with the name `change_<COMPONENT>_<FIELD>.js`) inside t
 ```sh
 $ storyblok generate-migration --space <SPACE_ID> --component <COMPONENT_NAME> --field <FIELD>
 ```
+It's important to note that the `component` and `field` parameters are required and must be spelled exactly as they are in Storyblok. You can check the exact name by looking at the `Block library` inside your space.
 
 #### Options
 
 * `space`: space where the component is
 * `component`: component name. It needs to be a valid component
 * `field`: name of field
+* `region`: your space region (default: `eu`). If your space was created under US region, you should use `us` instead.
 
 ### run-migration
 
