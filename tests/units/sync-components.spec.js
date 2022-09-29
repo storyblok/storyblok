@@ -223,9 +223,7 @@ describe('testing syncComponents', () => {
 
     return sync(_types, {
       api: {
-        getClient: () => {
-          return new StoryblokClient()
-        }
+        getClient: () => new StoryblokClient()
       },
       token: TOKEN_TEST,
       source: SOURCE_SPACE_TEST,
