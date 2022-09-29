@@ -1,7 +1,6 @@
 const sync = require('../../src/tasks/sync')
 const PresetsLib = jest.requireActual('../../src/utils/presets-lib')
 const { TOKEN_TEST, FAKE_COMPONENTS } = require('../constants')
-const StoryblokClient = require('storyblok-js-client')
 
 const FAKE_COMPONENTS_TO_TEST = {
   '001': {
@@ -223,7 +222,7 @@ describe('testing syncComponents', () => {
 
     return sync(_types, {
       api: {
-        getClient: () => new StoryblokClient()
+        getClient: jest.fn(() => {})
       },
       token: TOKEN_TEST,
       source: SOURCE_SPACE_TEST,
