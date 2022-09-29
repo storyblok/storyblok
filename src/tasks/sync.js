@@ -10,7 +10,6 @@ const SyncSpaces = {
 
   init (options) {
     const { api } = options
-    console.log(api)
     console.log(chalk.green('✓') + ' Loading options')
     this.sourceSpaceId = options.source
     this.targetSpaceId = options.target
