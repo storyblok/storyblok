@@ -222,7 +222,7 @@ describe('testing syncComponents', () => {
 
     return sync(_types, {
       api: {
-        getClient: jest.fn(() => {})
+        getClient: jest.fn(() => ({}))
       },
       token: TOKEN_TEST,
       source: SOURCE_SPACE_TEST,
