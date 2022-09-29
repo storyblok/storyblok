@@ -1,6 +1,7 @@
 const sync = require('../../src/tasks/sync')
 const PresetsLib = jest.requireActual('../../src/utils/presets-lib')
 const { TOKEN_TEST, FAKE_COMPONENTS } = require('../constants')
+const StoryblokClient = require('storyblok-js-client')
 
 const FAKE_COMPONENTS_TO_TEST = {
   '001': {
@@ -99,7 +100,7 @@ const FAKE_PRESETS = {
             title: 'A default hero title',
             subtitle: 'A default hero subtitle',
             component: 'hero',
-            image: 'https://a.storyblok.com/f/002/bd78c087d1/screen-shot.png',
+            image: 'https://a.storyblok.com/f/002/bd78c087d1/screen-shot.png'
           },
           component_id: 3, // from FAKE_COMPONENTS 'hero'
           space_id: '000000',
@@ -221,6 +222,13 @@ describe('testing syncComponents', () => {
     const _types = ['components']
 
     return sync(_types, {
+      api: {
+        getClient: () => {
+          return new StoryblokClient({
+            accessToken: ''
+          })
+        }
+      },
       token: TOKEN_TEST,
       source: SOURCE_SPACE_TEST,
       target: TARGET_SPACE_TEST
@@ -291,7 +299,7 @@ describe('testing syncComponents', () => {
           title: 'A default hero title',
           subtitle: 'A default hero subtitle',
           component: 'hero',
-          image: 'https://a.storyblok.com/f/002/bd78c087d1/screen-shot.png',
+          image: 'https://a.storyblok.com/f/002/bd78c087d1/screen-shot.png'
         },
         component_id: 3, // from FAKE_COMPONENTS 'hero'
         space_id: '000000',
