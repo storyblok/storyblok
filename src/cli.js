@@ -70,8 +70,9 @@ program
   })
 
 // pull-components
+const pullComponents = 'pull-components'
 program
-  .command('pull-components')
+  .command(pullComponents)
   .option('-r, --region [value]', 'region', 'eu')
   .description("Download your space's components schema as json")
   .action(async (source) => {
@@ -95,13 +96,14 @@ program
       api.setSpaceId(space)
       await tasks.pullComponents(api, { space })
     } catch (e) {
-      errorHandler(e)
+      errorHandler(e, pullComponents)
     }
   })
 
 // push-components
+const pushComponents = 'push-components'
 program
-  .command('push-components <source>')
+  .command(pushComponents + ' <source>')
   .option('-p, --presets-source <presetsSource>', 'Path to presets file')
   .option('-r, --region [value]', 'region', 'eu')
   .description("Download your space's components schema as json. The source parameter can be a URL to your JSON file or a path to it")
@@ -128,7 +130,7 @@ program
       api.setSpaceId(space)
       await tasks.pushComponents(api, { source, presetsSource })
     } catch (e) {
-      errorHandler(e)
+      errorHandler(e, pushComponents)
     }
   })
 
@@ -174,8 +176,9 @@ program
   })
 
 // sync
+const sync = 'sync'
 program
-  .command('sync')
+  .command(sync)
   .description('Sync schemas, roles, folders and stories between spaces')
   .requiredOption('--type <TYPE>', 'Define what will be sync. Can be components, folders, stories, datasources or roles')
   .requiredOption('--source <SPACE_ID>', 'Source space id')
@@ -216,7 +219,7 @@ program
 
       console.log('\n' + chalk.green('✓') + ' Sync data between spaces successfully completed')
     } catch (e) {
-      errorHandler(e)
+      errorHandler(e, sync)
     }
   })
 
@@ -243,8 +246,8 @@ program
   .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
   .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
   .action(async (options) => {
-    const { field } = options || ''
-    const { component } = options || ''
+    const { field = '' } = options
+    const { component = '' } = options
 
     const space = program.space
     if (!space) {
@@ -275,6 +278,7 @@ program
   .description('Run a migration file')
   .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
   .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
+  .option('-r, --region [value]', 'region', 'eu')
   .option('--dryrun', 'Do not update the story content')
   .option('--publish <PUBLISH_OPTION>', 'Publish the content. It can be: all, published or published-with-changes')
   .option('--publish-languages <LANGUAGES>', 'Publish specific languages')
@@ -405,11 +409,11 @@ if (program.rawArgs.length <= 2) {
   program.help()
 }
 
-function errorHandler (e) {
+function errorHandler (e, task) {
   if (/404/.test(e.message)) {
     console.log(chalk.yellow('/!\\') + ' If your space was created under US region, you must provide the region as argument --region us. Otherwise, you can use the default --region eu or omit this flag.')
   } else {
-    console.log(chalk.red('X') + ' An error occurred when executing the pull-components task: ' + e.message)
+    console.log(chalk.red('X') + ' An error occurred when executing the ' + task + ' task: ' + e || e.message)
   }
   process.exit(1)
 }

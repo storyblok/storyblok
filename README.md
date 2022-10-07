@@ -176,6 +176,7 @@ $ storyblok run-migration --publish published --space 1234 --component article -
   * `published`: only publish stories that already are published and don't have unpublished changes
   * `published-with-changes`: publish stories that are published and have unpublished changes
 * `publish-languages` (optional): publish specific languages. You can publish more than one language at a time by separating the languages by `,`
+* `region`: your space region (default: `eu`). If your space was created under US region, you should use `us` instead.
 
 ### rollback-migration
 

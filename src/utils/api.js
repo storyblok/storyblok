@@ -147,10 +147,6 @@ module.exports = {
     this.region = region
   },
 
-  setAccessToken (accessToken) {
-    this.accessToken = accessToken
-  },
-
   getPresets () {
     const client = this.getClient()
 
