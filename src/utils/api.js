@@ -5,16 +5,21 @@ const inquirer = require('inquirer')
 
 const creds = require('./creds')
 const getQuestions = require('./get-questions')
-const { LOGIN_URL, SIGNUP_URL, API_URL } = require('../constants')
+const { LOGIN_URL, SIGNUP_URL, API_URL, US_API_URL } = require('../constants')
 
 module.exports = {
   accessToken: '',
+  oauthToken: '',
   spaceId: null,
+  region: 'eu',
 
   getClient () {
+    const apiURL = this.region === 'us' ? US_API_URL : API_URL
     return new Storyblok({
-      oauthToken: this.accessToken
-    }, API_URL)
+      accessToken: this.accessToken,
+      oauthToken: this.oauthToken,
+      region: this.region
+    }, apiURL)
   },
 
   getPath (path) {
@@ -70,7 +75,7 @@ module.exports = {
   persistCredentials (email, data) {
     const token = this.extractToken(data)
     if (token) {
-      this.accessToken = token
+      this.oauthToken = token
       creds.set(email, token)
 
       return Promise.resolve(data)
@@ -115,7 +120,7 @@ module.exports = {
     })
       .then(response => {
         const token = this.extractToken(response)
-        this.accessToken = token
+        this.oauthToken = token
         creds.set(email, token)
 
         return Promise.resolve(true)
@@ -127,7 +132,7 @@ module.exports = {
     const { token } = creds.get() || {}
 
     if (token) {
-      this.accessToken = token
+      this.oauthToken = token
       return true
     }
 
@@ -136,6 +141,10 @@ module.exports = {
 
   setSpaceId (spaceId) {
     this.spaceId = spaceId
+  },
+
+  setRegion (region) {
+    this.region = region
   },
 
   getPresets () {
