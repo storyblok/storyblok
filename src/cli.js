@@ -13,23 +13,7 @@ const pkg = require('../package.json')
 
 const tasks = require('./tasks')
 const { getQuestions, lastStep, api, creds } = require('./utils')
-const { SYNC_TYPES } = require('./constants')
-
-const commandsList = {
-  GENERATE_MIGRATION: 'generate-migration',
-  IMPORT: 'import',
-  LOGIN: 'login',
-  LOGOUT: 'logout',
-  PULL_COMPONENTS: 'pull-components',
-  PUSH_COMPONENTS: 'push-components',
-  QUICKSTART: 'quickstart',
-  ROLLBACK_MIGRATION: 'rollback-migration',
-  RUN_MIGRATION: 'run-migration',
-  SCAFFOLD: 'scaffold',
-  SELECT: 'select',
-  SPACES: 'spaces',
-  SYNC: 'sync'
-}
+const { SYNC_TYPES, COMMANDS } = require('./constants')
 
 clear()
 console.log(chalk.cyan(figlet.textSync('Storyblok')))
@@ -53,7 +37,7 @@ program
 
 // login
 program
-  .command(commandsList.LOGIN)
+  .command(COMMANDS.LOGIN)
   .description('Login to the Storyblok cli')
   .action(async () => {
     if (api.isAuthorized()) {
@@ -72,7 +56,7 @@ program
 
 // logout
 program
-  .command(commandsList.LOGOUT)
+  .command(COMMANDS.LOGOUT)
   .description('Logout from the Storyblok cli')
   .action(async () => {
     try {
@@ -87,7 +71,7 @@ program
 
 // pull-components
 program
-  .command(commandsList.PULL_COMPONENTS)
+  .command(COMMANDS.PULL_COMPONENTS)
   .option('-r, --region [value]', 'region', 'eu')
   .description("Download your space's components schema as json")
   .action(async (source) => {
@@ -111,13 +95,13 @@ program
       api.setSpaceId(space)
       await tasks.pullComponents(api, { space })
     } catch (e) {
-      errorHandler(e, commandsList.PULL_COMPONENTS)
+      errorHandler(e, COMMANDS.PULL_COMPONENTS)
     }
   })
 
 // push-components
 program
-  .command(commandsList.PUSH_COMPONENTS + ' <source>')
+  .command(COMMANDS.PUSH_COMPONENTS + ' <source>')
   .option('-p, --presets-source <presetsSource>', 'Path to presets file')
   .option('-r, --region [value]', 'region', 'eu')
   .description("Download your space's components schema as json. The source parameter can be a URL to your JSON file or a path to it")
@@ -144,13 +128,13 @@ program
       api.setSpaceId(space)
       await tasks.pushComponents(api, { source, presetsSource })
     } catch (e) {
-      errorHandler(e, commandsList.PUSH_COMPONENTS)
+      errorHandler(e, COMMANDS.PUSH_COMPONENTS)
     }
   })
 
 // scaffold
 program
-  .command(commandsList.SCAFFOLD + ' <name>')
+  .command(COMMANDS.SCAFFOLD + ' <name>')
   .description('Scaffold <name> component')
   .action(async (name) => {
     console.log(`${chalk.blue('-')} Scaffolding a component\n`)
@@ -173,7 +157,7 @@ program
 
 // select
 program
-  .command(commandsList.SELECT)
+  .command(COMMANDS.SELECT)
   .description('Usage to kickstart a boilerplate, fieldtype or theme')
   .action(async () => {
     console.log(`${chalk.blue('-')} Select a boilerplate, fieldtype or theme to initialize\n`)
@@ -191,7 +175,7 @@ program
 
 // sync
 program
-  .command(commandsList.SYNC)
+  .command(COMMANDS.SYNC)
   .description('Sync schemas, roles, folders and stories between spaces')
   .requiredOption('--type <TYPE>', 'Define what will be sync. Can be components, folders, stories, datasources or roles')
   .requiredOption('--source <SPACE_ID>', 'Source space id')
@@ -232,13 +216,13 @@ program
 
       console.log('\n' + chalk.green('✓') + ' Sync data between spaces successfully completed')
     } catch (e) {
-      errorHandler(e, commandsList.SYNC)
+      errorHandler(e, COMMANDS.SYNC)
     }
   })
 
 // quickstart
 program
-  .command(commandsList.QUICKSTART)
+  .command(COMMANDS.QUICKSTART)
   .description('Start a project quickly')
   .action(async () => {
     try {
@@ -253,7 +237,7 @@ program
   })
 
 program
-  .command(commandsList.GENERATE_MIGRATION)
+  .command(COMMANDS.GENERATE_MIGRATION)
   .description('Generate a content migration file')
   .option('-r, --region [value]', 'region', 'eu')
   .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
@@ -287,7 +271,7 @@ program
   })
 
 program
-  .command(commandsList.RUN_MIGRATION)
+  .command(COMMANDS.RUN_MIGRATION)
   .description('Run a migration file')
   .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
   .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
@@ -339,7 +323,7 @@ program
   })
 
 program
-  .command(commandsList.ROLLBACK_MIGRATION)
+  .command(COMMANDS.ROLLBACK_MIGRATION)
   .description('Rollback-migration a migration file')
   .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
   .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
@@ -368,7 +352,7 @@ program
 
 // list spaces
 program
-  .command(commandsList.SPACES)
+  .command(COMMANDS.SPACES)
   .description('List all spaces of the logged account')
   .action(async () => {
     try {
@@ -385,7 +369,7 @@ program
 
 // import data
 program
-  .command(commandsList.IMPORT)
+  .command(COMMANDS.IMPORT)
   .description('Import data from other systems and relational databases.')
   .requiredOption('-f, --file <FILE_NAME>', 'Name of the file')
   .requiredOption('-t, --type <TYPE>', 'Type of the content')

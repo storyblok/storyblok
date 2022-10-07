@@ -11,10 +11,27 @@ const SYNC_TYPES = [
   'datasources'
 ]
 
+const COMMANDS = {
+  GENERATE_MIGRATION: 'generate-migration',
+  IMPORT: 'import',
+  LOGIN: 'login',
+  LOGOUT: 'logout',
+  PULL_COMPONENTS: 'pull-components',
+  PUSH_COMPONENTS: 'push-components',
+  QUICKSTART: 'quickstart',
+  ROLLBACK_MIGRATION: 'rollback-migration',
+  RUN_MIGRATION: 'run-migration',
+  SCAFFOLD: 'scaffold',
+  SELECT: 'select',
+  SPACES: 'spaces',
+  SYNC: 'sync'
+}
+
 module.exports = {
   LOGIN_URL,
   SIGNUP_URL,
   API_URL,
   SYNC_TYPES,
-  US_API_URL
+  US_API_URL,
+  COMMANDS
 }
