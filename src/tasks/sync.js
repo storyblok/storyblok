@@ -1,6 +1,5 @@
 const pSeries = require('p-series')
 const chalk = require('chalk')
-const StoryblokClient = require('storyblok-js-client')
 const SyncComponents = require('./sync-commands/components')
 const SyncDatasources = require('./sync-commands/datasources')
 const { capitalize } = require('../utils')
@@ -10,13 +9,12 @@ const SyncSpaces = {
   sourceComponents: [],
 
   init (options) {
+    const { api } = options
     console.log(chalk.green('✓') + ' Loading options')
     this.sourceSpaceId = options.source
     this.targetSpaceId = options.target
     this.oauthToken = options.token
-    this.client = new StoryblokClient({
-      oauthToken: options.token
-    }, options.api)
+    this.client = api.getClient()
   },
 
   async getStoryWithTranslatedSlugs (sourceStory, targetStory) {
