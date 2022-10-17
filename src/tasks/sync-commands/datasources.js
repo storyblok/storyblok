@@ -1,6 +1,6 @@
 const chalk = require('chalk')
-const StoryblokClient = require('storyblok-js-client')
 const UUID = require('simple-uuid')
+const api = require('../../utils/api')
 
 class SyncDatasources {
   /**
@@ -12,9 +12,7 @@ class SyncDatasources {
     this.sourceSpaceId = options.sourceSpaceId
     this.targetSpaceId = options.targetSpaceId
     this.oauthToken = options.oauthToken
-    this.client = new StoryblokClient({
-      oauthToken: options.oauthToken
-    })
+    this.client = api.getClient()
   }
 
   async sync () {
