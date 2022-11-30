@@ -87,7 +87,7 @@ const SyncSpaces = {
         const payload = {
           story: storyData,
           force_update: '1',
-          ...(sourceStory.published ? { published: 1 } : {})
+          ...(sourceStory.published ? { publish: 1 } : {})
         }
 
         let createdStory = null
