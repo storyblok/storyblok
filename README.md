@@ -28,6 +28,18 @@ Usage to kickstart a boilerplate, fieldtype or theme
 $ storyblok select
 ```
 
+### pull-languages
+
+Download your space's languages schema as json. This command will download 1 file.
+
+```sh
+$ storyblok pull-languages --space <SPACE_ID>
+```
+
+#### Options
+
+* `space`: your space id
+
 ### pull-components
 
 Download your space's components schema as json. This command will download 2 files: 1 for the components and 1 for the presets.

@@ -69,6 +69,31 @@ program
     }
   })
 
+// pull-languages
+program
+  .command('pull-languages')
+  .description("Download your space's languages schema as json")
+  .action(async () => {
+    console.log(`${chalk.blue('-')} Executing pull-languages task`)
+    const space = program.space
+    if (!space) {
+      console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
+      process.exit(0)
+    }
+
+    try {
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
+
+      api.setSpaceId(space)
+      await tasks.pullLanguages(api, { space })
+    } catch (e) {
+      console.log(chalk.red('X') + ' An error occurred when executing the pull-languages task: ' + e.message)
+      process.exit(1)
+    }
+  })
+
 // pull-components
 program
   .command(COMMANDS.PULL_COMPONENTS)
