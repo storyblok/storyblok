@@ -282,7 +282,7 @@ $ storyblok -V # or --version
 
 Content migrations are a convenient way to change fields of your content.
 
-To execute a migration you first need to create a migration file. This file is a pure Javascript function where the content of a specific content type or compontent gets passed through.
+To execute a migration you first need to create a migration file. This file is a pure Javascript function where the content of a specific content type or component gets passed through.
 
 ### 1. Creating a migration file
 
