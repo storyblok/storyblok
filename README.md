@@ -149,7 +149,7 @@ $ storyblok login
 
 ### user
 
-Get the currently logged in user
+Get the current logged in user
 
 ```sh
 $ storyblok user

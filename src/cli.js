@@ -57,7 +57,7 @@ program
 // getUser
 program
   .command('user')
-  .description('Get the currently logged in user')
+  .description('Get the current logged in user')
   .action(async () => {
     if (api.isAuthorized()) {
       try {
