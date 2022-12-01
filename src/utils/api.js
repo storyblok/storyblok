@@ -5,7 +5,7 @@ const inquirer = require('inquirer')
 
 const creds = require('./creds')
 const getQuestions = require('./get-questions')
-const { LOGIN_URL, SIGNUP_URL, API_URL, US_API_URL } = require('../constants')
+const { LOGIN_URL, SIGNUP_URL, API_URL, US_API_URL, USER_INFO } = require('../constants')
 
 module.exports = {
   accessToken: '',
@@ -72,6 +72,20 @@ module.exports = {
     }
   },
 
+  async getUser () {
+    try {
+      const { data } = await axios.get(USER_INFO, {
+        headers: {
+          Authorization: this.accessToken
+        }
+      })
+      return data.user
+    } catch (e) {
+      this.logoutIfUnauthorized(e)
+      return undefined
+    }
+  },
+
   persistCredentials (email, data) {
     const token = this.extractToken(data)
     if (token) {
@@ -109,7 +123,10 @@ module.exports = {
     return data.access_token
   },
 
-  logout () {
+  logout (unauthorized) {
+    if (creds.get().email && unauthorized) {
+      console.log(chalk.red('X') + ' Your login seems to be expired, we logged you out. Please log back in again.')
+    }
     creds.set(null)
   },
 

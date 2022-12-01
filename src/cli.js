@@ -54,6 +54,21 @@ program
     }
   })
 
+// getUser
+program
+  .command('user')
+  .description('Get the currently logged in user')
+  .action(async () => {
+    if (api.isAuthorized()) {
+      try {
+        const user = await api.getUser()
+        console.log(chalk.green('✓') + ` Hi ${user.friendly_name}, you current logged in with: ${creds.get().email}`)
+      } catch (e) {}
+      return
+    }
+    console.log(chalk.red('X') + ' There is currently no user logged.')
+  })
+
 // logout
 program
   .command(COMMANDS.LOGOUT)
