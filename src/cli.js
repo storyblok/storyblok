@@ -13,7 +13,7 @@ const pkg = require('../package.json')
 
 const tasks = require('./tasks')
 const { getQuestions, lastStep, api, creds } = require('./utils')
-const { SYNC_TYPES } = require('./constants')
+const { SYNC_TYPES, COMMANDS } = require('./constants')
 
 clear()
 console.log(chalk.cyan(figlet.textSync('Storyblok')))
@@ -37,7 +37,7 @@ program
 
 // login
 program
-  .command('login')
+  .command(COMMANDS.LOGIN)
   .description('Login to the Storyblok cli')
   .action(async () => {
     if (api.isAuthorized()) {
@@ -71,7 +71,7 @@ program
 
 // logout
 program
-  .command('logout')
+  .command(COMMANDS.LOGOUT)
   .description('Logout from the Storyblok cli')
   .action(async () => {
     try {
@@ -84,12 +84,12 @@ program
     }
   })
 
-// pull-components
+// pull-languages
 program
-  .command('pull-components')
-  .description("Download your space's components schema as json")
+  .command('pull-languages')
+  .description("Download your space's languages schema as json")
   .action(async () => {
-    console.log(`${chalk.blue('-')} Executing pull-components task`)
+    console.log(`${chalk.blue('-')} Executing pull-languages task`)
     const space = program.space
     if (!space) {
       console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
@@ -102,17 +102,48 @@ program
       }
 
       api.setSpaceId(space)
+      await tasks.pullLanguages(api, { space })
+    } catch (e) {
+      console.log(chalk.red('X') + ' An error occurred when executing the pull-languages task: ' + e.message)
+      process.exit(1)
+    }
+  })
+
+// pull-components
+program
+  .command(COMMANDS.PULL_COMPONENTS)
+  .option('-r, --region [value]', 'region', 'eu')
+  .description("Download your space's components schema as json")
+  .action(async (source) => {
+    console.log(`${chalk.blue('-')} Executing pull-components task`)
+    const space = program.space
+    if (!space) {
+      console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
+      process.exit(0)
+    }
+
+    try {
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
+
+      const { region } = source
+      if (program.args.length > 0) {
+        api.setRegion(region)
+      }
+
+      api.setSpaceId(space)
       await tasks.pullComponents(api, { space })
     } catch (e) {
-      console.log(chalk.red('X') + ' An error occurred when executing the pull-components task: ' + e.message)
-      process.exit(1)
+      errorHandler(e, COMMANDS.PULL_COMPONENTS)
     }
   })
 
 // push-components
 program
-  .command('push-components <source>')
+  .command(COMMANDS.PUSH_COMPONENTS + ' <source>')
   .option('-p, --presets-source <presetsSource>', 'Path to presets file')
+  .option('-r, --region [value]', 'region', 'eu')
   .description("Download your space's components schema as json. The source parameter can be a URL to your JSON file or a path to it")
   .action(async (source, options) => {
     console.log(`${chalk.blue('-')} Executing push-components task`)
@@ -128,17 +159,22 @@ program
       if (!api.isAuthorized()) {
         await api.processLogin()
       }
+
+      const { region } = options
+      if (program.args.length > 0) {
+        api.setRegion(region)
+      }
+
       api.setSpaceId(space)
       await tasks.pushComponents(api, { source, presetsSource })
     } catch (e) {
-      console.log(chalk.red('X') + ' An error occurred when executing the push-components task: ' + e.message)
-      process.exit(1)
+      errorHandler(e, COMMANDS.PUSH_COMPONENTS)
     }
   })
 
 // scaffold
 program
-  .command('scaffold <name>')
+  .command(COMMANDS.SCAFFOLD + ' <name>')
   .description('Scaffold <name> component')
   .action(async (name) => {
     console.log(`${chalk.blue('-')} Scaffolding a component\n`)
@@ -161,7 +197,7 @@ program
 
 // select
 program
-  .command('select')
+  .command(COMMANDS.SELECT)
   .description('Usage to kickstart a boilerplate, fieldtype or theme')
   .action(async () => {
     console.log(`${chalk.blue('-')} Select a boilerplate, fieldtype or theme to initialize\n`)
@@ -179,36 +215,40 @@ program
 
 // sync
 program
-  .command('sync')
+  .command(COMMANDS.SYNC)
   .description('Sync schemas, roles, folders and stories between spaces')
   .requiredOption('--type <TYPE>', 'Define what will be sync. Can be components, folders, stories, datasources or roles')
   .requiredOption('--source <SPACE_ID>', 'Source space id')
   .requiredOption('--target <SPACE_ID>', 'Target space id')
+  .option('-r, --region [value]', 'region', 'eu')
   .action(async (options) => {
     console.log(`${chalk.blue('-')} Sync data between spaces\n`)
 
-    const {
-      type,
-      source,
-      target
-    } = options
-
     try {
-      const _types = type.split(',') || []
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
 
+      const {
+        type,
+        source,
+        target,
+        region
+      } = options
+
+      api.setRegion(region)
+
+      const _types = type.split(',') || []
       _types.forEach(_type => {
         if (!SYNC_TYPES.includes(_type)) {
           throw new Error(`The type ${_type} is not valid`)
         }
       })
 
-      if (!api.isAuthorized()) {
-        await api.processLogin()
-      }
-
       const token = creds.get().token || null
 
       await tasks.sync(_types, {
+        api,
         token,
         source,
         target
@@ -216,14 +256,13 @@ program
 
       console.log('\n' + chalk.green('✓') + ' Sync data between spaces successfully completed')
     } catch (e) {
-      console.error(chalk.red('X') + ' An error ocurred when syncing spaces: ' + e.message)
-      process.exit(1)
+      errorHandler(e, COMMANDS.SYNC)
     }
   })
 
 // quickstart
 program
-  .command('quickstart')
+  .command(COMMANDS.QUICKSTART)
   .description('Start a project quickly')
   .action(async () => {
     try {
@@ -238,13 +277,14 @@ program
   })
 
 program
-  .command('generate-migration')
+  .command(COMMANDS.GENERATE_MIGRATION)
   .description('Generate a content migration file')
+  .option('-r, --region [value]', 'region', 'eu')
   .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
   .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
   .action(async (options) => {
-    const field = options.field || ''
-    const component = options.component || ''
+    const { field = '' } = options
+    const { component = '' } = options
 
     const space = program.space
     if (!space) {
@@ -259,6 +299,9 @@ program
         await api.processLogin()
       }
 
+      const { region } = options
+      api.setRegion(region)
+
       api.setSpaceId(space)
       await tasks.generateMigration(api, component, field)
     } catch (e) {
@@ -268,10 +311,11 @@ program
   })
 
 program
-  .command('run-migration')
+  .command(COMMANDS.RUN_MIGRATION)
   .description('Run a migration file')
   .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
   .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
+  .option('-r, --region [value]', 'region', 'eu')
   .option('--dryrun', 'Do not update the story content')
   .option('--publish <PUBLISH_OPTION>', 'Publish the content. It can be: all, published or published-with-changes')
   .option('--publish-languages <LANGUAGES>', 'Publish specific languages')
@@ -319,7 +363,7 @@ program
   })
 
 program
-  .command('rollback-migration')
+  .command(COMMANDS.ROLLBACK_MIGRATION)
   .description('Rollback-migration a migration file')
   .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
   .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
@@ -348,7 +392,7 @@ program
 
 // list spaces
 program
-  .command('spaces')
+  .command(COMMANDS.SPACES)
   .description('List all spaces of the logged account')
   .action(async () => {
     try {
@@ -365,7 +409,7 @@ program
 
 // import data
 program
-  .command('import')
+  .command(COMMANDS.IMPORT)
   .description('Import data from other systems and relational databases.')
   .requiredOption('-f, --file <FILE_NAME>', 'Name of the file')
   .requiredOption('-t, --type <TYPE>', 'Type of the content')
@@ -400,4 +444,13 @@ program.parse(process.argv)
 
 if (program.rawArgs.length <= 2) {
   program.help()
+}
+
+function errorHandler (e, command) {
+  if (/404/.test(e.message)) {
+    console.log(chalk.yellow('/!\\') + ' If your space was created under US region, you must provide the region as argument --region us. Otherwise, you can use the default --region eu or omit this flag.')
+  } else {
+    console.log(chalk.red('X') + ' An error occurred when executing the ' + command + ' task: ' + e || e.message)
+  }
+  process.exit(1)
 }

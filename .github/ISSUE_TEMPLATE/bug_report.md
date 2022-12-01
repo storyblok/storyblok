@@ -11,8 +11,8 @@ assignees: ''
 - [ ] *app.storyblok.com (CMS - Interface)*   
 - [ ] *api.storyblok.com (CMS - Content Delivery API)*
 - [ ] *mapi.storyblok.com (CMS - Management API)*
-- [ ] *capi.storyblok.com (Commerce - API)*     
-- [ ] *Commerce - Interface*   
+- [ ] *a.storyblok.com (CMS - Image Service)*
+- [ ] *storyblok.com (Website)*
 - [ ] *Other:* <!-- => If you've got an issue with on of our boilerplates or themes - please create an issue in the specific repo -->
 
 **Current behavior:**
