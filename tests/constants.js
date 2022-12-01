@@ -229,11 +229,31 @@ const FAKE_SPACES = () => [
   }
 ]
 
+const FAKE_SPACE_OPTIONS = () => ({
+  languages: [
+    {
+      code: 'pt',
+      name: 'Português'
+    },
+    {
+      code: 'nl-be',
+      name: 'Dutch (Belgian)'
+    }
+  ],
+  hosted_backup: false,
+  onboarding_step: '3',
+  default_lang_name: 'English',
+  rev_share_enabled: true,
+  required_assest_fields: [],
+  use_translated_stories: false
+})
+
 module.exports = {
   EMAIL_TEST,
   TOKEN_TEST,
   FAKE_STORIES,
   PASSWORD_TEST,
   FAKE_COMPONENTS,
-  FAKE_SPACES
+  FAKE_SPACES,
+  FAKE_SPACE_OPTIONS
 }

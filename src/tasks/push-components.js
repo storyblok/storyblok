@@ -103,7 +103,7 @@ const push = async (api, components, presets = []) => {
       if (schema) {
         Object.keys(schema).forEach(field => {
           if (schema[field].component_group_whitelist) {
-            schema[field].component_group_whitelist = schema[field].component_group_whitelist.map(uuid => 
+            schema[field].component_group_whitelist = schema[field].component_group_whitelist.map(uuid =>
               getGroupByUuid(componentsGroups, uuid) ? getGroupByUuid(componentsGroups, uuid).uuid : uuid
             )
           }

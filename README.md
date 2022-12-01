@@ -28,29 +28,43 @@ Usage to kickstart a boilerplate, fieldtype or theme
 $ storyblok select
 ```
 
-### pull-components
+### pull-languages
 
-Download your space's components schema as json. This command will download 2 files: 1 for the components and 1 for the presets.
+Download your space's languages schema as json. This command will download 1 file.
 
 ```sh
-$ storyblok pull-components --space <SPACE_ID>
+$ storyblok pull-languages --space <SPACE_ID>
 ```
 
 #### Options
 
 * `space`: your space id
 
+### pull-components
+
+Download your space's components schema as json. This command will download 2 files: 1 for the components and 1 for the presets.
+
+```sh
+$ storyblok pull-components --space <SPACE_ID> --region <REGION>
+```
+
+#### Options
+
+* `space`: your space id
+* `region`: your space region (default: `eu`). If your space was created under US region, you should use `us` instead.
+
 ### push-components
 
 Push your components file to your/another space
 
 ```sh
-$ storyblok push-components <SOURCE> --space <SPACE_ID> --presets-source <PRESETS_SOURCE>
+$ storyblok push-components <SOURCE> --space <SPACE_ID> --region <REGION> --presets-source <PRESETS_SOURCE>
 ```
 
 #### Parameters
 
 * `source`: can be a URL or path to JSON file.
+* `region`: your space region (default: `eu`). If your space was created under US region, you should use `us` instead.
 
 Using an **URL**
 
@@ -67,6 +81,7 @@ $ storyblok push-components ./components.json --space 67819
 #### Options
 
 * `space`: your space id
+* `region`: your space region (default: `eu`). If your space was created under US region, you should use `us` instead.
 * `presets-source` (optional): it can be a URL or path to JSON file with the presets
 
 #### Examples
@@ -155,6 +170,7 @@ $ storyblok sync --type <COMMAND> --source <SPACE_ID> --target <SPACE_ID>
 * `type`: describe the command type to execute. Can be: `folders`, `components`, `stories`, `datasources` or `roles`. It's possible pass multiple types separated by comma (`,`).
 * `source`: the source space to use to sync
 * `target`: the target space to use to sync
+* `region`: your space region (default: `eu`). If your space was created under US region, you should use `us` instead.
 
 #### Examples
 
@@ -190,6 +206,14 @@ Login to the Storyblok cli
 $ storyblok login
 ```
 
+### user
+
+Get the currently logged in user
+
+```sh
+$ storyblok user
+```
+
 ### generate-migration
 
 Create a migration file (with the name `change_<COMPONENT>_<FIELD>.js`) inside the `migrations` folder. Check **Migrations** section to more details
@@ -197,12 +221,14 @@ Create a migration file (with the name `change_<COMPONENT>_<FIELD>.js`) inside t
 ```sh
 $ storyblok generate-migration --space <SPACE_ID> --component <COMPONENT_NAME> --field <FIELD>
 ```
+It's important to note that the `component` and `field` parameters are required and must be spelled exactly as they are in Storyblok. You can check the exact name by looking at the `Block library` inside your space.
 
 #### Options
 
 * `space`: space where the component is
 * `component`: component name. It needs to be a valid component
 * `field`: name of field
+* `region`: your space region (default: `eu`). If your space was created under US region, you should use `us` instead.
 
 ### run-migration
 
@@ -229,6 +255,7 @@ $ storyblok run-migration --publish published --space 1234 --component article -
   * `published`: only publish stories that already are published and don't have unpublished changes
   * `published-with-changes`: publish stories that are published and have unpublished changes
 * `publish-languages` (optional): publish specific languages. You can publish more than one language at a time by separating the languages by `,`
+* `region`: your space region (default: `eu`). If your space was created under US region, you should use `us` instead.
 
 ### rollback-migration
 
@@ -334,7 +361,7 @@ $ storyblok -V # or --version
 
 Content migrations are a convenient way to change fields of your content.
 
-To execute a migration you first need to create a migration file. This file is a pure Javascript function where the content of a specific content type or compontent gets passed through.
+To execute a migration you first need to create a migration file. This file is a pure Javascript function where the content of a specific content type or component gets passed through.
 
 ### 1. Creating a migration file
 

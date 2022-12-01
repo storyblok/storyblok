@@ -5,16 +5,21 @@ const inquirer = require('inquirer')
 
 const creds = require('./creds')
 const getQuestions = require('./get-questions')
-const { LOGIN_URL, SIGNUP_URL, API_URL } = require('../constants')
+const { LOGIN_URL, SIGNUP_URL, API_URL, US_API_URL, USER_INFO } = require('../constants')
 
 module.exports = {
   accessToken: '',
+  oauthToken: '',
   spaceId: null,
+  region: 'eu',
 
   getClient () {
+    const apiURL = this.region === 'us' ? US_API_URL : API_URL
     return new Storyblok({
-      oauthToken: this.accessToken
-    }, API_URL)
+      accessToken: this.accessToken,
+      oauthToken: this.oauthToken,
+      region: this.region
+    }, apiURL)
   },
 
   getPath (path) {
@@ -67,10 +72,24 @@ module.exports = {
     }
   },
 
+  async getUser () {
+    try {
+      const { data } = await axios.get(USER_INFO, {
+        headers: {
+          Authorization: this.accessToken
+        }
+      })
+      return data.user
+    } catch (e) {
+      this.logoutIfUnauthorized(e)
+      return undefined
+    }
+  },
+
   persistCredentials (email, data) {
     const token = this.extractToken(data)
     if (token) {
-      this.accessToken = token
+      this.oauthToken = token
       creds.set(email, token)
 
       return Promise.resolve(data)
@@ -104,7 +123,10 @@ module.exports = {
     return data.access_token
   },
 
-  logout () {
+  logout (unauthorized) {
+    if (creds.get().email && unauthorized) {
+      console.log(chalk.red('X') + ' Your login seems to be expired, we logged you out. Please log back in again.')
+    }
     creds.set(null)
   },
 
@@ -115,7 +137,7 @@ module.exports = {
     })
       .then(response => {
         const token = this.extractToken(response)
-        this.accessToken = token
+        this.oauthToken = token
         creds.set(email, token)
 
         return Promise.resolve(true)
@@ -127,7 +149,7 @@ module.exports = {
     const { token } = creds.get() || {}
 
     if (token) {
-      this.accessToken = token
+      this.oauthToken = token
       return true
     }
 
@@ -138,6 +160,10 @@ module.exports = {
     this.spaceId = spaceId
   },
 
+  setRegion (region) {
+    this.region = region
+  },
+
   getPresets () {
     const client = this.getClient()
 
@@ -145,6 +171,15 @@ module.exports = {
       .get(this.getPath('presets'))
       .then(data => data.data.presets || [])
       .catch(err => Promise.reject(err))
+  },
+
+  getSpaceOptions () {
+    const client = this.getClient()
+
+    return client
+      .get(this.getPath(''))
+      .then((data) => data.data.space.options || {})
+      .catch((err) => Promise.reject(err))
   },
 
   getComponents () {

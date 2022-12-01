@@ -1,6 +1,5 @@
 const pSeries = require('p-series')
 const chalk = require('chalk')
-const StoryblokClient = require('storyblok-js-client')
 const SyncComponents = require('./sync-commands/components')
 const SyncDatasources = require('./sync-commands/datasources')
 const { capitalize } = require('../utils')
@@ -10,13 +9,12 @@ const SyncSpaces = {
   sourceComponents: [],
 
   init (options) {
+    const { api } = options
     console.log(chalk.green('✓') + ' Loading options')
     this.sourceSpaceId = options.source
     this.targetSpaceId = options.target
     this.oauthToken = options.token
-    this.client = new StoryblokClient({
-      oauthToken: options.token
-    }, options.api)
+    this.client = api.getClient()
   },
 
   async getStoryWithTranslatedSlugs (sourceStory, targetStory) {
@@ -45,29 +43,29 @@ const SyncSpaces = {
 
   async syncStories () {
     console.log(chalk.green('✓') + ' Syncing stories...')
-    var targetFolders = await this.client.getAll(`spaces/${this.targetSpaceId}/stories`, {
+    const targetFolders = await this.client.getAll(`spaces/${this.targetSpaceId}/stories`, {
       folder_only: 1,
       sort_by: 'slug:asc'
     })
 
-    var folderMapping = {}
+    const folderMapping = {}
 
     for (let i = 0; i < targetFolders.length; i++) {
       var folder = targetFolders[i]
       folderMapping[folder.full_slug] = folder.id
     }
 
-    var all = await this.client.getAll(`spaces/${this.sourceSpaceId}/stories`, {
+    const all = await this.client.getAll(`spaces/${this.sourceSpaceId}/stories`, {
       story_only: 1
     })
 
     for (let i = 0; i < all.length; i++) {
       console.log(chalk.green('✓') + ' Starting update ' + all[i].full_slug)
 
-      var storyResult = await this.client.get('spaces/' + this.sourceSpaceId + '/stories/' + all[i].id)
-      var sourceStory = storyResult.data.story
-      var slugs = sourceStory.full_slug.split('/')
-      var folderId = 0
+      const { data } = await this.client.get('spaces/' + this.sourceSpaceId + '/stories/' + all[i].id)
+      const sourceStory = data.story
+      const slugs = sourceStory.full_slug.split('/')
+      let folderId = 0
 
       if (slugs.length > 1) {
         slugs.pop()
@@ -89,7 +87,7 @@ const SyncSpaces = {
         const payload = {
           story: storyData,
           force_update: '1',
-          ...(sourceStory.published ? { published: 1 } : {})
+          ...(sourceStory.published ? { publish: 1 } : {})
         }
 
         let createdStory = null

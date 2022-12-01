@@ -210,7 +210,7 @@ class SyncComponents {
     return Object.keys(sourceSchema).reduce((acc, key) => {
       // handle blocks separately
       const sourceSchemaItem = sourceSchema[key]
-      if (sourceSchemaItem.type === 'bloks') {
+      if (sourceSchemaItem?.type === 'bloks' || sourceSchemaItem?.type === 'richtext') {
         acc[key] = this.mergeBloksSchema(sourceSchemaItem)
         return acc
       }
