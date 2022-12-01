@@ -147,6 +147,14 @@ Login to the Storyblok cli
 $ storyblok login
 ```
 
+### user
+
+Get the currently logged in user
+
+```sh
+$ storyblok user
+```
+
 ### generate-migration
 
 Create a migration file (with the name `change_<COMPONENT>_<FIELD>.js`) inside the `migrations` folder. Check **Migrations** section to more details
