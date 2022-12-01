@@ -91,7 +91,7 @@ const runMigration = async (api, component, field, options = {}) => {
         const storyData = await api.getSingleStory(story.id)
         const oldContent = cloneDeep(storyData.content)
 
-        await processMigration(storyData.content, component, migrationFn)
+        await processMigration(storyData.content, component, migrationFn, story.full_slug)
 
         const isChangeContent = !isEqual(oldContent, storyData.content)
 
