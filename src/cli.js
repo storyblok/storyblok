@@ -172,6 +172,54 @@ program
     }
   })
 
+// delete-component
+program
+  .command('delete-component <component>')
+  .description('Delete a single component on your space.')
+  .action(async (component, options) => {
+    console.log(`${chalk.blue('-')} Executing delete-component task`)
+    const space = program.space
+    if (!space) {
+      console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
+      process.exit(0)
+    }
+    try {
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
+      api.setSpaceId(space)
+      await tasks.deleteComponent(api, { comp: component })
+    } catch (e) {
+      console.log(chalk.red('X') + ' An error occurred when executing the delete-component task: ' + e.message)
+      process.exit(1)
+    }
+  })
+
+// delete-components
+program
+  .command('delete-components <source>')
+  .description('Delete all components in your space that occur in your source file.')
+  .option('-r, --reverse', 'Delete all components in your space that do not appear in your source.', false)
+  .option('--dryrun', 'Does not perform any delete changes on your space.')
+  .action(async (source, options) => {
+    console.log(`${chalk.blue('-')} Executing delete-components task`)
+    const space = program.space
+    if (!space) {
+      console.log(chalk.red('X') + ' Please provide the space as argument --space YOUR_SPACE_ID.')
+      process.exit(0)
+    }
+    try {
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
+      api.setSpaceId(space)
+      await tasks.deleteComponents(api, { source, dryRun: !!options.dryrun, reversed: !!options.reverse })
+    } catch (e) {
+      console.log(chalk.red('X') + ' An error occurred when executing the delete-component task: ' + e.message)
+      process.exit(1)
+    }
+  })
+
 // scaffold
 program
   .command(COMMANDS.SCAFFOLD + ' <name>')

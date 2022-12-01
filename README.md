@@ -98,6 +98,65 @@ Using a **path** to file
 $ storyblok push-components ./components.json --presets-source ./presets.json --space 67819
 ```
 
+### delete-component
+
+Delete a single component on your space.
+
+```sh
+storyblok delete-component <component> --space <SPACE_ID>
+```
+
+#### Parameters
+* `component`: The name or id of the component
+
+#### Options
+* `space_id`: the space where the command should be executed.
+
+#### Examples
+
+Delete a component on your space.
+```sh
+storyblok delete-component 111111 --space 67819
+```
+
+```sh
+storyblok delete-component teaser --space 67819
+```
+
+### delete-components
+
+Delete all components from your Space that occur in your Local JSON.
+Or delete those components on your Space that do not appear in the JSON. (`--reverse`)
+
+```sh
+storyblok delete-components <SOURCE> --space <SPACE_ID>
+```
+
+#### Parameters
+* `source`: can be a URL or path to JSON file.
+
+#### Options
+* `space_id`: the space where the command should be executed.
+* `reverse`: When passed as an argument, deletes only those components on your space that do not appear in the JSON.
+* `dryrun`: when passed as an argument, does not perform any changes on the given space.
+
+#### Examples
+
+Delete all components on a certain space that occur in your local JSON.
+```sh
+storyblok delete-components ./components.json --space 67819
+```
+
+Delete only those components which do not occur in your local json from your space.
+```sh
+storyblok delete-components ./components.json --space 67819 --reverse
+```
+
+To see the result in your console output but to not perform the command on your space, use the `--dryrun` argument.
+```sh
+storyblok delete-components ./components.json --space 67819 --reverse --dryrun
+```
+
 ### sync
 
 Sync components, folder, roles, datasources or stories between spaces
