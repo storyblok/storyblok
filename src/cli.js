@@ -39,13 +39,19 @@ program
 program
   .command(COMMANDS.LOGIN)
   .description('Login to the Storyblok cli')
-  .action(async () => {
+  .option('-r, --region [value]', 'region', 'eu')
+  .action(async (source) => {
     if (api.isAuthorized()) {
       console.log(chalk.green('✓') + ' The user has been already logged. If you want to change the logged user, you must logout and login again')
       return
     }
 
     try {
+      const { region } = source
+      if (program.args.length > 0) {
+        api.setRegion(region)
+      }
+
       await api.processLogin()
       process.exit(0)
     } catch (e) {
@@ -58,13 +64,22 @@ program
 program
   .command('user')
   .description('Get the currently logged in user')
-  .action(async () => {
+  .option('-r, --region [value]', 'region', 'eu')
+  .action(async (source) => {
     if (api.isAuthorized()) {
       try {
+        const { region } = source
+        if (program.args.length > 0) {
+          api.setRegion(region)
+        }
+
         const user = await api.getUser()
         console.log(chalk.green('✓') + ` Hi ${user.friendly_name}, you current logged in with: ${creds.get().email}`)
-      } catch (e) {}
-      return
+      } catch (e) {
+        console.log(chalk.red('X') + ` Please check if your current region matches your user's region: ${e.message}. You can change the user's region with the --region flag.`)
+      } finally {
+        process.exit(0)
+      }
     }
     console.log(chalk.red('X') + ' There is currently no user logged.')
   })

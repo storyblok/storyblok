@@ -5,7 +5,7 @@ const inquirer = require('inquirer')
 
 const creds = require('./creds')
 const getQuestions = require('./get-questions')
-const { LOGIN_URL, SIGNUP_URL, API_URL, US_API_URL, USER_INFO } = require('../constants')
+const { SIGNUP_URL, API_URL, US_API_URL, CN_API_URL } = require('../constants')
 
 module.exports = {
   accessToken: '',
@@ -14,12 +14,11 @@ module.exports = {
   region: 'eu',
 
   getClient () {
-    const apiURL = this.region === 'us' ? US_API_URL : API_URL
     return new Storyblok({
       accessToken: this.accessToken,
       oauthToken: this.oauthToken,
       region: this.region
-    }, apiURL)
+    }, this.apiSwitcher())
   },
 
   getPath (path) {
@@ -32,7 +31,7 @@ module.exports = {
 
   async login (email, password) {
     try {
-      const response = await axios.post(LOGIN_URL, {
+      const response = await axios.post(`${this.apiSwitcher()}users/login`, {
         email: email,
         password: password
       })
@@ -57,7 +56,7 @@ module.exports = {
 
         const { otp_attempt: code } = await inquirer.prompt(questions)
 
-        const newResponse = await axios.post(LOGIN_URL, {
+        const newResponse = await axios.post(`${this.apiSwitcher()}users/login`, {
           email: email,
           password: password,
           otp_attempt: code
@@ -74,15 +73,14 @@ module.exports = {
 
   async getUser () {
     try {
-      const { data } = await axios.get(USER_INFO, {
+      const { data } = await axios.get(`${this.apiSwitcher()}users/me`, {
         headers: {
-          Authorization: this.accessToken
+          Authorization: this.oauthToken
         }
       })
       return data.user
     } catch (e) {
-      this.logoutIfUnauthorized(e)
-      return undefined
+      return Promise.reject(e)
     }
   },
 
@@ -147,7 +145,6 @@ module.exports = {
 
   isAuthorized () {
     const { token } = creds.get() || {}
-
     if (token) {
       this.oauthToken = token
       return true
@@ -243,5 +240,15 @@ module.exports = {
       .get('spaces/', {})
       .then(res => res.data.spaces || [])
       .catch(err => Promise.reject(err))
+  },
+
+  apiSwitcher () {
+    const apiList = {
+      us: US_API_URL,
+      cn: CN_API_URL,
+      eu: API_URL
+    }
+
+    return apiList[this.region]
   }
 }
