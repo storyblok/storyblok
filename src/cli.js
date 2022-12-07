@@ -40,14 +40,14 @@ program
   .command(COMMANDS.LOGIN)
   .description('Login to the Storyblok cli')
   .option('-r, --region [value]', 'region', 'eu')
-  .action(async (source) => {
+  .action(async (options) => {
     if (api.isAuthorized()) {
       console.log(chalk.green('✓') + ' The user has been already logged. If you want to change the logged user, you must logout and login again')
       return
     }
 
     try {
-      const { region } = source
+      const { region } = options
       if (program.args.length > 0) {
         api.setRegion(region)
       }
@@ -65,10 +65,10 @@ program
   .command('user')
   .description('Get the currently logged in user')
   .option('-r, --region [value]', 'region', 'eu')
-  .action(async (source) => {
+  .action(async (options) => {
     if (api.isAuthorized()) {
       try {
-        const { region } = source
+        const { region } = options
         if (program.args.length > 0) {
           api.setRegion(region)
         }
@@ -103,7 +103,8 @@ program
 program
   .command('pull-languages')
   .description("Download your space's languages schema as json")
-  .action(async () => {
+  .option('-r, --region [value]', 'region', 'eu')
+  .action(async (options) => {
     console.log(`${chalk.blue('-')} Executing pull-languages task`)
     const space = program.space
     if (!space) {
@@ -114,6 +115,11 @@ program
     try {
       if (!api.isAuthorized()) {
         await api.processLogin()
+      }
+
+      const { region } = options
+      if (program.args.length > 0) {
+        api.setRegion(region)
       }
 
       api.setSpaceId(space)
@@ -129,7 +135,7 @@ program
   .command(COMMANDS.PULL_COMPONENTS)
   .option('-r, --region [value]', 'region', 'eu')
   .description("Download your space's components schema as json")
-  .action(async (source) => {
+  .action(async (options) => {
     console.log(`${chalk.blue('-')} Executing pull-components task`)
     const space = program.space
     if (!space) {
@@ -142,7 +148,7 @@ program
         await api.processLogin()
       }
 
-      const { region } = source
+      const { region } = options
       if (program.args.length > 0) {
         api.setRegion(region)
       }
@@ -191,6 +197,7 @@ program
 program
   .command('delete-component <component>')
   .description('Delete a single component on your space.')
+  .option('-r, --region [value]', 'region', 'eu')
   .action(async (component, options) => {
     console.log(`${chalk.blue('-')} Executing delete-component task`)
     const space = program.space
@@ -202,6 +209,12 @@ program
       if (!api.isAuthorized()) {
         await api.processLogin()
       }
+
+      const { region } = options
+      if (program.args.length > 0) {
+        api.setRegion(region)
+      }
+
       api.setSpaceId(space)
       await tasks.deleteComponent(api, { comp: component })
     } catch (e) {
@@ -216,6 +229,7 @@ program
   .description('Delete all components in your space that occur in your source file.')
   .option('-r, --reverse', 'Delete all components in your space that do not appear in your source.', false)
   .option('--dryrun', 'Does not perform any delete changes on your space.')
+  .option('-r, --region [value]', 'region', 'eu')
   .action(async (source, options) => {
     console.log(`${chalk.blue('-')} Executing delete-components task`)
     const space = program.space
@@ -227,6 +241,12 @@ program
       if (!api.isAuthorized()) {
         await api.processLogin()
       }
+
+      const { region } = options
+      if (program.args.length > 0) {
+        api.setRegion(region)
+      }
+
       api.setSpaceId(space)
       await tasks.deleteComponents(api, { source, dryRun: !!options.dryrun, reversed: !!options.reverse })
     } catch (e) {
@@ -327,8 +347,18 @@ program
 program
   .command(COMMANDS.QUICKSTART)
   .description('Start a project quickly')
-  .action(async () => {
+  .option('-r, --region [value]', 'region', 'eu')
+  .action(async (options) => {
     try {
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
+
+      const { region } = options
+      if (program.args.length > 0) {
+        api.setRegion(region)
+      }
+
       const space = program.space
       const questions = getQuestions('quickstart', { space }, api)
       const answers = await inquirer.prompt(questions)
@@ -412,6 +442,9 @@ program
         await api.processLogin()
       }
 
+      const { region } = options
+      api.setRegion(region)
+
       api.setSpaceId(space)
       await tasks.runMigration(
         api,
@@ -430,6 +463,7 @@ program
   .description('Rollback-migration a migration file')
   .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
   .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
+  .option('-r, --region [value]', 'region', 'eu')
   .action(async (options) => {
     const field = options.field || ''
     const component = options.component || ''
@@ -444,6 +478,9 @@ program
         await api.processLogin()
       }
 
+      const { region } = options
+      api.setRegion(region)
+
       api.setSpaceId(space)
 
       await tasks.rollbackMigration(api, field, component)
@@ -457,15 +494,21 @@ program
 program
   .command(COMMANDS.SPACES)
   .description('List all spaces of the logged account')
-  .action(async () => {
+  .option('-r, --region [value]', 'region', 'eu')
+  .action(async (options) => {
     try {
       if (!api.isAuthorized()) {
         await api.processLogin()
       }
 
+      const { region } = options
+      if (program.args.length > 0) {
+        api.setRegion(region)
+      }
+
       await tasks.listSpaces(api)
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred to listing sapces : ' + e.message)
+      console.log(chalk.red('X') + ' An error ocurred to listing spaces: ' + e.message)
       process.exit(1)
     }
   })
