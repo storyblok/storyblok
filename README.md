@@ -51,7 +51,6 @@ $ storyblok pull-components --space <SPACE_ID> --region <REGION>
 #### Options
 
 * `space`: your space id
-* `region`: your space region (default: `eu`). You can use `us`, `cn` or `eu`. If your space was created under US region, you should use `us`. If it's from China, use `cn`.
 
 ### push-components
 
@@ -64,7 +63,6 @@ $ storyblok push-components <SOURCE> --space <SPACE_ID> --region <REGION> --pres
 #### Parameters
 
 * `source`: can be a URL or path to JSON file.
-* `region`: your space region (default: `eu`). You can use `us`, `cn` or `eu`. If your space was created under US region, you should use `us`. If it's from China, use `cn`.
 
 Using an **URL**
 
@@ -81,7 +79,6 @@ $ storyblok push-components ./components.json --space 67819
 #### Options
 
 * `space`: your space id
-* `region`: your space region (default: `eu`). You can use `us`, `cn` or `eu`. If your space was created under US region, you should use `us`. If it's from China, use `cn`.
 * `presets-source` (optional): it can be a URL or path to JSON file with the presets
 
 #### Examples
@@ -170,7 +167,6 @@ $ storyblok sync --type <COMMAND> --source <SPACE_ID> --target <SPACE_ID>
 * `type`: describe the command type to execute. Can be: `folders`, `components`, `stories`, `datasources` or `roles`. It's possible pass multiple types separated by comma (`,`).
 * `source`: the source space to use to sync
 * `target`: the target space to use to sync
-* `region`: your space region (default: `eu`). You can use `us`, `cn` or `eu`. If your space was created under US region, you should use `us`. If it's from China, use `cn`.
 
 #### Examples
 
@@ -205,6 +201,11 @@ Login to the Storyblok cli
 ```sh
 $ storyblok login
 ```
+#### Options
+
+* `email`: your user's email address
+* `password`: your user's password
+* `region`: your user's region (default: `eu`). You can use `us`, `cn` or `eu`. This region will be used for the other cli's commands.
 
 ### user
 
@@ -228,7 +229,6 @@ It's important to note that the `component` and `field` parameters are required 
 * `space`: space where the component is
 * `component`: component name. It needs to be a valid component
 * `field`: name of field
-* `region`: your space region (default: `eu`). You can use `us`, `cn` or `eu`. If your space was created under US region, you should use `us`. If it's from China, use `cn`.
 
 ### run-migration
 
@@ -255,7 +255,6 @@ $ storyblok run-migration --publish published --space 1234 --component article -
   * `published`: only publish stories that already are published and don't have unpublished changes
   * `published-with-changes`: publish stories that are published and have unpublished changes
 * `publish-languages` (optional): publish specific languages. You can publish more than one language at a time by separating the languages by `,`
-* `region`: your space region (default: `eu`). You can use `us`, `cn` or `eu`. If your space was created under US region, you should use `us`. If it's from China, use `cn`.
 
 ### rollback-migration
 
@@ -275,7 +274,6 @@ $ storyblok rollback-migration --space 1234 --component Product --field title
 
 ### spaces
 
-* `region`: your space region (default: `eu`). You can use `us`, `cn` or `eu`. If your space was created under US region, you should use `us`. If it's from China, use `cn`.
 
 List all spaces of the logged account
 

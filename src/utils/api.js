@@ -11,14 +11,16 @@ module.exports = {
   accessToken: '',
   oauthToken: '',
   spaceId: null,
-  region: 'eu',
+  region: '',
 
   getClient () {
+    const { region } = creds.get()
+
     return new Storyblok({
       accessToken: this.accessToken,
       oauthToken: this.oauthToken,
       region: this.region
-    }, this.apiSwitcher())
+    }, this.apiSwitcher(region))
   },
 
   getPath (path) {
@@ -29,9 +31,9 @@ module.exports = {
     return path
   },
 
-  async login (email, password) {
+  async login (email, password, region) {
     try {
-      const response = await axios.post(`${this.apiSwitcher()}users/login`, {
+      const response = await axios.post(`${this.apiSwitcher(region)}users/login`, {
         email: email,
         password: password
       })
@@ -56,24 +58,26 @@ module.exports = {
 
         const { otp_attempt: code } = await inquirer.prompt(questions)
 
-        const newResponse = await axios.post(`${this.apiSwitcher()}users/login`, {
+        const newResponse = await axios.post(`${this.apiSwitcher(region)}users/login`, {
           email: email,
           password: password,
           otp_attempt: code
         })
 
-        return this.persistCredentials(email, newResponse.data || {})
+        return this.persistCredentials(email, newResponse.data || {}, region)
       }
 
-      return this.persistCredentials(email, data)
+      return this.persistCredentials(email, data, region)
     } catch (e) {
       return Promise.reject(e)
     }
   },
 
   async getUser () {
+    const { region } = creds.get()
+
     try {
-      const { data } = await axios.get(`${this.apiSwitcher()}users/me`, {
+      const { data } = await axios.get(`${this.apiSwitcher(this.region ? this.region : region)}users/me`, {
         headers: {
           Authorization: this.oauthToken
         }
@@ -84,11 +88,11 @@ module.exports = {
     }
   },
 
-  persistCredentials (email, data) {
+  persistCredentials (email, data, region = 'eu') {
     const token = this.extractToken(data)
     if (token) {
       this.oauthToken = token
-      creds.set(email, token)
+      creds.set(email, token, region)
 
       return Promise.resolve(data)
     }
@@ -98,9 +102,9 @@ module.exports = {
   async processLogin () {
     try {
       const questions = getQuestions('login')
-      const { email, password } = await inquirer.prompt(questions)
+      const { email, password, region } = await inquirer.prompt(questions)
 
-      const data = await this.login(email, password)
+      const data = await this.login(email, password, region)
 
       console.log(chalk.green('✓') + ' Log in successfully! Token has been added to .netrc file.')
 
@@ -128,15 +132,16 @@ module.exports = {
     creds.set(null)
   },
 
-  signup (email, password) {
+  signup (email, password, region = 'eu') {
     return axios.post(SIGNUP_URL, {
       email: email,
-      password: password
+      password: password,
+      region
     })
       .then(response => {
         const token = this.extractToken(response)
         this.oauthToken = token
-        creds.set(email, token)
+        creds.set(email, token, region)
 
         return Promise.resolve(true)
       })
@@ -242,13 +247,13 @@ module.exports = {
       .catch(err => Promise.reject(err))
   },
 
-  apiSwitcher () {
+  apiSwitcher (region) {
     const apiList = {
       us: US_API_URL,
       cn: CN_API_URL,
       eu: API_URL
     }
 
-    return apiList[this.region]
+    return region ? apiList[region] : apiList[this.region]
   }
 }
