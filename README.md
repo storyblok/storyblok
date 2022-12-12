@@ -10,9 +10,13 @@ You found an issue?<br>Tell us about it - <a href="https://github.com/storyblok/
 [![GitHub issues](https://img.shields.io/github/issues/storyblok/storyblok.svg?style=flat-square&v=1)](https://github.com/storyblok/storyblok/issues?q=is%3Aopen+is%3Aissue)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/storyblok/storyblok.svg?style=flat-square&v=1)](https://github.com/storyblok/storyblok/issues?q=is%3Aissue+is%3Aclosed)
 
+## BREAKING CHANGE
+
+We added the `region` option upon login. If you are using the CLI, please `logout` and `login` again providing your user region.
+
 ## Installation
 
-Make sure you've node `>= 9.11.0` installed.
+Make sure you have Node `>= 9.11.0` installed.
 
 ```sh
 $ npm i storyblok -g
