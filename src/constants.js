@@ -1,8 +1,8 @@
 const API_URL = 'https://api.storyblok.com/v1/'
 const US_API_URL = 'https://api-us.storyblok.com/v1/'
+const CN_API_URL = 'https://api.storyblokchina.cn/v1/'
 const LOGIN_URL = `${API_URL}users/login`
 const SIGNUP_URL = `${API_URL}users/signup`
-const USER_INFO = `${API_URL}users/me`
 
 const SYNC_TYPES = [
   'folders',
@@ -33,7 +33,7 @@ module.exports = {
   SIGNUP_URL,
   API_URL,
   SYNC_TYPES,
-  USER_INFO,
   US_API_URL,
+  CN_API_URL,
   COMMANDS
 }

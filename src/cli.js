@@ -39,7 +39,7 @@ program
 program
   .command(COMMANDS.LOGIN)
   .description('Login to the Storyblok cli')
-  .action(async () => {
+  .action(async (options) => {
     if (api.isAuthorized()) {
       console.log(chalk.green('✓') + ' The user has been already logged. If you want to change the logged user, you must logout and login again')
       return
@@ -63,8 +63,11 @@ program
       try {
         const user = await api.getUser()
         console.log(chalk.green('✓') + ` Hi ${user.friendly_name}, you current logged in with: ${creds.get().email}`)
-      } catch (e) {}
-      return
+      } catch (e) {
+        console.log(chalk.red('X') + ` Please check if your current region matches your user's region: ${e.message}.`)
+      } finally {
+        process.exit(0)
+      }
     }
     console.log(chalk.red('X') + ' There is currently no user logged.')
   })
@@ -112,9 +115,8 @@ program
 // pull-components
 program
   .command(COMMANDS.PULL_COMPONENTS)
-  .option('-r, --region [value]', 'region', 'eu')
   .description("Download your space's components schema as json")
-  .action(async (source) => {
+  .action(async () => {
     console.log(`${chalk.blue('-')} Executing pull-components task`)
     const space = program.space
     if (!space) {
@@ -125,11 +127,6 @@ program
     try {
       if (!api.isAuthorized()) {
         await api.processLogin()
-      }
-
-      const { region } = source
-      if (program.args.length > 0) {
-        api.setRegion(region)
       }
 
       api.setSpaceId(space)
@@ -143,7 +140,6 @@ program
 program
   .command(COMMANDS.PUSH_COMPONENTS + ' <source>')
   .option('-p, --presets-source <presetsSource>', 'Path to presets file')
-  .option('-r, --region [value]', 'region', 'eu')
   .description("Download your space's components schema as json. The source parameter can be a URL to your JSON file or a path to it")
   .action(async (source, options) => {
     console.log(`${chalk.blue('-')} Executing push-components task`)
@@ -160,11 +156,6 @@ program
         await api.processLogin()
       }
 
-      const { region } = options
-      if (program.args.length > 0) {
-        api.setRegion(region)
-      }
-
       api.setSpaceId(space)
       await tasks.pushComponents(api, { source, presetsSource })
     } catch (e) {
@@ -176,7 +167,7 @@ program
 program
   .command('delete-component <component>')
   .description('Delete a single component on your space.')
-  .action(async (component, options) => {
+  .action(async (component) => {
     console.log(`${chalk.blue('-')} Executing delete-component task`)
     const space = program.space
     if (!space) {
@@ -187,6 +178,7 @@ program
       if (!api.isAuthorized()) {
         await api.processLogin()
       }
+
       api.setSpaceId(space)
       await tasks.deleteComponent(api, { comp: component })
     } catch (e) {
@@ -212,6 +204,7 @@ program
       if (!api.isAuthorized()) {
         await api.processLogin()
       }
+
       api.setSpaceId(space)
       await tasks.deleteComponents(api, { source, dryRun: !!options.dryrun, reversed: !!options.reverse })
     } catch (e) {
@@ -268,7 +261,6 @@ program
   .requiredOption('--type <TYPE>', 'Define what will be sync. Can be components, folders, stories, datasources or roles')
   .requiredOption('--source <SPACE_ID>', 'Source space id')
   .requiredOption('--target <SPACE_ID>', 'Target space id')
-  .option('-r, --region [value]', 'region', 'eu')
   .action(async (options) => {
     console.log(`${chalk.blue('-')} Sync data between spaces\n`)
 
@@ -280,11 +272,8 @@ program
       const {
         type,
         source,
-        target,
-        region
+        target
       } = options
-
-      api.setRegion(region)
 
       const _types = type.split(',') || []
       _types.forEach(_type => {
@@ -314,6 +303,10 @@ program
   .description('Start a project quickly')
   .action(async () => {
     try {
+      if (!api.isAuthorized()) {
+        await api.processLogin()
+      }
+
       const space = program.space
       const questions = getQuestions('quickstart', { space }, api)
       const answers = await inquirer.prompt(questions)
@@ -327,7 +320,6 @@ program
 program
   .command(COMMANDS.GENERATE_MIGRATION)
   .description('Generate a content migration file')
-  .option('-r, --region [value]', 'region', 'eu')
   .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
   .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
   .action(async (options) => {
@@ -347,9 +339,6 @@ program
         await api.processLogin()
       }
 
-      const { region } = options
-      api.setRegion(region)
-
       api.setSpaceId(space)
       await tasks.generateMigration(api, component, field)
     } catch (e) {
@@ -363,7 +352,6 @@ program
   .description('Run a migration file')
   .requiredOption('-c, --component <COMPONENT_NAME>', 'Name of the component')
   .requiredOption('-f, --field <FIELD_NAME>', 'Name of the component field')
-  .option('-r, --region [value]', 'region', 'eu')
   .option('--dryrun', 'Do not update the story content')
   .option('--publish <PUBLISH_OPTION>', 'Publish the content. It can be: all, published or published-with-changes')
   .option('--publish-languages <LANGUAGES>', 'Publish specific languages')
@@ -450,7 +438,7 @@ program
 
       await tasks.listSpaces(api)
     } catch (e) {
-      console.log(chalk.red('X') + ' An error ocurred to listing sapces : ' + e.message)
+      console.log(chalk.red('X') + ' An error ocurred to listing spaces: ' + e.message)
       process.exit(1)
     }
   })
@@ -496,7 +484,7 @@ if (program.rawArgs.length <= 2) {
 
 function errorHandler (e, command) {
   if (/404/.test(e.message)) {
-    console.log(chalk.yellow('/!\\') + ' If your space was created under US region, you must provide the region as argument --region us. Otherwise, you can use the default --region eu or omit this flag.')
+    console.log(chalk.yellow('/!\\') + ' If your space was created under US or CN region, you must provide the region us or cn upon login.')
   } else {
     console.log(chalk.red('X') + ' An error occurred when executing the ' + command + ' task: ' + e || e.message)
   }

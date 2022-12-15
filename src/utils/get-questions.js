@@ -128,6 +128,19 @@ const getOptions = (subCommand, argv = {}, api = {}) => {
 
           return 'Please enter a valid password:'
         }
+      },
+      {
+        type: 'input',
+        name: 'region',
+        message: 'Enter your user\'s region (us, eu or cn):',
+        validate: function (value) {
+          const flagList = ['us', 'cn', 'eu']
+          if (flagList.indexOf(value) > -1) {
+            return true
+          }
+
+          return 'Please enter a valid region: us, eu or cn'
+        }
       }
     ]
   }
