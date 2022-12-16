@@ -12,10 +12,10 @@ We're sorry if you've encountered a bug while using Storyblok. Your help in iden
 
 
 ## Submitting feature requests
-It's great you have some ideas around how to improve our product. You can use the following link to submit a feature request or upvote exisiting feature requests: <https://feedback.storyblok.com/b/feature-requests/>
+It's great you have some feedback around how to improve Storyblok. You can use the following link to submit a feature request or upvote exisiting feature requests: <https://feedback.storyblok.com/b/feature-requests/>
 
 ## Asking questions & reaching support
 If you have a general question about using Storyblok, you can try searching our documentation or check our Discord channels. If you can't find the answer you are looking for, you can contact our support team for assistance. You can do that from within the Storyblok app <https://app.storyblok.com> or on our website <https://storyblok.com>. Please provide as much detail as possible about your question, including any relevant error messages or screenshots.
 
 
-Thanks again for your help in making our product better!
+Thanks again for your help in making Storyblok better!
