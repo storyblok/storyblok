@@ -1,8 +1,0 @@
-app.storyblok:
-    - '[x] *app.storyblok.com'
-api.storyblok:
-    - '[x] *api.storyblok.com'
-mapi.storyblok:
-    - '[x] *mapi.storyblok.com'
-capi.storyblok:
-    - '[x] *capi.storyblok.com'
