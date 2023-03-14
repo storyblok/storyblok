@@ -70,13 +70,13 @@ A **headless CMS** is a back-end-only content management system (CMS) built fr
 - [Community](https://www.storyblok.com/community)
 - [Learning Hub](https://www.storyblok.com/docs)
 - SDKs
-    - https://github.com/storyblok/storyblok-js
-    - https://github.com/storyblok/storyblok-react
-    - https://github.com/storyblok/storyblok-vue
-    - https://github.com/storyblok/storyblok-nuxt
-    - https://github.com/storyblok/storyblok-svelte
-    - https://github.com/storyblok/storyblok-astro/
-    - https://github.com/storyblok/gatsby-source-storyblok
+    - [JavaScript SDK](https://github.com/storyblok/storyblok-js)
+    - [React SDK](https://github.com/storyblok/storyblok-react)
+    - [Vue SDK](https://github.com/storyblok/storyblok-vue)
+    - [Nuxt SDK](https://github.com/storyblok/storyblok-nuxt)
+    - [Svelte SDK](https://github.com/storyblok/storyblok-svelte)
+    - [Astro SDK](https://github.com/storyblok/storyblok-astro/)
+    - [Gatsby SDK](https://github.com/storyblok/gatsby-source-storyblok)
 - [Storyblok CLI](https://github.com/storyblok/storyblok-cli)
 
 # We are Hiring
