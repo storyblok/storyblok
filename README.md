@@ -26,8 +26,6 @@ Storyblok is a visual CMS that works with any framework. Integrate with any app 
 
 # Why Storyblok?
 
-![Screen Shot 2023-02-21 at 1.26.07 PM.png](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/6110baea-a6f9-48fe-ba79-cb70eb292e25/Screen_Shot_2023-02-21_at_1.26.07_PM.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T230300Z&X-Amz-Expires=86400&X-Amz-Signature=5a7d0503c18c50e21a481ec0c1df1bfe073a13554c6a7a1955f42aa783449016&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22Screen%2520Shot%25202023-02-21%2520at%25201.26.07%2520PM.png%22&x-id=GetObject)
-
 - **Work with any technology**: Storyblok’s headless, API-first CMS architecture empowers developers to work with any technology and integrate with any third-party solution.
 - **Scale without limits:**   Storyblok monitors your applications and automatically scales performance to ensure optimal efficiency and performance.
 - **Flexible Data Schemas:** Storyblok's component-based approach gives you full control over your content structure. You can define your own custom data models with nestable components that can be reused across all your projects.
@@ -39,7 +37,6 @@ Storyblok is a visual CMS that works with any framework. Integrate with any app 
 
 A **headless CMS** is a back-end-only content management system (CMS) built from the ground up as a content repository that makes content accessible via APIs.  [Headless CMS explained](https://www.storyblok.com/tp/headless-cms-explained)
 
-![Screen Shot 2023-02-21 at 1.23.09 PM.png](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/71501f4a-3257-4a1f-bec2-1819769bcf10/Screen_Shot_2023-02-21_at_1.23.09_PM.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230313%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230313T230146Z&X-Amz-Expires=86400&X-Amz-Signature=4ab7bd32faf6b7d4f041f4eeeb8fc2dbfd7984b36857cfb956298ee7be785fd2&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22Screen%2520Shot%25202023-02-21%2520at%25201.23.09%2520PM.png%22&x-id=GetObject)
 
 # Key Features
 
