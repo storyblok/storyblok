@@ -1,12 +1,10 @@
-# GitHub Working Draft
+# Welcome to Storyblok
 
-# Intro
+Storyblok is a visual CMS that works with any framework. Integrate with any app, frontend, or framework. Publish anywhere with an API-first backend. Storyblok’s industry-leading [Visual Editor](https://www.storyblok.com/docs/editor-guides/visual-editor) makes it easy for marketing teams to independently create, edit, and collaborate.  
 
-Storyblok is a visual CMS that works with any framework. Integrate with any app or frontend or framework. Publish anywhere with an API-first backend. Storyblok’s industry-leading [Visual Editor](https://www.storyblok.com/docs/editor-guides/visual-editor) makes it easy for marketing teams to independently create, edit, and collaborate.  
+## Getting Started
 
-# Get started with your favorite technology
-
-- [https://www.storyblok.com/docs/guide/getting-started](https://www.storyblok.com/docs/guide/getting-started) → 
+[Start with your favorite technology](https://www.storyblok.com/docs/guide/getting-started) 
 
 [The Storyblok Next.js Ultimate Tutorial](https://www.storyblok.com/tp/nextjs-headless-cms-ultimate-tutorial)
 
@@ -18,34 +16,37 @@ Storyblok is a visual CMS that works with any framework. Integrate with any app 
 
 [The Storyblok Laravel Ultimate Tutorial](https://www.storyblok.com/tp/storyblok-laravel-ultimate-tutorial)
 
-<aside>
+💡 **[Try it out for free](https://app.storyblok.com/#!/signup?utm_source=github_storyblok&utm_medium=website)**
 
-💡 [Try it out for free](https://app.storyblok.com/#!/signup?utm_source=github_storyblok&utm_medium=website)
+## Why Storyblok?
 
-</aside>
-
-# Why Storyblok?
-
-- **Work with any technology**: Storyblok’s headless, API-first CMSs architecture empowers developers to work with any technology and integrate with any third-party solution.
-- **Scale without limits:**   Storyblok monitors your applications and automatically scales performance to ensure optimal efficiency and performance.
-- **Flexible Data Schemas:** Storyblok's component-based approach gives you full control over your content structure. You can define your own custom data models with nestable components that can be reused across all your projects.
-- **Publish Faster:** Marketing and content teams work faster with a visual editor enabling them to work independently. No more content tickets in your backlog.
+- **Work with any technology**: Storyblok’s headless, API-first CMS architecture empowers developers to work with any technology and integrate with any third-party solution.
+- **Scale without limits:**  Storyblok monitors your applications and automatically scales performance to ensure optimal efficiency and performance.
+- **Flexible data schemas:** Storyblok's component-based approach gives you full control over your content structure. You can define your own custom data models with nestable components that can be reused across all your projects.
+- **Publish faster:** Marketing and content teams work faster with a Visual Editor enabling them to work independently. No more content tickets in your backlog.
 - **Enterprise security**: Ensure data security using one of the most secure, enterprise-grade CMSs available on the market. Storyblok is ISO 27001 certified.
 - **Deliver Better Experiences**: Personalize content experiences for different markets, languages, or audience segments using Storyblok's built-in localization tools, or integrate with any third-party solution through API-first integrations.
 
-# How it works
+## How it works
 
 A **headless CMS** is a back-end-only content management system (CMS) built from the ground up as a content repository that makes content accessible via APIs.  [Headless CMS explained](https://www.storyblok.com/tp/headless-cms-explained)
 
+**A basic headless CMS Architecture:**
 
-# Key Features
+![A basic headless CMS architecture](https://a.storyblok.com/f/88751/1546x918/811ed7b1ed/headless.jpg/m/600x0/)
+
+**Storyblok CMS architecture:**
+
+![Storyblok CMS architecture](https://a.storyblok.com/f/88751/1546x918/c975b8aa76/storyblok-cms.jpg/m/600x0/)
+
+## Key Features
 
 **Composable Architecture:**
 
 - **APIs**: Work with any frontend or third-party integration with [GraphQL](https://www.storyblok.com/docs/graphql-api), [REST](https://www.storyblok.com/docs/api/content-delivery/v2), and [Management API.](https://www.storyblok.com/docs/api/management)
-- **Flexible Backend**: As a headless content management system, Storyblok can manage and serve content for any app or site.
-- **Apps**: Add extra functionalities to your space through a suite of custom apps available for free on the Storyblok App store, or build your own.
-- **Composable Components**: Define new content types such as an about page, hero section, gallery, and any other content type or content schema. Create once, reuse everywhere. The limit is your imagination.
+- **Flexible backend**: As a headless content management system, Storyblok can manage and serve content for any app or site.
+- **Apps**: Add extra functionalities to your space through a suite of custom apps available for free on the [Storyblok App Directory](https://www.storyblok.com/app-store), or build your own.
+- **Composable components**: Easily define new nestable blocks (such as a hero, grid, or button) or content type blocks (such as an article, landing page, or product page). Create once, reuse everywhere. The limit is your imagination.
 
 **Streamline Workflows:**
 
