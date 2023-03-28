@@ -29,7 +29,7 @@ Storyblok is a visual CMS that works with any framework. Integrate with any app,
 
 ## How it works
 
-A **headless CMS** is a back-end-only content management system (CMS) built from the ground up as a content repository that makes content accessible via APIs.  [Headless CMS explained](https://www.storyblok.com/tp/headless-cms-explained)
+A **[Headless CMS](https://www.storyblok.com/tp/headless-cms-explained)** is a back-end-only content management system (CMS) built from the ground up as a content repository that makes content accessible via APIs.  
 
 **A basic headless CMS Architecture:**
 
@@ -46,19 +46,19 @@ A **headless CMS** is a back-end-only content management system (CMS) built fr
 - **APIs**: Work with any frontend or third-party integration with [GraphQL](https://www.storyblok.com/docs/graphql-api), [REST](https://www.storyblok.com/docs/api/content-delivery/v2), and [Management API.](https://www.storyblok.com/docs/api/management)
 - **Flexible backend**: As a headless content management system, Storyblok can manage and serve content for any app or site.
 - **Apps**: Add extra functionalities to your space through a suite of custom apps available for free on the [Storyblok App Directory](https://www.storyblok.com/app-store), or build your own.
-- **Composable components**: Easily define new nestable blocks (such as a hero, grid, or button) or content type blocks (such as an article, landing page, or product page). Create once, reuse everywhere. The limit is your imagination.
+- **Composable components**: Easily define new nestable blocks (such as a hero, grid, or button) or content type blocks (such as an article, landing page, or product page). Create once, reuse everywhere. The limit is your imagination. [Learn more](https://www.storyblok.com/docs/guide/essentials/content-structures).
 
 **Streamline Workflows:**
 
-- **Visual editing interface**: Storyblok enables non-technical users to build and edit JSON structures with an easy-to-use visual interface.
-- **Component Library**: Find, access, and edit components directly from the visual editor making it easier for teams to collaborate.
+- **Visual editing interface**: Storyblok enables non-technical users to build and edit JSON structures with an easy-to-use visual interface. [Learn more](https://www.storyblok.com/docs/editor-guides/visual-editor).
+- **Component Library**: Find, access, and edit components directly from the Visual Editor making it easier for teams to collaborate.
 - **Collaboration workflows**: Publish faster with inclusive collaboration workflows that give anyone on the team a simple way to make a suggestion or take action.
 
 **Audience Experiences:**
 
-- **Image Service**: Make apps and websites faster by Transforming, optimizing, and caching images in a CDN.
-- **Internationalization**: Create personalized content experiences via built-in folder-level and field-level internationalization.
-- **Omnichannel Experiences**: Storyblok’s headless architecture enables developers to publish content across any digital channel via APIs.
+- **Image Service**: Make apps and websites faster by Transforming, optimizing, and caching images in a CDN. [Learn more](https://www.storyblok.com/docs/image-service).
+- **Internationalization**: Create personalized content experiences via built-in folder-level and field-level internationalization. [Learn more](https://www.storyblok.com/docs/guide/in-depth/internationalization).
+- **Omnichannel Experiences**: Storyblok’s headless architecture enables developers to publish content across any digital channel via APIs. [Learn more](https://www.storyblok.com/lp/omnichannel-cms).
 
 # Resources
 
