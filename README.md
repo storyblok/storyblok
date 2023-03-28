@@ -2,11 +2,11 @@
 
 # Intro
 
-Storyblok is a visual CMS that works with any framework. Integrate with any app or frontend or framework. Publish anywhere with an API-first backend. Storyblok’s industry-leading Visual Editor makes it easy for marketing teams to independently create, edit, and collaborate.  
+Storyblok is a visual CMS that works with any framework. Integrate with any app or frontend or framework. Publish anywhere with an API-first backend. Storyblok’s industry-leading [Visual Editor](https://www.storyblok.com/docs/editor-guides/visual-editor) makes it easy for marketing teams to independently create, edit, and collaborate.  
 
-# Getting Started
+# Get started with your favorite technology
 
-- [https://www.storyblok.com/docs/guide/getting-started](https://www.storyblok.com/docs/guide/getting-started) → this should be replaced by the new Quickstart page once it’s live
+- [https://www.storyblok.com/docs/guide/getting-started](https://www.storyblok.com/docs/guide/getting-started) → 
 
 [The Storyblok Next.js Ultimate Tutorial](https://www.storyblok.com/tp/nextjs-headless-cms-ultimate-tutorial)
 
@@ -26,11 +26,11 @@ Storyblok is a visual CMS that works with any framework. Integrate with any app 
 
 # Why Storyblok?
 
-- **Work with any technology**: Storyblok’s headless, API-first CMS architecture empowers developers to work with any technology and integrate with any third-party solution.
+- **Work with any technology**: Storyblok’s headless, API-first CMSs architecture empowers developers to work with any technology and integrate with any third-party solution.
 - **Scale without limits:**   Storyblok monitors your applications and automatically scales performance to ensure optimal efficiency and performance.
 - **Flexible Data Schemas:** Storyblok's component-based approach gives you full control over your content structure. You can define your own custom data models with nestable components that can be reused across all your projects.
 - **Publish Faster:** Marketing and content teams work faster with a visual editor enabling them to work independently. No more content tickets in your backlog.
-- **Enterprise security**: ensure data security on one of the most secure, enterprise-grade CMS available on the market. Storyblok is ISO 27001 certified.
+- **Enterprise security**: Ensure data security using one of the most secure, enterprise-grade CMSs available on the market. Storyblok is ISO 27001 certified.
 - **Deliver Better Experiences**: Personalize content experiences for different markets, languages, or audience segments using Storyblok's built-in localization tools, or integrate with any third-party solution through API-first integrations.
 
 # How it works
@@ -55,8 +55,8 @@ A **headless CMS** is a back-end-only content management system (CMS) built fr
 
 **Audience Experiences:**
 
-- **Image Service**: Make apps and websites faster by Transforming, optimizing, and caching images in a CDN
-- **Internationalization**: Create personalized content experiences via built-in folder-level and field-level internationalization
+- **Image Service**: Make apps and websites faster by Transforming, optimizing, and caching images in a CDN.
+- **Internationalization**: Create personalized content experiences via built-in folder-level and field-level internationalization.
 - **Omnichannel Experiences**: Storyblok’s headless architecture enables developers to publish content across any digital channel via APIs.
 
 # Resources
@@ -66,6 +66,11 @@ A **headless CMS** is a back-end-only content management system (CMS) built fr
 - [Discord](https://discord.gg/jKrbAMz)
 - [Community](https://www.storyblok.com/community)
 - [Learning Hub](https://www.storyblok.com/docs)
+- Clients 
+  - [PHP Client](https://github.com/storyblok/storyblok-php-client)
+  - [JavaScript Client](https://github.com/storyblok/storyblok-js-client)
+  - [Ruby Client](https://github.com/storyblok/storyblok-ruby-client)
+  - [Python Client](https://github.com/storyblok/storyblok-python-client)
 - SDKs
     - [JavaScript SDK](https://github.com/storyblok/storyblok-js)
     - [React SDK](https://github.com/storyblok/storyblok-react)
