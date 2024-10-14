@@ -1,12 +1,8 @@
 blank_issues_enabled: false
 contact_links:    
-  - name: 🆘 Storyblok Livechat - the quickest way to get help
-    url: https://www.storyblok.com/
-    about: Communicate directly with our support team using the chat-chat widget on our website.
-  
   - name: 🐛 Storyblok Helpdesk
-    url: https://storyblok.atlassian.net/servicedesk/customer/portals
-    about: The easiest way to report bugs and raise your questions.
+    url: https://support.storyblok.com
+    about: The easiest way to report bugs and raise your questions. SSO login with your Storyblok account.
     
   - name: 👩‍🚀 Discord community
     url: https://discord.gg/WmMYYQp
